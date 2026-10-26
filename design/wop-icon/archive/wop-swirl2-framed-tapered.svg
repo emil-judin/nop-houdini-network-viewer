@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<clipPath id="c"><rect width="512" height="512"/></clipPath>
+<rect width="512" height="512" fill="#FE4703"/>
+<g clip-path="url(#c)">
+<path d="M 201.6 325.3 L 403.1 293.4 M 193.2 308.8 L 344.5 157.5 M 176.7 300.4 L 211.7 79.1 M 158.4 303.3 L 52.1 94.8 M 145.3 316.4 L -72.1 205.6 M 142.4 334.7 L -9.7 358.8 M 150.8 351.2 L 34.8 467.2 M 167.3 359.6 L 140.1 531.5 M 185.6 356.7 L 269.2 520.7 M 198.7 343.6 L 371.6 431.7" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"/>
+<path d="M 205.6 324.7 Q 203.1 314.2 203.1 298.9" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="14.0"/>
+<path d="M 203.1 298.9 Q 191.9 291.0 180.4 276.7" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="15.7"/>
+<path d="M 180.4 276.7 Q 163.7 277.9 142.9 273.0" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="17.3"/>
+<path d="M 142.9 273.0 Q 128.4 286.4 106.1 296.4" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="19.0"/>
+<path d="M 106.1 296.4 Q 102.2 319.0 89.0 343.1" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="20.7"/>
+<path d="M 89.0 343.1 Q 101.1 366.1 105.5 396.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="22.3"/>
+<path d="M 105.5 396.5 Q 131.8 408.9 155.7 432.7" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="24.0"/>
+<path d="M 155.7 432.7 Q 187.2 426.2 223.8 431.6" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="25.7"/>
+<path d="M 223.8 431.6 Q 247.2 405.2 282.5 386.3" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="27.3"/>
+<path d="M 282.5 386.3 Q 285.9 348.0 304.4 309.0" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="29.0"/>
+<path d="M 304.4 309.0 Q 282.7 273.6 273.8 228.2" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="30.7"/>
+<path d="M 273.8 228.2 Q 232.5 211.3 196.1 177.9" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="32.3"/>
+<path d="M 196.1 177.9 Q 149.8 189.6 97.5 183.9" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="34.0"/>
+<path d="M 97.5 183.9 Q 65.2 223.2 17.0 251.0" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="35.7"/>
+<path d="M 17.0 251.0 Q 13.9 305.0 -9.7 358.8" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="37.3"/>
+<path d="M -9.7 358.8 Q 21.5 406.7 34.8 467.2" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="39.0"/>
+<path d="M 34.8 467.2 Q 91.2 488.5 140.1 531.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="40.7"/>
+<path d="M 140.1 531.5 Q 201.2 514.5 269.2 520.7" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 269.2 520.7 Q 310.4 468.4 371.6 431.7" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 371.6 431.7 Q 374.2 362.0 403.1 293.4" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 403.1 293.4 Q 362.4 233.0 344.5 157.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 344.5 157.5 Q 273.1 131.7 211.7 79.1" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 211.7 79.1 Q 135.8 101.3 52.1 94.8" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+<path d="M 52.1 94.8 Q 2.0 160.0 -72.1 205.6" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="42.0"/>
+</g>
+</svg>

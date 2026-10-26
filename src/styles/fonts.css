@@ -1,0 +1,45 @@
+/*
+ * Houdini's open-source UI fonts (SIL Open Font License), Latin subset, WOFF2 only
+ * (supported by every current browser). Kept in its own file because the
+ * `<houdini-network>` web component must register fonts on the page: browsers ignore
+ * `@font-face` rules inside a Shadow DOM.
+ */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("../../node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("../../node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Source Code Pro";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("../../node_modules/@fontsource/source-code-pro/files/source-code-pro-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Source Code Pro";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("../../node_modules/@fontsource/source-code-pro/files/source-code-pro-latin-600-normal.woff2") format("woff2");
+}

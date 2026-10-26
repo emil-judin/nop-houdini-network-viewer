@@ -1,0 +1,77 @@
+{
+  "name": "wop-houdini-network-viewer",
+  "version": "0.1.0-alpha.0",
+  "description": "WOP: View and share Houdini node networks on the web. Interactive, view-only viewer for SideFX Houdini node networks on portfolio websites and technical documentation. Not affiliated with SideFX.",
+  "author": "Emil Judin",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./web-component": {
+      "types": "./dist/types/web-component.d.ts",
+      "import": "./dist/web-component.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "sideEffects": [
+    "*.css",
+    "./dist/web-component.js"
+  ],
+  "files": [
+    "dist",
+    "exporter",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "check": "tsc --noEmit",
+    "build": "vite build",
+    "build:lib": "vite build -c vite.lib.config.ts --mode npm && vite build -c vite.lib.config.ts --mode web-component && tsc -p tsconfig.lib.json",
+    "prepublishOnly": "npm run check && npm run build:lib"
+  },
+  "keywords": [
+    "houdini",
+    "sidefx",
+    "node-graph",
+    "wop",
+    "viewer",
+    "network-viewer",
+    "sop",
+    "vex",
+    "portfolio",
+    "technical-art"
+  ],
+  "peerDependencies": {
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.4.2",
+    "lucide-react": "^0.475.0"
+  },
+  "devDependencies": {
+    "@fontsource/source-code-pro": "^5.3.1",
+    "@fontsource/source-sans-pro": "^5.3.0",
+    "@tailwindcss/vite": "^4.0.6",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.0.6",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}

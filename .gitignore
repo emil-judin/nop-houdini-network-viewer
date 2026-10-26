@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+complex-network.json
+public/__local_houdini_ref_icons.json
+# Local-only SideFX reference icons for the Icon Review Gallery (scripts/build_local_reference_icons.py)
+local-refs/
+
+
+dist-playground/
+__pycache__/

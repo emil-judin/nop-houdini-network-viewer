@@ -1,0 +1,2633 @@
+{
+  "schemaVersion": "1.2.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-10-26T07:55:57.391711+00:00",
+  "exportMode": "full",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/circuit_board",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "bend1",
+        "type": "bend",
+        "label": "Bend",
+        "icon": "SOP_bend",
+        "pos": [
+          0.2817,
+          -3.0851
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": true,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Geometry to Bend",
+          "Rest Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "grouptype",
+            "label": "Group Type",
+            "type": "Menu",
+            "val": [
+              "guess"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Guess from Group"
+          },
+          {
+            "name": "mask",
+            "label": "Mask",
+            "type": "String",
+            "val": [
+              "bend_attrib"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "maskmode",
+            "hasMenu": true,
+            "disabled": true
+          },
+          {
+            "name": "maskmode",
+            "label": "Mask Mode",
+            "type": "Menu",
+            "val": [
+              "maskoff"
+            ],
+            "expr": [
+              null
+            ],
+            "labelHidden": true,
+            "menuLabel": "Mask Off"
+          },
+          {
+            "name": "folder1",
+            "label": "folder1",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "dodeform",
+            "label": "Enable Deformation",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "limit_deformation",
+            "label": "Limit Deformation to Capture Region",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "symmetricdeformation",
+            "label": "Deform in Both Directions",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "enablebend",
+            "label": "Enable",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "bendfolder",
+            "label": "bendfolder",
+            "type": "FolderSet",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ]
+          },
+          {
+            "name": "bendmode",
+            "label": "Mode",
+            "type": "Menu",
+            "val": [
+              "angle"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Bend"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "menuLabel": "Angle"
+          },
+          {
+            "name": "bend",
+            "label": "Bend Angle",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Bend"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "bendscalemode_angle",
+            "range": [
+              -90.0,
+              90.0
+            ]
+          },
+          {
+            "name": "bendscalemode_angle",
+            "label": "Scale Mode",
+            "type": "Menu",
+            "val": [
+              "none"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Bend"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "No Scaling"
+          },
+          {
+            "name": "enabletwist",
+            "label": "Enable",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "twistfolder",
+            "label": "twistfolder",
+            "type": "FolderSet",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ]
+          },
+          {
+            "name": "twist",
+            "label": "Twist",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "twistscalemode",
+            "range": [
+              -180.0,
+              180.0
+            ]
+          },
+          {
+            "name": "twistscalemode",
+            "label": "Scale Mode",
+            "type": "Menu",
+            "val": [
+              "none"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "No Scaling"
+          },
+          {
+            "name": "enablelengthscale",
+            "label": "Enable",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "lengthscalefolder",
+            "label": "lengthscalefolder",
+            "type": "FolderSet",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ]
+          },
+          {
+            "name": "preservevolume",
+            "label": "Preserve Volume",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Length Scale"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "lengthscale",
+            "label": "Length Scale",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Length Scale"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "lengthscalescalemode",
+            "range": [
+              0.0,
+              2.0
+            ]
+          },
+          {
+            "name": "lengthscalescalemode",
+            "label": "Scale Mode",
+            "type": "Menu",
+            "val": [
+              "none"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Length Scale"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "No Scaling"
+          },
+          {
+            "name": "enabletaper",
+            "label": "Enable",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "taperfolder",
+            "label": "taperfolder",
+            "type": "FolderSet",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ]
+          },
+          {
+            "name": "taperaxes",
+            "label": "Taper Along",
+            "type": "Menu",
+            "val": [
+              "3"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "tapermode",
+            "label": "Mode",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "menuLabel": "Linear"
+          },
+          {
+            "name": "taper",
+            "label": "Taper",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "taperscalemode",
+            "range": [
+              0.0,
+              2.0
+            ]
+          },
+          {
+            "name": "taperscalemode",
+            "label": "Scale Mode",
+            "type": "Menu",
+            "val": [
+              "none"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "No Scaling"
+          },
+          {
+            "name": "squish",
+            "label": "Squish",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "squishscalemode",
+            "range": [
+              0.0,
+              2.0
+            ]
+          },
+          {
+            "name": "squishscalemode",
+            "label": "Scale Mode",
+            "type": "Menu",
+            "val": [
+              "none"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "No Scaling"
+          },
+          {
+            "name": "squishpivot",
+            "label": "Squish Pivot",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "range": [
+              0.01,
+              0.99
+            ]
+          },
+          {
+            "name": "enableramp",
+            "label": "Enable Ramp",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "taperprofile",
+            "label": "Profile",
+            "type": "Ramp",
+            "val": [
+              "4"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "ramp": {
+              "color": false,
+              "keys": [
+                0.0,
+                0.25,
+                0.7248,
+                0.8538
+              ],
+              "values": [
+                1.0,
+                0.3143,
+                0.8286,
+                0.3429
+              ],
+              "basis": [
+                "Constant",
+                "CatmullRom",
+                "BSpline",
+                "CatmullRom"
+              ]
+            }
+          },
+          {
+            "name": "folder0",
+            "label": "folder0",
+            "type": "FolderSet",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation"
+            ]
+          },
+          {
+            "name": "upvectorcontrol",
+            "label": "Up Vector Control",
+            "type": "Menu",
+            "val": [
+              "custom"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "menuLabel": "Custom"
+          },
+          {
+            "name": "up",
+            "label": "Up Vector",
+            "type": "Float",
+            "val": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "upangle",
+            "label": "Up Vector Angle",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "range": [
+              0.0,
+              360.0
+            ]
+          },
+          {
+            "name": "origin",
+            "label": "Capture Origin",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "dir",
+            "label": "Capture Direction",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "length",
+            "label": "Capture Length",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "enableoutattrib",
+            "label": "Enable Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "joinNext": "outattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "outattrib",
+            "label": "Output Attribute",
+            "type": "String",
+            "val": [
+              "capture"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Capture"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "userest",
+            "label": "Use Rest Positions",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Attributes"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "attribs",
+            "label": "Attributes to Transform",
+            "type": "String",
+            "val": [
+              "*"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Attributes"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "updateaffectednmls",
+            "label": "Recompute Affected Normals",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Attributes"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "vlength",
+            "label": "Preserve Normal Length",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Attributes"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "taperprofile1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile1value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "constant"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "menuLabel": "Constant"
+          },
+          {
+            "name": "taperprofile2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.25
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile2value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.3143
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "menuLabel": "Catmull-Rom"
+          },
+          {
+            "name": "taperprofile3pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.7248
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile3value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.8286
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile3interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "bspline"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "menuLabel": "B-Spline"
+          },
+          {
+            "name": "taperprofile4pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.8538
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile4value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.3429
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ]
+          },
+          {
+            "name": "taperprofile4interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Deformation",
+              "Taper"
+            ],
+            "menuLabel": "Catmull-Rom"
+          }
+        ]
+      },
+      {
+        "name": "transform1",
+        "type": "xform",
+        "label": "Transform",
+        "icon": "SOP_xform",
+        "pos": [
+          0.2817,
+          -2.0851
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Transform geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "grouptype",
+            "label": "Group Type",
+            "type": "Menu",
+            "val": [
+              "guess"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Guess from Group"
+          },
+          {
+            "name": "xOrd",
+            "label": "Transform Order",
+            "type": "Menu",
+            "val": [
+              "srt"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "rOrd",
+            "menuLabel": "Scale Rot Trans"
+          },
+          {
+            "name": "rOrd",
+            "label": "Rotate Order",
+            "type": "Menu",
+            "val": [
+              "xyz"
+            ],
+            "expr": [
+              null
+            ],
+            "labelHidden": true,
+            "menuLabel": "Rx Ry Rz"
+          },
+          {
+            "name": "t",
+            "label": "Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "s",
+            "label": "Scale",
+            "type": "Float",
+            "val": [
+              240.0,
+              3.0,
+              0.0
+            ],
+            "expr": [
+              "$F",
+              "1+2",
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "name": "shear",
+            "label": "Shear",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              1.25
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ],
+            "keyframed": [
+              true
+            ]
+          },
+          {
+            "name": "parmgroup_pivotxform",
+            "label": "parmgroup_pivotxform",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "p",
+            "label": "Pivot Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "pr",
+            "label": "Pivot Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "parmgroup_prexform",
+            "label": "parmgroup_prexform",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "prexform_xOrd",
+            "label": "Pre-Transform Order",
+            "type": "Menu",
+            "val": [
+              "srt"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "prexform_rOrd",
+            "menuLabel": "Scale Rot Trans"
+          },
+          {
+            "name": "prexform_rOrd",
+            "label": "Pre-Rotate Order",
+            "type": "Menu",
+            "val": [
+              "xyz"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "Rx Ry Rz"
+          },
+          {
+            "name": "prexform_t",
+            "label": "Pre-Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_r",
+            "label": "Pre-Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_s",
+            "label": "Pre-Scale",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_shear",
+            "label": "Pre-Shear",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "attribs",
+            "label": "Attributes",
+            "type": "String",
+            "val": [
+              "*"
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "updatenmls",
+            "label": "Recompute Point Normals",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "updateaffectednmls",
+            "label": "Recompute Affected Normals",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "vlength",
+            "label": "Preserve Normal Length",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "invertxform",
+            "label": "Invert Transformation",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "addattrib",
+            "label": "Output Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "outputattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "outputattrib",
+            "label": "Output Attribute",
+            "type": "String",
+            "val": [
+              "xform"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "outputmerge",
+            "disabled": true
+          },
+          {
+            "name": "outputmerge",
+            "label": "Combine",
+            "type": "Menu",
+            "val": [
+              "post"
+            ],
+            "expr": [
+              null
+            ],
+            "labelHidden": true,
+            "disabled": true,
+            "menuLabel": "Post-Multiply"
+          }
+        ]
+      },
+      {
+        "name": "curve1",
+        "type": "curve::2.0",
+        "label": "Curve",
+        "icon": "SOP_curve",
+        "pos": [
+          0.2817,
+          -1.0851
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input Curves"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Created Curves"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "sepparm3",
+            "label": "Separator",
+            "type": "Separator",
+            "val": [],
+            "expr": []
+          },
+          {
+            "name": "outputtype",
+            "label": "Primitive Type",
+            "type": "Menu",
+            "val": [
+              "polygon"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Polygon"
+          },
+          {
+            "name": "convertcurves",
+            "label": "Reinterpret Curves as Current Type and Order",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "sepparm",
+            "label": "Separator",
+            "type": "Separator",
+            "val": [],
+            "expr": []
+          },
+          {
+            "name": "mode",
+            "label": "Mode",
+            "type": "Menu",
+            "val": [
+              "0"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Select/Edit Mode"
+          },
+          {
+            "name": "operations",
+            "label": "Topology Operations",
+            "type": "Label",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "delete"
+          },
+          {
+            "name": "sepparm6",
+            "label": "Spacer",
+            "type": "Separator",
+            "val": [],
+            "expr": []
+          },
+          {
+            "name": "pointoperations",
+            "label": "Tangent Operations",
+            "type": "Label",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "makecorner"
+          },
+          {
+            "name": "sepparm4",
+            "label": "Spacer",
+            "type": "Separator",
+            "val": [],
+            "expr": []
+          },
+          {
+            "name": "sepparm5",
+            "label": "Spacer",
+            "type": "Separator",
+            "val": [],
+            "expr": []
+          },
+          {
+            "name": "updatefrominput",
+            "label": "Update Curves from Input",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "snaponclose",
+            "label": "Snap Tangents when Fusing Ends in Draw Mode",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "maintainpoint",
+            "label": "Approximate Shape on Delete",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "approxendtangents",
+            "label": "Approximate End Tangents",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "caching",
+            "label": "caching",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "softtransform",
+            "label": "Enable Soft Transform",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "softtransformrad",
+            "labelHidden": true
+          },
+          {
+            "name": "softtransformrad",
+            "label": "Soft Transform Radius",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              0.0,
+              10.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "output",
+            "label": "output",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "outputcornerpts",
+            "label": "Output Corner Points",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "cornerptsgroup",
+            "labelHidden": true
+          },
+          {
+            "name": "cornerptsgroup",
+            "label": "Corner Points Group",
+            "type": "String",
+            "val": [
+              "corner_points"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputsmoothpts",
+            "label": "Output Smooth Points",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "smoothptsgroup",
+            "labelHidden": true
+          },
+          {
+            "name": "smoothptsgroup",
+            "label": "Smooth Points Group",
+            "type": "String",
+            "val": [
+              "smooth_points"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputautopts",
+            "label": "Output Auto Points",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "autoptsgroup",
+            "labelHidden": true
+          },
+          {
+            "name": "autoptsgroup",
+            "label": "Auto Points Group",
+            "type": "String",
+            "val": [
+              "auto_points"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputname",
+            "label": "Output Name",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "name",
+            "labelHidden": true
+          },
+          {
+            "name": "name",
+            "label": "Name",
+            "type": "String",
+            "val": [
+              "curve1"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputxaxis",
+            "label": "Output X Axis",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "xaxisname",
+            "labelHidden": true
+          },
+          {
+            "name": "xaxisname",
+            "label": "X Axis",
+            "type": "String",
+            "val": [
+              "out"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputyaxis",
+            "label": "Output Y Axis",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "yaxisname",
+            "labelHidden": true
+          },
+          {
+            "name": "yaxisname",
+            "label": "Y Axis",
+            "type": "String",
+            "val": [
+              "up"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputzaxis",
+            "label": "Output Z Axis",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "zaxisname",
+            "labelHidden": true
+          },
+          {
+            "name": "zaxisname",
+            "label": "Z Axis",
+            "type": "String",
+            "val": [
+              "tangent"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputorient",
+            "label": "Output Orient Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "orientname",
+            "labelHidden": true
+          },
+          {
+            "name": "orientname",
+            "label": "Orient",
+            "type": "String",
+            "val": [
+              "orient"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "targetorients",
+            "label": "Target Orientations",
+            "type": "Folder",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output"
+            ]
+          },
+          {
+            "name": "curoperation",
+            "label": "curoperation",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "activepoints",
+            "label": "Active Points",
+            "type": "String",
+            "val": [
+              "0"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "translate",
+            "label": "Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "rotate",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "scale",
+            "label": "Scale",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "cornerpts",
+            "label": "Corner Points",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "smoothpts",
+            "label": "Smooth Points",
+            "type": "String",
+            "val": [
+              "*"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "autopts",
+            "label": "Auto Points",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Current Operation"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "pivottransformfolder",
+            "label": "pivottransformfolder",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "pivottranslate",
+            "label": "Pivot Translate",
+            "type": "Float",
+            "val": [
+              -3.6129,
+              0.0,
+              4.0634
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              false,
+              true
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "pivotrotate",
+            "label": "Pivot Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "pivotfixed",
+            "label": "Fixed Pivot",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "roundedcornersfolder",
+            "label": "roundedcornersfolder",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "viewroundcorners",
+            "label": "View Rounded Corners",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Rounded Corners"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "roundcornerpts",
+            "label": "Round Corner Points",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Rounded Corners"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "roundcornerradius",
+            "label": "Round Corner Radius",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Rounded Corners"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "range": [
+              0.0,
+              10.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "showroundcornerwidget",
+            "label": "Show Rounded Corner Widget",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Rounded Corners"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "showroundcornerlabels",
+            "label": "Show Rounded Corner Labels",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Rounded Corners"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "editedgeops",
+            "label": "editedgeops",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "handleparmsfolder",
+            "label": "handleparmsfolder",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "output0",
+        "type": "output",
+        "label": "Output",
+        "icon": "SOP_output",
+        "pos": [
+          2.0252,
+          -4.0851
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "outputidx",
+            "label": "Output Index",
+            "type": "Int",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0,
+              10
+            ]
+          }
+        ]
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [],
+    "wires": [
+      {
+        "from": "transform1",
+        "fromOutput": 0,
+        "to": "bend1",
+        "toInput": 0
+      },
+      {
+        "from": "curve1",
+        "fromOutput": 0,
+        "to": "transform1",
+        "toInput": 0
+      },
+      {
+        "from": "bend1",
+        "fromOutput": 0,
+        "to": "output0",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default"
+  }
+}

@@ -1,0 +1,35 @@
+/*
+ * Styles the viewer needs on top of its Tailwind classes: React Flow's base styles and
+ * overrides for transparent Houdini nodes. Shared by the playground and the library builds.
+ */
+@import "@xyflow/react/dist/style.css";
+
+/* Ensure React Flow custom nodes allow floating right-side Houdini node labels without clipping */
+.react-flow__node {
+  overflow: visible !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font-family: "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Connectors only show their Houdini input / output label as a tooltip: they cannot start wires
+   (the viewer is not connectable), but must receive the pointer for the tooltip to appear */
+.react-flow__handle {
+  pointer-events: all !important;
+  cursor: default !important;
+}
+
+.react-flow__pane {
+  cursor: grab;
+}
+
+.react-flow__pane:active {
+  cursor: grabbing;
+}
+
+/* Dark native scrollbars and form controls in every browser */
+.wop-root {
+  color-scheme: dark;
+}

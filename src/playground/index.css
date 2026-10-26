@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "../styles/theme.css";
+@import "../styles/fonts.css";
+@import "../styles/viewer.css";
+
+/* Dark native scrollbars and form controls on the whole playground page */
+:root {
+  color-scheme: dark;
+}

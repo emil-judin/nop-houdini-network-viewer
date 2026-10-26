@@ -1,0 +1,24 @@
+/*
+ * Viewer theme tokens. Tailwind's `font-sans` / `font-mono` use Houdini's UI fonts.
+ *
+ * Sizes are pinned to pixels instead of Tailwind's `rem` defaults: `rem` follows the host
+ * page's root font size (even inside a Shadow DOM), so a site using `html { font-size: 62.5% }`
+ * would otherwise shrink the whole viewer. Values equal the defaults at a 16px root.
+ */
+@theme {
+  --font-sans: "Source Sans Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, monospace;
+
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --radius: 4px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --container-md: 448px;
+  --container-2xl: 672px;
+  --container-4xl: 896px;
+}

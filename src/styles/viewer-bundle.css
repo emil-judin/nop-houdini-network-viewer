@@ -1,0 +1,17 @@
+/*
+ * Complete viewer stylesheet without fonts: Tailwind theme, scoped reset, React Flow and
+ * viewer styles, then only the utility classes the viewer uses. Injected into the Shadow DOM
+ * of the `<houdini-network>` web component. Unlayered on purpose, so rules of the host page
+ * cannot outrank it through cascade layers.
+ */
+@import "tailwindcss/theme.css";
+@import "./theme.css";
+@import "./reset.css";
+@import "./viewer.css";
+@import "tailwindcss/utilities.css" source(none);
+
+@source "../components";
+@source "../embed";
+/* The word "container" in comments would generate Tailwind's `.container` class, which would also
+   restyle host page elements named `container` (the npm stylesheet is not inside a Shadow DOM). */
+@source not inline("container");
