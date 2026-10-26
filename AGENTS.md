@@ -44,6 +44,7 @@ Every change must strictly follow our **6 Core Pillars**:
   - Built-in Houdini SOPs like `attribwrangle` or SideFX Labs nodes return `isSubNetwork() == True`. Only recurse into user-authored `subnet` nodes or unlocked/custom HDAs to prevent multi-megabyte JSON bloat.
 - **Library Styles (`src/styles/`):**
   - The npm and web component builds have no Tailwind preflight (it would reset the host page). Viewer components must look right with only the scoped `.wop-root` reset in `src/styles/reset.css`.
+  - The npm `style.css` is scoped to `.wop-root` at build time (`vite.lib.config.ts`), so every viewer element must render inside a `.wop-root` element: no portals to `document.body`.
   - Use `px` for sizes in viewer components (arbitrary values like `text-[11px]`, or the px-pinned theme tokens), never raw `rem`: `rem` follows the host page's root font size, even inside a Shadow DOM.
   - Size viewer layouts with container queries (`@container`, `@2xl:`) on the viewer, not viewport breakpoints, because embeds are often narrower than the page.
 - **Operator Icons (`src/components/nodes/icons/`):**

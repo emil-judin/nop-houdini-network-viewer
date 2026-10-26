@@ -45,7 +45,7 @@ Every architectural decision, code module, and documentation file in this reposi
   - Supports **both** copying JSON directly to the OS Clipboard (`hou.ui.copyTextToClipboard`) and saving a `.json` file to disk (`hou.ui.selectFile`).
   - Offers **both** Parameter Export modes via a quick prompt (`Compact: Modified Parms + VEX/Code` vs. `Full: All Visible Parms`).
   - **Smart Subnetwork Filtering:** Only recurses into user-authored Subnets and custom HDAs (skipping internal built-in HDAs like `attribwrangle`'s internal VOP net or locked SideFX `labs::` internals, which reduces JSON size by >90%).
-  - **Icon & Shape Extraction:** Extracts deduplicated SVG icons (from both `$HFS/houdini/config/Icons/icons.zip` and `opdef:...?IconSVG` virtual paths via `hou.readFile()`) and custom node shape definitions (`$HFS/houdini/config/NodeShapes/*.json`), paired with clean procedural fallbacks in the web renderer.
+  - **Icons:** Built-in SideFX and Labs icons are never copied: the export names them and the viewer draws original icons. Only icons of the user's own digital assets are embedded (`opdef:...?IconSVG` via `hou.readFile()`), deduplicated. The 36 built-in node shapes ship with the viewer; exporting custom shapes is an open item.
 - **HUD & Overlay Controls:**
   - Full-Screen / Maximize toggle button.
   - Minimap (colored by actual Houdini node RGB values) + Fit-to-View & Zoom controls.
@@ -79,77 +79,81 @@ flowchart TD
 
 ```text
 wop-houdini-network-viewer/
-├── AGENTS.md                          # Always-on concise agent rules, 6 pillars & commands (<150 lines)
-├── PLAN.md                            # Complete architectural & phased implementation plan
-├── README.md                          # Human-facing documentation, quickstart, and portfolio embed guide
+├── AGENTS.md                          # Always-on concise agent rules, 6 pillars & commands
+├── PLAN.md                            # This plan: architecture, milestones, roadmap
+├── README.md                          # Human-facing documentation, quickstart, embed guide
+├── CHANGELOG.md                       # Release notes per version
 ├── LICENSE                            # MIT License
-├── package.json                       # NPM package config (unscoped 'wop-houdini-network-viewer')
-├── tsconfig.json                      # Strict TypeScript configuration
-├── vite.config.ts                     # Playground app build config (output: dist-playground/)
-├── vite.lib.config.ts                 # NPM Library & Web Component bundle build config (output: dist/)
-├── tsconfig.lib.json                  # Type declarations for the npm package (dist/types/)
+├── package.json                       # npm package 'wop-houdini-network-viewer' and scripts
+├── vite.config.ts                     # Playground build (dist-playground/), og:image URLs, dev-only reference icons
+├── vite.lib.config.ts                 # npm + web component builds (dist/), npm stylesheet scoping
+├── tsconfig.json / tsconfig.lib.json  # Strict TypeScript; type declarations for the npm package
+├── .github/workflows/
+│   └── deploy-playground.yml          # Builds the playground and publishes it to GitHub Pages
 │
-├── .agents/                           # Agentic Customizations (discovered automatically)
-│   └── skills/
-│       ├── houdini-graph-renderer/
-│       │   └── SKILL.md               # Visual specs: Houdini coordinate math, node shapes, flag colors, wires
-│       └── houdini-python-exporter/
-│           └── SKILL.md               # HOM Python rules: safe_expr, HDA recursion filtering, icon zip/opdef extraction
+├── .agents/skills/                    # On-demand agent knowledge
+│   ├── houdini-graph-renderer/SKILL.md
+│   └── houdini-python-exporter/SKILL.md
 │
-├── docs/                              # Deep-Dive Documentation for Humans & Agents
-│   ├── STATUS.md                      # Living progress tracker & session-to-session handoff log
-│   ├── ARCHITECTURE.md                # Technical decisions, coordinate transforms, Shadow DOM encapsulation
-│   └── SCHEMA.md                      # JSON Schema documentation & edge cases discovered from Houdini 22
+├── docs/
+│   ├── STATUS.md                      # Living progress tracker & session handoff log
+│   ├── ARCHITECTURE.md                # Coordinates, packaging, styles & isolation, navigation
+│   ├── SCHEMA.md                      # JSON contract and its versioning policy
+│   ├── ICON_ART_BIBLE.md              # Operator icon style, palette, legal rules
+│   ├── CODE_REVIEW.md                 # Review backlog (2026-10-24)
+│   └── TESTERS.md                     # Guide for the tester release
 │
-├── exporter/                          # Houdini Side (Python 3 / HOM)
-│   ├── wop_exporter.py    # Complete shelf tool script (Clipboard + File save, Compact + Full parms)
-│   └── README.md                      # 30-second installation guide for Houdini shelves
+├── exporter/                          # Houdini side (Python 3 / HOM)
+│   ├── wop_exporter.py                # Export dialog, copy-for-web hotkey function, schema writer
+│   ├── package/                       # Houdini package: wop.json + wop/ (shelf, icon, README.txt)
+│   └── README.md                      # Install (package or manual shelf tool) and usage
 │
-├── fixtures/                          # Real Houdini 22.0 Test Networks
-│   ├── circuit_board-network.json     # Small /obj/circuit_board network (Curve, Transform with an expression, Bend, Output)
-│   └── circuit_gen-network.json       # Production network, full parameters (Wrangles, Loops, Dots, NetBoxes, Subnets, Ramps)
+├── fixtures/                          # Real Houdini 22 exports used as demos
+│   ├── circuit_board-network.json     # Small /obj/circuit_board network
+│   └── circuit_gen-network.json       # Production network, full parameters
+│
+├── design/wop-icon/                   # WOP icon sources, variants and the website icon pack
+├── public/                            # Playground static files (favicons, manifest, og-image);
+│                                      #   downloads/ is generated (exporter zip and script)
+├── scripts/                           # build_exporter_package.mjs, icon pack and reference icon builders
+├── local-refs/                        # Gitignored SideFX reference icons, served by the dev server only
 │
 └── src/
-    ├── index.ts                       # Library entry point: exports <HoudiniNetwork />, types, and utilities
-    ├── web-component.ts               # Custom Element (<houdini-network>) with Shadow DOM isolation
+    ├── index.ts                       # npm entry: <HoudiniNetwork />, <RemoteHoudiniNetwork />, types, converter
+    ├── web-component.ts               # <houdini-network> custom element (Shadow DOM)
     ├── embed/                         # Shared by the web component and the ?embed=true page
     │   ├── embedAttributes.ts         # Attribute / URL parameter names -> viewer options
     │   ├── fetchNetwork.ts            # Downloads a network .json with readable errors
     │   └── RemoteHoudiniNetwork.tsx   # Viewer that loads its network from a URL
-    ├── styles/                        # Library and playground stylesheets (see docs/ARCHITECTURE.md section 5)
+    ├── styles/                        # theme, fonts, scoped reset, viewer, bundles (see ARCHITECTURE.md section 5)
     ├── schema/
-    │   ├── types.ts                   # Canonical TypeScript interfaces (HoudiniNetworkDocument, HoudiniNodeData, etc.)
-    │   ├── converter.ts               # Converts Houdini JSON -> React Flow Nodes & Edges (handles Y-inversion & scaling)
-    │   └── subnetPath.ts              # Subnetwork dive path -> stack of network levels
+    │   ├── types.ts                   # Canonical TypeScript interfaces of the JSON contract
+    │   ├── converter.ts               # Houdini JSON -> React Flow nodes & edges (Y inversion, scaling), schema guard
+    │   ├── subnetPath.ts              # Subnetwork dive path -> stack of network levels
+    │   ├── connectedWires.ts          # Wires attached to the selected node (through dots)
+    │   └── operatorType.ts            # Namespace / name / version of operator types
     ├── components/
-    │   ├── HoudiniNetwork.tsx         # Main React Flow wrapper, view-only layout, HUD controls, fullscreen & minimap
-    │   ├── hud/
-    │   │   ├── BreadcrumbBar.tsx      # Subnet path navigation (/obj/circuit_board/circuit_gen)
-    │   │   └── ViewerToolbar.tsx      # Fullscreen toggle, Fit View, Debug JSON download/copy
-    │   ├── inspector/
-    │   │   ├── ParameterInspector.tsx # Houdini Parameter Pane drawer (header, flags, comment, grouped parms)
-    │   │   ├── ParmLayoutView.tsx     # Tab bars and section folders
-    │   │   ├── ParmLine.tsx           # One pane row: gutter toggle, label, read-only widgets
-    │   │   ├── ResizableInspectorPanel.tsx # Side panel / bottom sheet with a drag handle
-    │   │   ├── paneStyles.ts          # Parameter Pane colors sampled from Houdini 22
-    │   │   ├── CodeBlock.tsx          # VEX / Python code field with Copy button
-    │   │   ├── codeHighlight.ts       # Lightweight VEX / Python tokenizer
-    │   │   └── parmModel.ts           # Exported parm tuples -> layout tree (tabs, sections, joined lines)
+    │   ├── HoudiniNetwork.tsx         # React Flow wrapper: view-only layout, navigation history, fullscreen, hotkeys
+    │   ├── NetworkErrorBoundary.tsx   # Render errors -> error panel
+    │   ├── hud/                       # Path bar, toolbar, network overview, loading / error states
+    │   ├── inspector/                 # Read-only Parameter Pane: layout model, rows, ramps, code, resizable panel
     │   ├── nodes/
-    │   │   ├── HoudiniSopNode.tsx     # 1:1 Houdini SOP node (SVG shapes, left/right flags, icon, label, connectors)
-    │   │   ├── HoudiniDotNode.tsx     # Wire routing dot (hou.NetworkDot)
-    │   │   ├── HoudiniSubnetInput.tsx # Indirect Subnet Input pill (#1..4 at top of subnet graphs)
-    │   │   ├── HoudiniNetBox.tsx      # Background Network Box (supports expanded & minimized states)
-    │   │   ├── HoudiniStickyNote.tsx  # Background Sticky Note
-    │   │   └── shapes/
-    │   │       └── nodeShapes.ts      # Built-in SVG path generators (rect, wave, cigar, diamond, chevron_up/down, null, tilted) + custom shape renderer
+    │   │   ├── HoudiniSopNode.tsx     # Node: shape, flags, icon, label, connectors, badges
+    │   │   ├── HoudiniDotNode.tsx / HoudiniSubnetInput.tsx / HoudiniNetBox.tsx / HoudiniStickyNote.tsx
+    │   │   ├── shapes/                # Houdini 22 NodeShapes data and helpers
+    │   │   └── icons/                 # Original operator icons: registry, sop/, labs/, path/
     │   └── edges/
-    │       └── HoudiniWire.tsx        # Authentic Houdini cubic Bezier wire & multi-input slot routing
-    └── playground/                    # Standalone Web App (GitHub Pages / Klee-style interface)
-        ├── App.tsx                    # Demo switcher, Open / Paste / drop a .json, Embed button
-        ├── EmbedDialog.tsx            # Embed code generator (HTML web component, React, iframe)
+    │       ├── HoudiniWire.tsx        # Wire edge (constant on-screen width, selection highlight)
+    │       └── wirePaths.ts           # Houdini's "default" and "rounded" wire routing
+    └── playground/                    # Hosted web app (GitHub Pages)
+        ├── App.tsx                    # Demos, open / drop / paste a .json, header buttons
+        ├── PlaygroundDialog.tsx       # Shared <dialog> frame
+        ├── EmbedDialog.tsx            # Embed code generator (web component, React, iframe)
+        ├── ExporterDialog.tsx         # Exporter download and install steps
+        ├── FeedbackDialog.tsx         # Tester feedback form (sendFeedback.ts, Web3Forms)
         ├── EmbedView.tsx              # ?embed=true full-page viewer for iframes
-        └── main.tsx                   # App entry point (lazy-loads the playground or the embed view)
+        ├── IconReviewGallery.tsx      # Icon review tool (dev server only)
+        └── main.tsx                   # Entry: lazy-loads the playground or the embed view
 ```
 
 ---
@@ -189,7 +193,8 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
 - `null`: Null (`null`) framed bracket/crossbar shape
 - `chevron_down` & `chevron_up`: For-Each Loop Begin (`block_begin`) & End (`block_end`)
 - `tilted`: Attribute Promote (`attribpromote`) slanted parallelogram
-- `circle`, `bone`, `cloud`, `bulge`, `star`: Standard Houdini palette shapes + dynamic rendering of any custom JSON shape extracted from `$HFS/houdini/config/NodeShapes/`.
+- `circle`, `bone`, `cloud`, `bulge`, `star` and the rest of Houdini 22's 36 built-in shapes (`houdiniShapesData.json`).
+- Custom shapes: the viewer can draw shape definitions from the document's `customShapes`, but the exporter does not fill it yet, so user-made shapes fall back to `rect` (open item, see the roadmap).
 
 ### 4.3 Input/Output Connectors & The `maxInputs: 9999` Rule
 - **Standard Nodes (`maxInputs <= 4`):**
@@ -205,17 +210,18 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
 1. **Avoiding the 3MB Built-In HDA Trap:**
    - Many standard Houdini SOPs (`attribwrangle`, `color`, `split`, `convertline`, `labs::*`) return `True` for `node.isSubNetwork()`.
    - Our exporter checks a helper `should_recurse_subnet(node)`:
-     - Returns `True` if `node.type().name() in ("subnet", "geo", "dopnet", "topnet", "lopnet")` OR if the node is an unlocked HDA (`not node.isLockedHDA()`) OR belongs to a custom user namespace (non-SideFX/Labs HDA library path).
-     - Returns `False` for built-in SideFX/Labs atomic SOP wrappers.
+     - Returns `True` for user containers: `subnet`, `geo`, `dopnet`, `topnet`, `lopnet`, `objnet`.
+     - Returns `False` for built-in containers that are not digital assets at all (`type().definition() is None`, for example Attribute VOP or Solver SOP: engine internals, not user networks).
+     - For SideFX and Labs assets (library under `$HFS` or SideFX Labs), returns `True` only when the user unlocked the asset to edit it.
+     - Returns `True` for the user's own assets (any other library path), locked or not.
 2. **Safe Parameter & Expression Extraction:**
    - Iterates over `node.parmTuples()` so vector parameters (`tx, ty, tz` -> `Translate`) stay grouped as a single tuple row.
    - Wraps `p.expression()` in `try...except hou.OperationFailed:` because Houdini throws an exception when querying `.expression()` on time-dependent parameters that have `0` or `>1` keyframes.
    - Supports **Compact Mode** (only non-default parameter tuples + code snippets like `snippet` / `python`) and **Full Mode** (all visible non-hidden parameter tuples organized by folder tabs).
 3. **Deduplicated Icon Dictionary (`"icons": { ... }`):**
-   - For every unique `node.type().icon()` in the exported graph:
-     - First attempts `hou.readFile(icon_name)` (which resolves `opdef:/labs::Sop/...?IconSVG` directly).
-     - Next checks `$HFS/houdini/config/Icons/icons.zip` (converting `"SOP_polyextrude-2.0"` -> `"SOP/polyextrude.svg"` if the versioned name is not found).
-     - Stores the raw `<svg>...</svg>` string once in a top-level `"icons"` dictionary in the JSON so 50 `attribwrangle` nodes share 1 SVG definition.
+   - Built-in SideFX and Labs icons are **never copied**: the document only names them (`node.icon`) and the viewer draws its own original icons (see `docs/ICON_ART_BIBLE.md`).
+   - Only icons of the user's own digital assets are embedded, read with `hou.readFile()` (`opdef:...?IconSVG`), and stored once in the top-level `"icons"` dictionary so many nodes of one asset share one SVG.
+4. **Path scrubbing:** local folders in exported text are replaced with `$HIP`, `$JOB`, `$HOUDINI_USER_PREF_DIR`, `$HSITE`, `$HFS`, `$HOME` or `~` (see SCHEMA.md), so shared files never reveal the author's folders.
 
 ---
 
@@ -223,10 +229,10 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
 
 ### Milestone 1: Repository Scaffolding, Agentic Docs & Fixtures
 - Initialize `package.json` (`wop-houdini-network-viewer`), TypeScript, Vite, Tailwind CSS, `@xyflow/react`, and Lucide icons.
-- Create `AGENTS.md`, `PLAN.md`, `docs/STATUS.md`, `docs/ARCHITECTURE.md`, and `docs/SCHEMA.md` enforcing the 5 Core Pillars and neutral international documentation styling.
+- Create `AGENTS.md`, `PLAN.md`, `docs/STATUS.md`, `docs/ARCHITECTURE.md`, and `docs/SCHEMA.md` enforcing the Core Pillars (5 at the time, now 6) and neutral international documentation styling.
 - Create `.agents/skills/houdini-graph-renderer/SKILL.md` and `.agents/skills/houdini-python-exporter/SKILL.md`.
 - Write the production-ready `exporter/wop_exporter.py` shelf tool (with the UI dialog for Clipboard vs. File Save and Compact vs. Full parameters) and `exporter/README.md`.
-- Process `complex-network.json` into clean, fast-loading test fixtures in `fixtures/circuit-gen-network.json` and `fixtures/simple-sop-network.json`.
+- Process `complex-network.json` into clean, fast-loading test fixtures (now `fixtures/circuit_gen-network.json` and `fixtures/circuit_board-network.json`, re-exported from Houdini 22).
 - Implement the canonical TypeScript schema (`src/schema/types.ts`) and verify `npm run check` passes.
 
 ### Milestone 2: Core Network Canvas & Authentic Houdini Nodes
@@ -250,8 +256,69 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
   - Double-clicking a Subnet node (`children` present) dives into that child network and updates the top breadcrumb bar (`/obj/circuit_board/circuit_gen/subnetwork1`).
 - Build the **Playground Web App** (Paste JSON from clipboard, Drag & Drop `.json` file, switch between sample networks, and copy Embed Code) + **NPM & Web Component (`<houdini-network>`) Build Pipeline**.
 
+
+### Status (2026-10-27)
+
+Milestones 1 to 3 are complete (details in `docs/STATUS.md`). The roadmap below was sorted by the owner on 2026-10-27 into the tester release, Milestone 4, open items for later, and cut items.
+
+### Tester Release (`0.1.0-alpha.1`)
+
+Goal: a hosted playground that a small group of selected Houdini users can open, install the exporter from, try with their own networks, and send feedback from. Not published on npm (npm packages are public, so npm is the public launch in Milestone 4).
+
+- Version control (git repository, private or public GitHub repository).
+- Host the playground on GitHub Pages (`.github/workflows/deploy-playground.yml`), kept out of search engines (`noindex`) during testing.
+- Exporter download in the playground, installed as a Houdini package (`exporter/package/`, built into `wop-exporter.zip`).
+- Hide the internal Icon Review tab from the hosted playground.
+- Version `0.1.0-alpha.1`, CHANGELOG entry, matching README snippet.
+- Feedback form that sends testers' messages to the owner's email (Web3Forms), plus the tester guide `docs/TESTERS.md`.
+- Absolute `og:image` URL for link previews.
+- Scope the npm stylesheet to the viewer, so it cannot clash with a host page's Tailwind.
+- Schema versioning policy (`docs/SCHEMA.md` section 3) and a viewer guard for newer major versions.
+- This plan rewritten with the roadmap.
+- Owner steps: re-export the demo networks with schema 1.3.0, check one real export for private data, smoke-test Safari, Firefox and a real phone.
+
+### Milestone 4: Quality, Public Release & Viewer Features
+
+**Quality**
+- Automated tests with Vitest (converter, layout, ramps, parameter layout model).
+- Lint setup with the React hooks rules.
+- Repeatable browser checks as a script (for example Playwright), replacing the one-off headless Chrome runs.
+- CI on GitHub Actions: check, tests and both builds on every push.
+
+**Public release**
+- Publish `wop-houdini-network-viewer` on npm (and so on jsDelivr for the web component), after the tester feedback.
+- `repository`, `homepage` and `bugs` fields in `package.json`.
+- Embedding guide: CORS, file size, where to host the JSON.
+- Remove the tester-phase `noindex` from `index.html`.
+
+**Viewer**
+- Node search (`Ctrl+F`): find a node by name or type and frame it, including inside subnetworks.
+- Links to a subnetwork or node: a share link or embed option that opens a given subnetwork with a node selected.
+- Save the view as PNG or SVG.
+- Multiparm blocks with instance count (needs a Houdini reference screenshot).
+
+**Exporter**
+- Run the exporter on Houdini 20.5 and 21 (needs those installs).
+
+### Open for Later (no date)
+
+- Keyboard and screen-reader support (move between nodes, labels for canvas and inspector, reduced motion).
+- Decide what other contexts show (VOP, LOP, TOP, DOP), then VOP networks with side connectors, and the OBJ / LOP / TOP flag sets.
+- Export custom node shapes (`customShapes`).
+- Large networks: render only visible nodes (`onlyRenderVisibleElements`), load the demo network on demand.
+- Path bar history dropdowns and jump menu.
+- Houdini light color scheme.
+- Upload and share service (short links, like Klee): needs a server, storage and moderation.
+
+### Cut
+
+- Usage analytics on the hosted playground (ask testers directly instead).
+- Keyframe colors in the Parameter Pane (no reference screenshot planned).
+- Verifying sticky notes against a real export.
+
 ---
 
 ## 6. Verification & Acceptance Criteria
-- **Automated Checks (`npm run check`):** TypeScript strict typecheck (`tsc --noEmit`) + production build (`vite build`) pass with zero warnings.
-- **Real Production Graph Verification:** Your 169-node `circuit_gen` network renders in the browser with accurate spatial layout, wire dots, For-Each chevrons, wavy Wrangle shapes, cigar Merge shapes, expanded/minimized Network Boxes, and clickable VEX inspection.
+- **Automated Checks:** `npm run check` (strict `tsc --noEmit`), `npm run build` and `npm run build:lib` pass without errors. The build's chunk size warning for the bundled demo network is known (see "Open for Later"). Tests, lint and CI arrive in Milestone 4.
+- **Real Production Graph Verification:** the 169-node `circuit_gen` network renders in the browser with accurate spatial layout, wire dots, For-Each chevrons, wavy Wrangle shapes, cigar Merge shapes, expanded/minimized Network Boxes, and clickable VEX inspection.
+- **Library isolation:** on a host page with its own utility classes, the npm build styles only the viewer and the host's elements stay untouched.

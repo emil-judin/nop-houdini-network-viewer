@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- WOP shelf, loaded by the WOP Houdini package (packages/wop.json adds this folder to HOUDINI_PATH). -->
+
+  <toolshelf name="wop" label="WOP">
+    <memberTool name="wop_export"/>
+    <memberTool name="wop_copy"/>
+  </toolshelf>
+
+  <!-- Adds the WOP shelf as a tab to the default shelf set at the top of the window. -->
+  <shelfSetEdit name="shelf_set_1" fileLocation="$HFS/houdini/toolbar/ShelfDefinitions.shelf">
+    <addMemberToolshelf name="wop"/>
+  </shelfSetEdit>
+
+  <tool name="wop_export" label="Export for WOP" icon="$WOP/icons/wop.svg">
+    <helpText><![CDATA[Export the current network (or the selected nodes) for the WOP web viewer: copy to the clipboard or save a .json file.]]></helpText>
+    <script scriptType="python"><![CDATA[import sys
+
+# The package puts scripts/python on the Python path; this keeps the tool working if it does not
+_wop_python = hou.expandString("$WOP/scripts/python")
+if _wop_python not in sys.path:
+    sys.path.append(_wop_python)
+
+import wop_exporter
+wop_exporter.run_interactive_export(kwargs.get("pane"))
+]]></script>
+  </tool>
+
+  <tool name="wop_copy" label="Copy for WOP" icon="$WOP/icons/wop.svg">
+    <helpText><![CDATA[Copy the selected nodes of the Network Editor under the mouse (or the whole network) as compact JSON, without a dialog. Paste it into the WOP playground with Ctrl+V. Bind it to a hotkey such as Ctrl+Shift+Alt+C.]]></helpText>
+    <script scriptType="python"><![CDATA[import sys
+
+_wop_python = hou.expandString("$WOP/scripts/python")
+if _wop_python not in sys.path:
+    sys.path.append(_wop_python)
+
+import wop_exporter
+wop_exporter.copy_selection_for_web(kwargs.get("pane"))
+]]></script>
+  </tool>
+</shelfDocument>

@@ -10,3 +10,6 @@ local-refs/
 
 dist-playground/
 __pycache__/
+
+# Built by scripts/build_exporter_package.mjs (npm run build:exporter)
+public/downloads/

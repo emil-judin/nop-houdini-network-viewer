@@ -1,10 +1,34 @@
 # WOP Shelf Exporter for Houdini
 
-This folder contains the 1-click Python Shelf Tool script (`wop_exporter.py`) that exports your Houdini node networks into a self-contained JSON format for `wop-houdini-network-viewer`.
+This folder contains the Python exporter (`wop_exporter.py`) that exports your Houdini node networks into a self-contained JSON format for `wop-houdini-network-viewer`, and the Houdini package (`package/`) that installs it as a ready-made **WOP** shelf.
 
-## Setup in 30 Seconds
+Tested with Houdini 22.0.466; Houdini 20.5 and 21 are not tested yet.
 
-1. Open **SideFX Houdini** (tested with Houdini 22.0.466; Houdini 20.5 and 21 are not tested yet).
+## Install as a Houdini Package (recommended)
+
+Download `wop-exporter.zip` from the playground (**Exporter** button). It is built from this folder by `npm run build:exporter` (`scripts/build_exporter_package.mjs`) and contains:
+
+```text
+wop.json                            # package file: adds the wop folder to HOUDINI_PATH
+wop/
+├── scripts/python/wop_exporter.py  # the exporter (importable as `wop_exporter`)
+├── toolbar/wop.shelf               # WOP shelf: "Export for WOP" and "Copy for WOP"
+├── icons/wop.svg                   # shelf icon
+└── README.txt                      # install steps
+```
+
+1. Open the `packages` folder in your Houdini preferences (create it if it does not exist):
+   - Windows: `Documents\houdini22.0\packages`
+   - macOS: `~/Library/Preferences/houdini/22.0/packages`
+   - Linux: `~/houdini22.0/packages`
+2. Copy `wop.json` and the `wop` folder from the zip into it.
+3. Restart Houdini. The **WOP** shelf tab appears at the top. If it does not, click the **+** next to the shelf tabs and choose **Shelves > WOP**.
+
+Update by replacing the `wop` folder; uninstall by deleting `wop.json` and the `wop` folder. The hotkey for **Copy for WOP** is still set by hand (see below).
+
+## Manual Setup (Shelf Tool)
+
+1. Open **SideFX Houdini**.
 2. Click the **`+`** icon on any Shelf at the top of your workspace and select **New Tool...**.
 3. Under the **Options** tab:
    - **Name:** `wop_export`
@@ -36,7 +60,7 @@ wop_exporter.run_interactive_export(kwargs.get("pane"))
 
 For a copy-and-paste workflow without any dialog, bind `copy_selection_for_web()` to a hotkey. It copies the selected nodes of the Network Editor under the mouse (or the whole network when nothing is selected there) as compact JSON, then shows a status bar message. Paste it into the playground with `Ctrl+V`.
 
-This needs the **module install** above (the exporter file on your Houdini Python path).
+With the package installed, the **Copy for WOP** tool already exists: skip to step 2. With the manual setup, this needs the **module install** above (the exporter file on your Houdini Python path).
 
 1. Create a second shelf tool (**New Tool...**):
    - **Name:** `wop_copy`

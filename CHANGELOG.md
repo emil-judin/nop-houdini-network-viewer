@@ -2,9 +2,30 @@
 
 All notable changes to this project are documented here. Versions follow [Semantic Versioning](https://semver.org/); `alpha` releases can still change the JSON schema and the component API.
 
-## 0.1.0-alpha.0 (unreleased)
+## 0.1.0-alpha.1 (tester release)
 
-First public alpha of WOP, published on npm as `wop-houdini-network-viewer`.
+Hosted playground for a small group of testers. Not published on npm yet.
+
+### Exporter
+- Houdini package: `wop-exporter.zip` installs a **WOP** shelf with "Export for WOP" and "Copy for WOP" by copying it into the Houdini `packages` folder. The manual shelf tool setup still works.
+
+### Playground
+- **Exporter** button: download the Houdini package (or the plain `wop_exporter.py`) with install steps.
+- **Feedback** button: testers send a message straight to the author's email (shown when the build sets `VITE_WEB3FORMS_KEY`).
+- The Icon Review tab is now only in the dev server, no longer in the hosted playground.
+- Link previews: absolute `og:url` / `og:image` when the hosted address is known; `noindex` while testing.
+- Deployed to GitHub Pages by `.github/workflows/deploy-playground.yml`.
+
+### Viewer
+- Active flag colors (template, display) no longer spill past the node's edge.
+- Files from a newer major schema version show a clear "update the WOP viewer" message instead of being misread (see the versioning policy in `docs/SCHEMA.md`).
+
+### npm package
+- `style.css` is scoped to the viewer: its utility classes, React Flow overrides and theme variables no longer touch the host page, and a host's own Tailwind classes no longer restyle the viewer.
+
+## 0.1.0-alpha.0 (not published)
+
+First alpha of WOP, prepared for npm as `wop-houdini-network-viewer`.
 
 ### Viewer
 - View-only Houdini network canvas: authentic node shapes, flags, wires (default and rounded styles), routing dots, network boxes, sticky notes, subnet inputs and operator icons (original drawings, including all SideFX Labs SOPs).

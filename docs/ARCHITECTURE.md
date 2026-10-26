@@ -43,7 +43,7 @@ Houdini and web browsers use opposite vertical axes and different unit scales:
 
 ## 4. Packaging & Embedding Modes
 
-`npm.cmd run build:lib` builds both library outputs into `dist/` (`vite.lib.config.ts`, two modes) and the type declarations into `dist/types/` (`tsconfig.lib.json`). `npm.cmd run build` builds the playground into `dist-playground/`.
+`npm.cmd run build:lib` builds both library outputs into `dist/` (`vite.lib.config.ts`, two modes) and the type declarations into `dist/types/` (`tsconfig.lib.json`). `npm.cmd run build` builds the Houdini exporter package (`npm.cmd run build:exporter`: `public/downloads/wop-exporter.zip` from `exporter/package/` and `exporter/wop_exporter.py`) and then the playground into `dist-playground/`, which `.github/workflows/deploy-playground.yml` publishes to GitHub Pages on every push to `main`.
 
 1. **React Component (`src/index.ts`, `--mode npm`):**
    `dist/index.js` (ES) and `dist/index.cjs` export `<HoudiniNetwork data={...} />`, `<RemoteHoudiniNetwork src="..." />`, the schema types and the converter. `react` and `react-dom` are peer dependencies; `@xyflow/react` and `lucide-react` stay external. Styles ship separately as `dist/style.css` (`wop-houdini-network-viewer/style.css`).
@@ -65,7 +65,9 @@ The viewer is styled with Tailwind utility classes, but the library must not res
 | `viewer.css` | React Flow base CSS and viewer overrides (transparent nodes, `color-scheme: dark`) | all |
 | `reset.css` | Minimal reset scoped to `.wop-root` instead of Tailwind's global preflight; single-class specificity (`:where()`), so it beats host `button {}` rules but loses to utilities | library builds |
 | `viewer-bundle.css` | theme + reset + viewer + only the utilities used in `src/components` and `src/embed` (unlayered, so host CSS cannot outrank it through cascade layers) | web component (Shadow DOM) |
-| `library.css` | fonts + `viewer-bundle.css` | npm `style.css` |
+| `library.css` | fonts + `viewer-bundle.css` | npm `style.css` (scoped at build time, see below) |
+
+The npm `style.css` has no Shadow DOM around it, so `vite.lib.config.ts` (`scopeStylesheetToViewer`) rewrites every selector at build time to only match inside the viewer: utilities and React Flow rules become `:is(.wop-root, .wop-root *).class`, rules that start with `.wop-root` get one more `.wop-root`, type selectors become `.wop-root svg...`, and the theme variables move from `:root` to `.wop-root`. Every rule gains exactly one class of specificity, so the order between the viewer's own rules is unchanged, while a host page's same-named Tailwind classes, its theme variables and its other React Flow diagrams are no longer affected. Consequence: **every viewer element must render inside a `.wop-root` element** (no portals to `document.body`), or it gets no styles in the npm build.
 
 Inside the Shadow DOM, Tailwind's `@property` initial values are ignored, so `web-component.ts` sets them directly (`buildShadowPropertyDefaults`); without this, borders and shadows would vanish. The playground keeps using normal Tailwind (with preflight) plus `theme.css`, `fonts.css` and `viewer.css`.
 

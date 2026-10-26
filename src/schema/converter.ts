@@ -156,8 +156,15 @@ export function houdiniRgbLuminance(color: HoudiniRgbColor): number {
 }
 
 /**
+ * Major schema version this viewer reads. Minor versions only add optional fields, so every `1.x`
+ * export works; see the versioning policy in `docs/SCHEMA.md`.
+ */
+export const SUPPORTED_SCHEMA_MAJOR = 1;
+
+/**
  * Normalizes any raw JSON input (either a full `HoudiniNetworkDocument` or a legacy diagnostic dump)
- * into a canonical `HoudiniNetworkDocument`.
+ * into a canonical `HoudiniNetworkDocument`. Throws a readable error for files from a newer major
+ * schema version.
  */
 export function normalizeNetworkDocument(raw: unknown): HoudiniNetworkDocument {
   if (!raw || typeof raw !== 'object') {
@@ -165,6 +172,15 @@ export function normalizeNetworkDocument(raw: unknown): HoudiniNetworkDocument {
   }
 
   const obj = raw as Record<string, unknown>;
+
+  // Versioning policy (docs/SCHEMA.md): every 1.x export is readable; a newer major is not
+  const schemaMajor = typeof obj.schemaVersion === 'string' ? Number.parseInt(obj.schemaVersion, 10) : NaN;
+  if (schemaMajor > SUPPORTED_SCHEMA_MAJOR) {
+    throw new Error(
+      `This file uses schema ${obj.schemaVersion as string}, made by a newer WOP exporter. ` +
+        `Update the WOP viewer to show it (this viewer reads schema ${SUPPORTED_SCHEMA_MAJOR}.x).`,
+    );
+  }
 
   if (obj.root && typeof obj.root === 'object') {
     const root = obj.root as Record<string, unknown>;

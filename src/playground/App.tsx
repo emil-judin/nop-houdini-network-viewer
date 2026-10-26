@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { ClipboardPaste, Code2, FileUp, FolderOpen, Grid } from 'lucide-react';
+import React, { Suspense, useRef, useState } from 'react';
+import { ClipboardPaste, Code2, Download, FileUp, FolderOpen, Grid, MessageSquare } from 'lucide-react';
 import boardNetwork from '../../fixtures/circuit_board-network.json';
 import circuitNetwork from '../../fixtures/circuit_gen-network.json';
 import { HoudiniNetwork } from '../components/HoudiniNetwork';
@@ -7,8 +7,18 @@ import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import { OPERATOR_ICONS } from '../components/nodes/icons/iconRegistry';
 import type { HoudiniNetworkDocument } from '../schema/types';
 import { EmbedDialog } from './EmbedDialog';
-import { IconReviewGallery } from './IconReviewGallery';
+import { ExporterDialog } from './ExporterDialog';
+import { FeedbackDialog } from './FeedbackDialog';
+import { FEEDBACK_ACCESS_KEY } from './sendFeedback';
 import { useNetworkFileLoader, type LoadedNetwork } from './useNetworkFileLoader';
+
+/**
+ * Icon Review Gallery: an internal tool for the icon artwork, only in the dev server (`npm.cmd run dev`).
+ * The production check removes the import, so the gallery is not part of the hosted playground.
+ */
+const IconReviewGallery = import.meta.env.DEV
+  ? React.lazy(() => import('./IconReviewGallery').then((module) => ({ default: module.IconReviewGallery })))
+  : null;
 
 const circuitDoc = circuitNetwork as unknown as HoudiniNetworkDocument;
 const boardDoc = boardNetwork as unknown as HoudiniNetworkDocument;
@@ -49,6 +59,8 @@ export const App: React.FC = () => {
   const [tab, setTab] = useState<PlaygroundTab>('circuit');
   const [loaded, setLoaded] = useState<LoadedNetwork | null>(null);
   const [embedOpen, setEmbedOpen] = useState(false);
+  const [exporterOpen, setExporterOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loader = useNetworkFileLoader((network) => {
@@ -58,6 +70,12 @@ export const App: React.FC = () => {
 
   const activeDocument =
     tab === 'custom' && loaded ? loaded.doc : DEMO_NETWORKS[tab === 'board' ? 'board' : 'circuit'].doc;
+  const activeNetworkName =
+    tab === 'icons'
+      ? 'Icons Overview'
+      : tab === 'custom' && loaded
+        ? `own file: ${loaded.sourceName}`
+        : `demo: ${DEMO_NETWORKS[tab === 'board' ? 'board' : 'circuit'].label}`;
 
   // Houdini tab style: the active tab is a blue-grey pill with bold white text, others plain grey text
   const tabButtonClass = (active: boolean) =>
@@ -101,13 +119,25 @@ export const App: React.FC = () => {
                 <span className="max-w-36 truncate">{loaded.sourceName}</span>
               </button>
             )}
-            <button type="button" onClick={() => setTab('icons')} className={tabButtonClass(tab === 'icons')}>
-              <Grid className="w-3.5 h-3.5" />
-              <span>
-                Icons<span className="hidden md:inline"> Overview ({OPERATOR_ICONS.length + 1})</span>
-              </span>
-            </button>
+            {IconReviewGallery && (
+              <button type="button" onClick={() => setTab('icons')} className={tabButtonClass(tab === 'icons')}>
+                <Grid className="w-3.5 h-3.5" />
+                <span>
+                  Icons<span className="hidden md:inline"> Overview ({OPERATOR_ICONS.length + 1})</span>
+                </span>
+              </button>
+            )}
           </div>
+
+          <button
+            type="button"
+            onClick={() => setExporterOpen(true)}
+            title="Download the WOP exporter for Houdini"
+            className={HEADER_BUTTON}
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Exporter</span>
+          </button>
 
           {/* Load your own export */}
           <input
@@ -150,6 +180,17 @@ export const App: React.FC = () => {
               <span>Embed</span>
             </button>
           )}
+          {FEEDBACK_ACCESS_KEY && (
+            <button
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              title="Tell the author what worked, what broke and what is missing"
+              className={HEADER_BUTTON}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Feedback</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -168,8 +209,10 @@ export const App: React.FC = () => {
 
       {/* Main Canvas or Icon Overview Area */}
       <main className="flex-1 relative overflow-hidden flex flex-col">
-        {tab === 'icons' ? (
-          <IconReviewGallery />
+        {tab === 'icons' && IconReviewGallery ? (
+          <Suspense fallback={null}>
+            <IconReviewGallery />
+          </Suspense>
         ) : (
           <HoudiniNetwork data={activeDocument} fitView showMiniMap showToolbar showDebugActions />
         )}
@@ -198,6 +241,10 @@ export const App: React.FC = () => {
         onClose={() => setEmbedOpen(false)}
         suggestedFileName={suggestFileName(activeDocument, tab === 'custom' ? loaded : null)}
       />
+      <ExporterDialog open={exporterOpen} onClose={() => setExporterOpen(false)} />
+      {FEEDBACK_ACCESS_KEY && (
+        <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} networkName={activeNetworkName} />
+      )}
     </div>
   );
 };

@@ -77,3 +77,22 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 8. **Minimized Network Boxes:**
    - When `minimized: true`, Houdini reports `size[1]: 0.0`. The exporter includes `items: string[]` (names of nodes/dots inside the box) so the viewer can hide internal items when a box is minimized and render the collapsed header bar accurately.
 
+
+---
+
+## 3. Versioning Policy
+
+`schemaVersion` follows semantic versioning (`MAJOR.MINOR.PATCH`). The exporter always writes the newest version (`SCHEMA_VERSION` in `exporter/wop_exporter.py`); the viewer declares the major version it reads (`SUPPORTED_SCHEMA_MAJOR` in `src/schema/converter.ts`).
+
+- **PATCH** (`1.3.0` to `1.3.1`): the exporter fills existing fields more correctly. The shape and meaning of every field stay the same.
+- **MINOR** (`1.3.0` to `1.4.0`): adds optional fields. Old viewers ignore fields they do not know, and new viewers fall back to the old behavior when a field is missing. Every new field is marked with the version that added it ("schema 1.4.0") in this document.
+- **MAJOR** (`1.x` to `2.0.0`): anything that would make an old file render wrong: a removed or renamed field, a changed meaning or unit, a changed coordinate convention.
+
+Guarantees:
+
+1. **Every viewer reads every export of its major version.** A file exported years ago with schema `1.0.0` keeps working in the newest `1.x` viewer. Files people host on their own sites never need a re-export because of a viewer update.
+2. **A newer major is refused with a clear message**, never misread: the viewer shows "made by a newer WOP exporter, update the WOP viewer" instead of a broken network.
+3. **A schema `2.0.0` ships with a viewer that still reads `1.x`** (by converting old files on load), so embeds keep working during the change. Dropping `1.x` support would itself be a major release of the package.
+4. Every schema change is listed in `CHANGELOG.md` and in this document.
+
+While WOP is in `0.x` alpha these rules already apply to the schema; the React component API may still change between alpha releases.

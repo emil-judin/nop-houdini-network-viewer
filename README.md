@@ -29,7 +29,7 @@ npm run check
 # Start the interactive development playground
 npm run dev
 
-# Build the playground (dist-playground/) and the npm package + web component (dist/)
+# Build the playground with the exporter download (dist-playground/) and the npm package + web component (dist/)
 npm run build
 npm run build:lib
 ```
@@ -40,7 +40,7 @@ On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blo
 
 ## Exporting a Network from Houdini
 
-See [`exporter/README.md`](./exporter/README.md) for instructions on adding [`exporter/wop_exporter.py`](./exporter/wop_exporter.py) to your Houdini shelf in 30 seconds, and for binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
+Click **Exporter** in the playground to download `wop-exporter.zip`, a Houdini package: copy its contents into the `packages` folder of your Houdini preferences and restart Houdini to get a **WOP** shelf. See [`exporter/README.md`](./exporter/README.md) for the details, a manual shelf tool setup, and binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
 
 ---
 
@@ -53,7 +53,7 @@ The playground's **Embed** button generates all three snippets below for the net
 Upload the exported `.json` file next to your page, then:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/wop-houdini-network-viewer@0.1.0/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/wop-houdini-network-viewer@0.1.0-alpha.1/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
@@ -62,7 +62,7 @@ The viewer runs inside a Shadow DOM, so your site's CSS cannot break it and its 
 
 ```html
 <houdini-network style="height: 600px">
-  <script type="application/json">{ "schemaVersion": "1.1.0", "root": { ... } }</script>
+  <script type="application/json">{ "schemaVersion": "1.3.0", "root": { ... } }</script>
 </houdini-network>
 ```
 

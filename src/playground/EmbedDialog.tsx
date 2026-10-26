@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Copy, X } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Check, Copy } from 'lucide-react';
 import packageJson from '../../package.json';
 import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import {
@@ -9,6 +9,7 @@ import {
   buildWebComponentSnippet,
   type EmbedSnippetOptions,
 } from './embedSnippets';
+import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** jsDelivr serves every npm release, so the snippet works as soon as the package is published. */
 const WEB_COMPONENT_URL = `https://cdn.jsdelivr.net/npm/${packageJson.name}@${packageJson.version}/dist/web-component.js`;
@@ -50,7 +51,6 @@ export interface EmbedDialogProps {
  * (`<houdini-network>` web component), React (`<HoudiniNetwork />`) or an `<iframe>`.
  */
 export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggestedFileName }) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [tab, setTab] = useState<SnippetTab>('html');
   const [options, setOptions] = useState<EmbedSnippetOptions>({ ...DEFAULT_EMBED_OPTIONS, jsonUrl: suggestedFileName });
   const [copied, setCopied] = useState(false);
@@ -58,13 +58,6 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
   useEffect(() => {
     setOptions((o) => ({ ...o, jsonUrl: suggestedFileName }));
   }, [suggestedFileName]);
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
 
   const snippet = useMemo(() => {
     if (tab === 'react') return buildReactSnippet(options);
@@ -89,142 +82,117 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
   const activeTab = TABS.find((t) => t.id === tab) ?? TABS[0];
 
   return (
-    <dialog
-      ref={dialogRef}
-      onClose={onClose}
-      onClick={(event) => {
-        // A click on the backdrop targets the dialog element itself
-        if (event.target === dialogRef.current) onClose();
-      }}
-      aria-labelledby="embed-dialog-title"
-      className="m-auto w-[min(720px,calc(100%-24px))] max-h-[calc(100dvh-24px)] p-0 rounded-[3px] border border-[#1f1f1f] bg-[#2d2d2d] text-[#dddddd] shadow-2xl backdrop:bg-black/60"
-    >
-      <div className="flex flex-col max-h-[calc(100dvh-24px)]">
-        <header className="flex items-center justify-between gap-2 px-4 py-2.5 border-b-2 border-[#1f1f1f]">
-          <h2 id="embed-dialog-title" className="text-[14px] font-bold text-[#dddddd]">
-            Embed this network on your website
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className={`flex items-center justify-center w-7 h-7 rounded text-[#bdbdbd] hover:bg-[#434343] hover:text-white cursor-pointer ${TOUCH_TARGET}`}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </header>
-
-        <div className="overflow-y-auto px-4 py-3 space-y-3 text-xs">
-          {/* Options */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
-            <label className="flex flex-col gap-1 sm:col-span-2">
-              <span className="text-[#d2dcfb]">Network file URL (where you upload the exported .json)</span>
-              <input
-                type="text"
-                value={options.jsonUrl}
-                onChange={(e) => update('jsonUrl', e.target.value)}
-                spellCheck={false}
-                className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] font-mono text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]"
-              />
+    <PlaygroundDialog open={open} onClose={onClose} title="Embed this network on your website">
+      <div className="overflow-y-auto px-4 py-3 space-y-3 text-xs">
+        {/* Options */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
+          <label className="flex flex-col gap-1 sm:col-span-2">
+            <span className="text-[#d2dcfb]">Network file URL (where you upload the exported .json)</span>
+            <input
+              type="text"
+              value={options.jsonUrl}
+              onChange={(e) => update('jsonUrl', e.target.value)}
+              spellCheck={false}
+              className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] font-mono text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]"
+            />
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="text-[#d2dcfb]">Height (px)</span>
+            <input
+              type="number"
+              min={240}
+              step={20}
+              value={options.heightPx}
+              onChange={(e) => update('heightPx', Math.max(240, Number(e.target.value) || DEFAULT_EMBED_OPTIONS.heightPx))}
+              className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]"
+            />
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="flex flex-col gap-1">
+              <span className="text-[#d2dcfb]">Label size</span>
+              <select
+                value={options.labelSize}
+                onChange={(e) => update('labelSize', e.target.value as EmbedSnippetOptions['labelSize'])}
+                className="h-9 px-1.5 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white"
+              >
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="large">Large</option>
+              </select>
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-[#d2dcfb]">Height (px)</span>
-              <input
-                type="number"
-                min={240}
-                step={20}
-                value={options.heightPx}
-                onChange={(e) => update('heightPx', Math.max(240, Number(e.target.value) || DEFAULT_EMBED_OPTIONS.heightPx))}
-                className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]"
-              />
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <label className="flex flex-col gap-1">
-                <span className="text-[#d2dcfb]">Label size</span>
-                <select
-                  value={options.labelSize}
-                  onChange={(e) => update('labelSize', e.target.value as EmbedSnippetOptions['labelSize'])}
-                  className="h-9 px-1.5 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white"
-                >
-                  <option value="small">Small</option>
-                  <option value="medium">Medium</option>
-                  <option value="large">Large</option>
-                </select>
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-[#d2dcfb]">Wires</span>
-                <select
-                  value={options.wireStyle}
-                  onChange={(e) => update('wireStyle', e.target.value as EmbedSnippetOptions['wireStyle'])}
-                  className="h-9 px-1.5 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white"
-                >
-                  <option value="auto">As exported</option>
-                  <option value="default">Default</option>
-                  <option value="rounded">Rounded</option>
-                </select>
-              </label>
-            </div>
-            <div className="sm:col-span-2 flex flex-wrap gap-x-5 gap-y-1">
-              {(
-                [
-                  ['showToolbar', 'Toolbar'],
-                  ['showMiniMap', 'Minimap'],
-                  ['showInspector', 'Parameter Inspector'],
-                ] as const
-              ).map(([key, label]) => (
-                <label key={key} className="flex items-center gap-2 min-h-9 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={options[key]}
-                    onChange={(e) => update(key, e.target.checked)}
-                    className="w-4 h-4 accent-[#7082b9]"
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Snippet tabs */}
-          <div>
-            <div role="tablist" aria-label="Embed type" className="flex gap-0.5 pb-1 border-b-2 border-[#1f1f1f]">
-              {TABS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === t.id}
-                  onClick={() => setTab(t.id)}
-                  className={`h-6 px-2 rounded-[3px] text-[13px] cursor-pointer ${TOUCH_TARGET} ${
-                    tab === t.id ? 'bg-[#474e62] text-white font-bold' : 'text-[#a6a6a6] hover:text-[#dddddd]'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-            <p className="mt-2 text-[#d2dcfb]">{activeTab.help}</p>
-            {needsAbsoluteUrl && (
-              <p className="mt-1 text-[#e0b070]">
-                The file URL above is relative. An iframe loads it from this playground, so use a full https:// address.
-              </p>
-            )}
-            <div className="relative mt-2">
-              <pre className="m-0 max-h-72 overflow-auto rounded-[2px] border border-[#3a3a3a] bg-[#141414] p-3 pr-20 font-mono text-[12px] leading-[1.5] text-[#d6d6d6] whitespace-pre select-text">
-                {snippet}
-              </pre>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-white text-[12px] cursor-pointer ${TOUCH_TARGET}`}
+              <span className="text-[#d2dcfb]">Wires</span>
+              <select
+                value={options.wireStyle}
+                onChange={(e) => update('wireStyle', e.target.value as EmbedSnippetOptions['wireStyle'])}
+                className="h-9 px-1.5 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white"
               >
-                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                {copied ? 'Copied' : 'Copy'}
+                <option value="auto">As exported</option>
+                <option value="default">Default</option>
+                <option value="rounded">Rounded</option>
+              </select>
+            </label>
+          </div>
+          <div className="sm:col-span-2 flex flex-wrap gap-x-5 gap-y-1">
+            {(
+              [
+                ['showToolbar', 'Toolbar'],
+                ['showMiniMap', 'Minimap'],
+                ['showInspector', 'Parameter Inspector'],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="flex items-center gap-2 min-h-9 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={options[key]}
+                  onChange={(e) => update(key, e.target.checked)}
+                  className="w-4 h-4 accent-[#7082b9]"
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Snippet tabs */}
+        <div>
+          <div role="tablist" aria-label="Embed type" className="flex gap-0.5 pb-1 border-b-2 border-[#1f1f1f]">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => setTab(t.id)}
+                className={`h-6 px-2 rounded-[3px] text-[13px] cursor-pointer ${TOUCH_TARGET} ${
+                  tab === t.id ? 'bg-[#474e62] text-white font-bold' : 'text-[#a6a6a6] hover:text-[#dddddd]'
+                }`}
+              >
+                {t.label}
               </button>
-            </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[#d2dcfb]">{activeTab.help}</p>
+          {needsAbsoluteUrl && (
+            <p className="mt-1 text-[#e0b070]">
+              The file URL above is relative. An iframe loads it from this playground, so use a full https:// address.
+            </p>
+          )}
+          <div className="relative mt-2">
+            <pre className="m-0 max-h-72 overflow-auto rounded-[2px] border border-[#3a3a3a] bg-[#141414] p-3 pr-20 font-mono text-[12px] leading-[1.5] text-[#d6d6d6] whitespace-pre select-text">
+              {snippet}
+            </pre>
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-white text-[12px] cursor-pointer ${TOUCH_TARGET}`}
+            >
+              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
           </div>
         </div>
       </div>
-    </dialog>
+    </PlaygroundDialog>
   );
 };

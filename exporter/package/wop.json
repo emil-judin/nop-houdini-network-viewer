@@ -1,0 +1,7 @@
+{
+  "env": [
+    { "WOP": "$HOUDINI_USER_PREF_DIR/packages/wop" }
+  ],
+  "path": "$WOP",
+  "load_package_once": true
+}

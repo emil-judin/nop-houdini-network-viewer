@@ -12,8 +12,10 @@
     <link rel="manifest" href="./site.webmanifest" />
     <meta property="og:title" content="WOP" />
     <meta property="og:description" content="View and share Houdini node networks on the web." />
-    <!-- og:image needs an absolute URL; add it once the playground is hosted: ./og-image.png -->
+    <!-- og:url and og:image (absolute URLs) are added at build time from VITE_SITE_URL, see vite.config.ts -->
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Tester phase: keep the playground out of search engines; remove for the public release -->
+    <meta name="robots" content="noindex, nofollow" />
   </head>
   <body class="bg-[#1e1e1e] text-neutral-100 antialiased selection:bg-amber-500/30">
     <div id="root"></div>

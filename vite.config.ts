@@ -1,6 +1,6 @@
 import { createReadStream, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -31,10 +31,29 @@ function localReferenceIcons(): Plugin {
 }
 
 /**
+ * Adds `og:url` and `og:image` to the playground page. Link previews (chat apps, social sites) need
+ * absolute URLs, so the tags are only added when the hosted address is known (`VITE_SITE_URL`, set by
+ * the GitHub Pages workflow).
+ */
+function openGraphUrls(siteUrl: string | undefined): Plugin {
+  return {
+    name: 'open-graph-urls',
+    transformIndexHtml() {
+      if (!siteUrl) return [];
+      const base = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`;
+      return [
+        { tag: 'meta', attrs: { property: 'og:url', content: base }, injectTo: 'head' },
+        { tag: 'meta', attrs: { property: 'og:image', content: `${base}og-image.png` }, injectTo: 'head' },
+      ];
+    },
+  };
+}
+
+/**
  * Vite configuration for the WOP playground and development server.
  */
-export default defineConfig({
-  plugins: [react(), tailwindcss(), localReferenceIcons()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), tailwindcss(), localReferenceIcons(), openGraphUrls(loadEnv(mode, process.cwd(), 'VITE_').VITE_SITE_URL)],
   // Relative asset URLs, so the playground also works from a sub-path such as GitHub Pages (`/<repo>/`)
   base: './',
   build: {
@@ -45,4 +64,4 @@ export default defineConfig({
     port: 5173,
     open: false,
   },
-});
+}));
