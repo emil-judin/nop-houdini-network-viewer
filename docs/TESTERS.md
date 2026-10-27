@@ -6,7 +6,7 @@ This is an early test version. Some things will be missing or broken, and that i
 
 ## 1. Open the playground
 
-Open the link from your invitation. It works in a desktop or phone browser. Two demo networks are loaded: click nodes to see their parameters, double-click the Circuit Gen asset to go inside it, press `H` to fit the view.
+Open the link from your invitation. It works in a desktop or phone browser. Two demo networks are available: click nodes to see their parameters, open the Circuit Gen tab and double-click its subnetworks to go inside, press `H` to fit the view.
 
 ## 2. Install the exporter in Houdini
 
@@ -27,23 +27,26 @@ To remove it later, delete `wop.json` and the `wop` folder.
 - Export one of your own networks: select nodes (or nothing for the whole network), click **Export for WOP**, choose **Copy to Clipboard**, then press `Ctrl+V` in the playground.
 - Save a `.json` file instead and open it with **Open .json**, or drop it on the page.
 - Compare with Houdini: node shapes, colors, flags, wires, network boxes, the parameter panel. Anything that looks different from Houdini is useful feedback.
-- Go into subnetworks and your own digital assets, and back out with the path bar.
+- Go into subnetworks and your own unlocked digital assets, and back out with the path bar.
 - Try the playground on your phone or tablet.
 - Click **Embed** and, if you have a website, try putting a network on it (the iframe option works with the playground link).
 
 ## 4. Known limits
 
 - Tested with Houdini 22.0.466 only.
-- Tested in Chrome only so far. Safari, Firefox and phones should work, but reports are welcome.
+- Automated tests cover Chrome, Firefox and Safari's engine, plus phone and tablet profiles, but not real devices yet. Reports from real phones are welcome.
 - Built for SOP networks. Other network types (VOP, LOP, TOP, DOP) are not supported yet and may look wrong.
 - The React and web component embeds need the npm package, which is not published yet. Use the iframe option for now.
 
 ## 5. Privacy
 
 - A network you open in the playground stays in your browser; it is never uploaded.
-- The exporter replaces your local folders (for example `C:/Users/<name>/...`) with `$HIP`, `$JOB`, `~` and similar, so shared files do not reveal your folder names. Please check one of your exports before sharing it publicly, and tell me if anything private slipped through.
+- **Paths:** folders inside your project become `$HIP` or `$JOB` (`$HIP/geo/a.bgeo`). Every other path keeps only its file name: `D:/Clients/Acme/tex/rock.exr`, `C:/Users/<you>/...` and server shares such as `\\studio-nas\...` all become `<path>/rock.exr`. File names themselves stay, so rename a file if its name is confidential.
+- **Locked assets:** if your network uses locked assets that are not from SideFX (bought, studio or a colleague's), the exporter asks before including their insides. Choose **Export Closed** unless you made the asset yourself. Their icons are included either way.
+- **Exported as you wrote them:** network box titles exactly, and sticky notes, node names and parameter text apart from their paths. Check them before sharing.
 - Your asset names (for example `myname::my_asset::1.0`) are part of the export, because they identify the nodes.
+- Please check one of your exports before sharing it publicly, and tell me if anything private slipped through. For a serious leak, use the private contact in `SECURITY.md` instead of the feedback form.
 
 ## 6. Send feedback
 
-Click **Feedback** in the playground. Your message goes straight to me; add your name or email if you would like an answer. Screenshots help: if something looks wrong, mention what you expected and I may ask you for one.
+Click **Feedback** in the playground. Your message goes straight to me by email (through Web3Forms), with the WOP version, your browser and the name of the network on screen; your network file is never sent. Add your name or email if you would like an answer. Screenshots help: if something looks wrong, mention what you expected and I may ask you for one.

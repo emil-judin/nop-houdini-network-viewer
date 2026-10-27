@@ -1,3 +1,4 @@
+import type { HotkeyMode } from '../components/hooks/useViewerHotkeys';
 import type { HoudiniLabelSize } from '../schema/converter';
 import type { HoudiniWireStyle } from '../schema/types';
 
@@ -20,6 +21,8 @@ export interface EmbedViewerOptions {
   showDebugActions?: boolean;
   /** `fit-view`: `false` keeps the initial view instead of fitting the network. */
   fitView?: boolean;
+  /** `hotkeys`: `focus` (default), `hover` or `off` (see `HoudiniNetworkProps.hotkeys`). */
+  hotkeys?: HotkeyMode;
 }
 
 /**
@@ -33,6 +36,7 @@ export const EMBED_OPTION_NAMES = [
   'inspector',
   'debug-actions',
   'fit-view',
+  'hotkeys',
 ] as const;
 
 /**
@@ -60,6 +64,10 @@ export function parseEmbedOptions(read: (name: string) => string | null): EmbedV
   const wireStyle = read('wire-style');
   if (wireStyle === 'default' || wireStyle === 'rounded') {
     options.wireStyle = wireStyle;
+  }
+  const hotkeys = read('hotkeys');
+  if (hotkeys === 'focus' || hotkeys === 'hover' || hotkeys === 'off') {
+    options.hotkeys = hotkeys;
   }
   const flags: Array<[string, keyof EmbedViewerOptions]> = [
     ['minimap', 'showMiniMap'],

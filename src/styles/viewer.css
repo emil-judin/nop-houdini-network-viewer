@@ -33,3 +33,31 @@
 .wop-root {
   color-scheme: dark;
 }
+
+/* Keyboard focus (Tab) on operator nodes: a blue ring, distinct from Houdini's yellow selection outline */
+.react-flow__node:focus {
+  outline: none;
+}
+
+.react-flow__node:focus-visible {
+  outline: 2px solid #7fb2ff;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* Visible keyboard focus on the viewer's own controls */
+.wop-root :where(button, [role="region"], [role="separator"], [tabindex="0"]):focus-visible {
+  outline: 2px solid #7fb2ff;
+  outline-offset: 1px;
+}
+
+/* Less motion when the visitor asks the system for it (view changes are handled in script) */
+@media (prefers-reduced-motion: reduce) {
+  .wop-root *,
+  .wop-root ::before,
+  .wop-root ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -33,6 +33,8 @@ export const PlaygroundDialog: React.FC<PlaygroundDialogProps> = ({ open, onClos
   }, [open]);
 
   return (
+    // Closing on a backdrop click is a pointer shortcut; Escape and the close button work natively
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <dialog
       ref={dialogRef}
       onClose={onClose}

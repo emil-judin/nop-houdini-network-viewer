@@ -120,6 +120,8 @@ export const ResizableInspectorPanel: React.FC<ResizableInspectorPanelProps> = (
   };
 
   const handle = (
+    // WAI-ARIA window splitter: a focusable separator with a value, moved with the arrow keys
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <div
       role="separator"
       tabIndex={0}

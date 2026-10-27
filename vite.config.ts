@@ -1,4 +1,4 @@
-import { createReadStream, existsSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -49,16 +49,67 @@ function openGraphUrls(siteUrl: string | undefined): Plugin {
   };
 }
 
+/** Name and version from `package.json`. Only these two values reach the browser, never the whole file. */
+const PACKAGE = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { name: string; version: string };
+
+/**
+ * Content-Security-Policy for the hosted playground, as a meta tag (GitHub Pages cannot send headers).
+ * A second line of defence: scripts only from the playground itself, no plugins, no form posts.
+ * `connect-src https:` keeps `?embed=true&src=https://...` and the feedback form working. Only added
+ * to production builds, because the dev server injects inline scripts.
+ */
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "font-src 'self' data:",
+  "connect-src 'self' https: data:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'none'",
+].join('; ');
+
+/** Adds `CONTENT_SECURITY_POLICY` to the built playground page. */
+function contentSecurityPolicy(): Plugin {
+  return {
+    name: 'content-security-policy',
+    apply: 'build',
+    transformIndexHtml() {
+      return [
+        {
+          tag: 'meta',
+          attrs: { 'http-equiv': 'Content-Security-Policy', content: CONTENT_SECURITY_POLICY },
+          injectTo: 'head-prepend',
+        },
+      ];
+    },
+  };
+}
+
 /**
  * Vite configuration for the WOP playground and development server.
  */
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss(), localReferenceIcons(), openGraphUrls(loadEnv(mode, process.cwd(), 'VITE_').VITE_SITE_URL)],
+  plugins: [
+    react(),
+    tailwindcss(),
+    localReferenceIcons(),
+    openGraphUrls(loadEnv(mode, process.cwd(), 'VITE_').VITE_SITE_URL),
+    contentSecurityPolicy(),
+  ],
+  define: {
+    __WOP_VERSION__: JSON.stringify(PACKAGE.version),
+    __WOP_PACKAGE_NAME__: JSON.stringify(PACKAGE.name),
+  },
   // Relative asset URLs, so the playground also works from a sub-path such as GitHub Pages (`/<repo>/`)
   base: './',
   build: {
     // `dist/` belongs to the library build (`npm.cmd run build:lib`)
     outDir: 'dist-playground',
+    // The largest chunk is the Circuit Gen demo network (JSON data, about 100 KB gzip), loaded only
+    // when its tab is opened
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     port: 5173,

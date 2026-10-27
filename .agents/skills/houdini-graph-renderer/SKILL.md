@@ -1,54 +1,64 @@
 ---
 name: houdini-graph-renderer
 description: >-
-  Visual specification and coordinate conversion rules for rendering authentic, view-only SideFX Houdini node networks in React Flow. Activate this skill when creating or modifying node components, node shapes, flags, wires, network boxes, sticky notes, or coordinate transformations.
+  Rules for drawing Houdini networks in the WOP viewer (src/components/, src/schema/convertGraph.ts): node
+  shapes, flags, wires, dots, network boxes, sticky notes, subnet inputs, the path bar, the inspector and
+  coordinate conversion. Use when creating or changing any viewer component or the converter.
 ---
 
-# Houdini Graph Renderer Specification
+# WOP Graph Renderer
 
-Use this reference when implementing or modifying visual components in `src/components/` and coordinate conversion logic in `src/schema/converter.ts`.
+The viewer must look like Houdini 22's Network Editor (pillar 2) and stay view-only (pillar 3). The code holds
+every measured value as a named constant: this skill points to them instead of repeating numbers that drift.
+If a visual detail is unclear, ask the owner for a Houdini screenshot instead of guessing.
 
-## 1. Core Visual & Interaction Constraints
+## 1. Where the values live
 
-- **Strictly View-Only:**
-  - React Flow must be configured with `nodesDraggable={false}`, `nodesConnectable={false}`, `edgesReconnectable={false}`, `elementsSelectable={true}`, `panOnDrag={true}`, and `zoomOnScroll={true}`.
-  - Flag strips on nodes (`Bypass`, `Lock`, `Template`, `Display/Render`) are strictly visual status indicators and must not mutate state on click.
-- **Ask for Reference Screenshots:**
-  - If a visual detail of Houdini's Network Editor is unclear, ask the user for a reference screenshot from Houdini rather than guessing.
+| What | Source of truth |
+| --- | --- |
+| Units, node box (100 x 30 px), dot radius, box and sticky header heights, ID prefixes | `src/schema/convertGraph.ts` (`HOUDINI_UNIT_TO_PX`, `HOUDINI_DOT_RADIUS_PX`, `MINIMIZED_BOX_HEIGHT_PX`, `MINIMIZED_STICKY_HEIGHT_PX`, `*_ID_PREFIX`) |
+| The 36 node shapes, flag regions, connector slots | `src/components/nodes/shapes/houdiniShapesData.json`, read through `nodeShapes.ts` |
+| Node colors, selection outline, flag colors, bypass fading, padlocks | `src/components/nodes/HoudiniSopNode.tsx` |
+| Wire colors and paths (both Houdini wire styles) | `src/components/edges/HoudiniWire.tsx`, `wirePaths.ts` |
+| Canvas and grid colors | `src/components/theme.ts` |
+| Parameter Pane colors | `src/components/inspector/paneStyles.ts` |
+| Fidelity decisions and their history | `docs/HISTORY.md` |
 
-## 2. Houdini Color Tokens, Typography & Proportions
+## 2. Invariants
 
-- **Typography (Matching `$HFS/houdini/fonts/font.map`):**
-  - **Proportional UI & Node Labels (`--font-sans`):** `"Source Sans Pro"` (`@fontsource/source-sans-pro`, SIL Open Font License).
-  - **Fixed / Parameter Numbers & VEX Code (`--font-mono`):** `"Source Code Pro"` (`@fontsource/source-code-pro`, SIL Open Font License).
-- **Canvas Background:** `#242424` (major grid lines `#2e2e2e`, minor grid lines `#282828`).
-- **Default SOP Node Color:** `[0.8, 0.8, 0.8]` (`#cccccc`), rendered with a subtle dark border (`#141414`) and slight vertical luminance gradient for authenticity.
-- **Node Selection Highlight:** Bright yellow/gold outline (`#f5b800` / `#ffaa00`) when selected for parameter inspection.
-- **Flag Colors (SOP Context):**
-  - **Bypass (Left outer):** `#e5c130` (Yellow)
-  - **Lock (Left inner):** `#d94040` (Red)
-  - **Template (Right inner):** `#d45ca8` (Pink/Magenta)
-  - **Display / Render (Right outer):** `#3098e5` (Cyan/Blue)
-- **Standard Node Proportions (`UNIT_SCALE = 100`):**
-  - Standard SOP node size in Houdini units is `[1.1296, 0.2824]`, which maps to `113px x 28px`.
-  - Node name label (`node.name`) and comment text float outside to the right of the node body (`left: calc(100% + 8px)`), keeping the operator icon centered inside the node shape.
+- **Coordinates:** Houdini is +Y up in network units, the screen is +Y down in pixels:
+  `screenY = -(houY + height) * HOUDINI_UNIT_TO_PX`. Dots are centered on `pos`. Network box headers are drawn
+  above the body Houdini reports.
+- **Node size:** operator nodes are always drawn in Houdini's 10:3 shape box (100 x 30 px); `node.size` is
+  informational.
+- **Multi-input nodes:** nodes with `maxInputs > 4` (`merge`, `switch` report 9999) get one wide bar with 16
+  hidden handles `in-multi-0..15`; never render one handle per input in a loop. Wires fan out across the bar in
+  input order (`toInput`), computed in the converter.
+- **IDs:** operator nodes use their Houdini name; boxes, stickies, dots and subnet inputs use the prefixes
+  `box:`, `sticky:`, `dot:`, `input:` (Houdini never allows a colon in names). Wire ends resolve node first,
+  then dot, then subnet input. Wires to items that are not in the export are skipped.
+- **View-only:** `nodesDraggable={false}`, `nodesConnectable={false}`, `edgesReconnectable={false}`. Flags are
+  pictures, never buttons. Nodes are focusable for keyboard access (Tab, Enter opens the inspector), which does
+  not allow editing: arrow keys only move draggable nodes.
 
-## 3. Node Shapes (`src/components/nodes/shapes/nodeShapes.ts`)
+## 3. Library rules (also in AGENTS.md)
 
-Every node shape renders as an inline `<svg viewBox="0 0 113 28">` (or scaled to `size`):
-- `rect` (or `""`): Rounded pill/rectangle (`rx="4"`).
-- `wave`: Attribute Wrangle shape with a curved wave contour on the bottom edge.
-- `cigar`: Fully rounded stadium/capsule shape (`rx="14"`) used by `merge`.
-- `diamond`: Diamond polygon used by `switch`.
-- `null`: Framed bracket shape used by `null` nodes.
-- `chevron_down`: Downward-pointing block header used by `block_begin` (For-Each Begin).
-- `chevron_up`: Upward-pointing block footer used by `block_end` (For-Each End).
-- `tilted`: Slanted parallelogram used by `attribpromote`.
-- `circle`: Circular node body.
+- Every viewer element renders inside `.wop-root` (no portals to `document.body`): the npm stylesheet is scoped
+  to it at build time.
+- Sizes in `px` (or the px-pinned theme tokens), never raw `rem`.
+- Layouts follow the viewer's own width with container queries (`@md:`, `@2xl:`), not viewport breakpoints.
+- No `dangerouslySetInnerHTML` or `innerHTML` for file content. Custom SVG icons are shown only through
+  `<img src="data:image/svg+xml,...">` (`svgDataUri.ts`), where scripts cannot run.
+- Look up maps that come from the file with `Object.hasOwn` (an icon or shape named `constructor` must not
+  reach `Object.prototype`).
+- Touch targets reach 44 px on coarse pointers (`TOUCH_TARGET`), and at least 24 px everywhere (WCAG 2.5.8).
+- Text meets 4.5:1 contrast; dimmed Houdini colors that cannot are marked `aria-disabled` when they show
+  disabled parameters.
 
-## 4. Multi-Input Connectors & Subnet Inputs
+## 4. Structure
 
-- **Discrete Inputs (`maxInputs <= 4`):** Space handles evenly across the top edge (`(i + 1) / (maxInputs + 1) * 100%`).
-- **Wide Multi-Input Bar (`maxInputs > 4`):** Render a single wide pill handle centered at the top edge (`id="in-multi"`). Map all incoming edges (`toInput >= 0`) on multi-input nodes to this handle ID.
-- **Subnetwork Indirect Inputs (`subnetInputs`):** Convert each entry `{"name": "1", "num": 0, "pos": [x, y]}` into a `<HoudiniSubnetInput />` node with ID `__subnet_input_1`, and rewrite any wire with `from == "1"` to `from: "__subnet_input_1"`.
-
+- `HoudiniNetwork.tsx`: parsing (`normalizeNetworkDocument`), fullscreen, error boundaries, Labs icon loading;
+  the inner canvas wires the hooks in `src/components/hooks/` (navigation history, hotkeys, wire highlight,
+  fullscreen, reduced motion) to React Flow and the HUD.
+- The Parameter Inspector and the SideFX Labs icon drawings load on demand (`React.lazy`, `loadLabsIcons`).
+  Keep heavy, optional code behind such a boundary so embeds stay small.

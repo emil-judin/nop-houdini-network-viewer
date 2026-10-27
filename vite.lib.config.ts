@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto';
 import { transform } from 'esbuild';
+import MagicString from 'magic-string';
 import postcss from 'postcss';
-import { defineConfig, type Plugin } from 'vite';
+import { defineConfig, type Plugin, type Rollup } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -12,8 +14,58 @@ function minifyBrowserBundle(): Plugin {
   return {
     name: 'minify-browser-bundle',
     async renderChunk(code) {
-      const result = await transform(code, { minify: true, format: 'esm', target: 'es2022' });
+      // `sourcemap: 'external'` returns the map of this step, which Rollup chains with the earlier ones,
+      // so `web-component.js.map` matches the minified file
+      const result = await transform(code, { minify: true, format: 'esm', target: 'es2022', sourcemap: 'external' });
       return { code: result.code, map: result.map || null };
+    },
+  };
+}
+
+/** A WOFF2 font inlined as a data URI (Vite library mode inlines every asset). */
+const FONT_DATA_URI = /data:font\/woff2;base64,[A-Za-z0-9+/=]+/g;
+const FONT_DATA_PREFIX = 'data:font/woff2;base64,';
+
+/**
+ * Moves the fonts out of the bundles into `dist/fonts/`: `style.css` and the web component then
+ * stay small, do not block on 70 KB of base64, and the browser caches the fonts on their own.
+ * In `style.css` the fonts are referenced relative to the stylesheet; in the web component the
+ * script makes the URLs absolute at run time (`resolveFontUrls` in `src/web-component.ts`).
+ */
+function emitFontFiles(): Plugin {
+  const fileNames = new Map<string, string>();
+
+  /** Font file name for a data URI, emitting the file the first time it is seen. */
+  const fontFile = (context: Pick<Rollup.PluginContext, 'emitFile'>, dataUri: string): string => {
+    let fileName = fileNames.get(dataUri);
+    if (!fileName) {
+      const bytes = Buffer.from(dataUri.slice(FONT_DATA_PREFIX.length), 'base64');
+      fileName = `fonts/wop-${createHash('sha256').update(bytes).digest('hex').slice(0, 12)}.woff2`;
+      context.emitFile({ type: 'asset', fileName, source: bytes });
+      fileNames.set(dataUri, fileName);
+    }
+    return fileName;
+  };
+
+  return {
+    name: 'emit-font-files',
+    enforce: 'post',
+    renderStart() {
+      fileNames.clear();
+    },
+    renderChunk(code) {
+      if (!code.includes(FONT_DATA_PREFIX)) return null;
+      const output = new MagicString(code);
+      for (const match of code.matchAll(FONT_DATA_URI)) {
+        output.overwrite(match.index, match.index + match[0].length, `./${fontFile(this, match[0])}`);
+      }
+      return { code: output.toString(), map: output.generateMap({ hires: 'boundary' }) };
+    },
+    generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type !== 'asset' || !file.fileName.endsWith('.css')) continue;
+        file.source = String(file.source).replace(FONT_DATA_URI, (uri) => `./${fontFile(this, uri)}`);
+      }
     },
   };
 }
@@ -29,7 +81,7 @@ const VIEWER_SCOPE = `:is(${VIEWER_ROOT}, ${VIEWER_ROOT} *)`;
  * specificity, so the order between the viewer's own rules stays as it was, while they now outrank a
  * host page's identically named utility classes and never match host elements.
  */
-function scopeSelector(selector: string): string {
+export function scopeSelector(selector: string): string {
   const s = selector.trim();
   // Theme variables (`--spacing`, `--font-sans`, ...) would otherwise replace a host's Tailwind theme
   if (s === ':root' || s === ':host') return VIEWER_ROOT;
@@ -79,7 +131,12 @@ function scopeStylesheetToViewer(): Plugin {
 export default defineConfig(({ mode }) => {
   const isWebComponent = mode === 'web-component';
   return {
-    plugins: [react(), tailwindcss(), ...(isWebComponent ? [minifyBrowserBundle()] : [scopeStylesheetToViewer()])],
+    plugins: [
+      react(),
+      tailwindcss(),
+      emitFontFiles(),
+      ...(isWebComponent ? [minifyBrowserBundle()] : [scopeStylesheetToViewer()]),
+    ],
     // The playground's `public/` folder is not part of the package
     publicDir: false,
     // React reads `process.env.NODE_ENV`, which library mode does not replace when React is bundled
@@ -101,9 +158,16 @@ export default defineConfig(({ mode }) => {
             fileName: (format) => (format === 'es' ? 'index.js' : 'index.cjs'),
             cssFileName: 'style',
           },
-      rollupOptions: isWebComponent
-        ? {}
-        : { external: [/^react($|\/)/, /^react-dom($|\/)/, /^@xyflow\/react($|\/)/, /^lucide-react($|\/)/] },
+      // Parts loaded on demand (Parameter Inspector, SideFX Labs icons) are separate files in their own
+      // folder; the web component imports them relative to `web-component.js`
+      rollupOptions: {
+        // The on-demand chunks import shared code straight from the entry file, instead of Rollup
+        // moving everything into a second file behind a tiny entry (one request less)
+        preserveEntrySignatures: 'allow-extension',
+        ...(isWebComponent
+          ? { output: { chunkFileNames: 'web-component-chunks/[name]-[hash].js' } }
+          : { external: [/^react($|\/)/, /^react-dom($|\/)/, /^@xyflow\/react($|\/)/, /^lucide-react($|\/)/] }),
+      },
     },
   };
 });

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Background,
   BackgroundVariant,
@@ -18,18 +18,22 @@ import {
   type HoudiniNetBoxFlowNodeData,
   type HoudiniSopFlowNodeData,
   type HoudiniStickyFlowNodeData,
-  type HoudiniWireFlowEdgeData,
 } from '../schema/converter';
-import { getConnectedWireIds } from '../schema/connectedWires';
-import { canDiveInto, resolveSubnetLevels, type SubnetLevel } from '../schema/subnetPath';
+import { canDiveInto } from '../schema/subnetPath';
 import type { HoudiniNetworkDocument, HoudiniNodeData, HoudiniWireStyle } from '../schema/types';
 import { HoudiniWire } from './edges/HoudiniWire';
+import { useFullscreen } from './hooks/useFullscreen';
+import { useLabsIcons } from './hooks/useLabsIcons';
+import { isPathPrefix, useNavigationHistory, type BeforeNavigate } from './hooks/useNavigationHistory';
+import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
+import { useViewerHotkeys, type HotkeyMode } from './hooks/useViewerHotkeys';
+import { useWireHighlight } from './hooks/useWireHighlight';
 import { BreadcrumbBar } from './hud/BreadcrumbBar';
 import { buildNetworkPathSegments } from './hud/networkPathSegments';
 import { NavigableMiniMap } from './hud/NavigableMiniMap';
 import { NetworkErrorState } from './hud/NetworkErrorState';
+import { NetworkLoadingState } from './hud/NetworkLoadingState';
 import { ViewerToolbar } from './hud/ViewerToolbar';
-import { ParameterInspector } from './inspector/ParameterInspector';
 import { ResizableInspectorPanel, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
 import { useElementSize } from './useElementSize';
 import { NetworkErrorBoundary } from './NetworkErrorBoundary';
@@ -38,6 +42,13 @@ import { HoudiniNetBox } from './nodes/HoudiniNetBox';
 import { HoudiniSopNode } from './nodes/HoudiniSopNode';
 import { HoudiniStickyNote } from './nodes/HoudiniStickyNote';
 import { HoudiniSubnetInput } from './nodes/HoudiniSubnetInput';
+import { CANVAS_BG_CLASS, GRID_LINE_COLOR } from './theme';
+
+// The Parameter Inspector (pane layout, code highlighting, ramps) is only needed once a node is
+// selected, so it is loaded on demand and stays out of the first download of embeds
+const ParameterInspector = React.lazy(() =>
+  import('./inspector/ParameterInspector').then((module) => ({ default: module.ParameterInspector })),
+);
 
 /**
  * Props for the `<HoudiniNetwork />` embeddable component.
@@ -54,7 +65,7 @@ export interface HoudiniNetworkProps {
   showMiniMap?: boolean;
   /** Show the top HUD toolbar (path, fit view, debug JSON, fullscreen). Defaults to `true`. */
   showToolbar?: boolean;
-  /** Show the debug Copy/Download JSON buttons in the toolbar. Defaults to `true`. */
+  /** Show the debug Copy/Download JSON buttons in the toolbar. Defaults to `false`. */
   showDebugActions?: boolean;
   /**
    * Open the read-only Parameter Inspector when a node is selected (a side panel in wide viewers,
@@ -71,6 +82,12 @@ export interface HoudiniNetworkProps {
    * Defaults to the style exported with the network, or `"default"` for older exports.
    */
   wireStyle?: HoudiniWireStyle;
+  /**
+   * When the Houdini hotkeys (H, F, I, U, O, Shift+S) react: `"focus"` only while focus is inside the
+   * viewer (after clicking or tabbing into it), `"hover"` also while the pointer is over it, `"off"`
+   * never. Defaults to `"focus"`, so single keys never act on a page the visitor is typing on.
+   */
+  hotkeys?: HotkeyMode;
   /** Optional callback fired when the selected operator node changes (`null` when nothing is selected). */
   onNodeSelect?: (node: HoudiniNodeData | null) => void;
   /** Optional CSS class name for the outer container. */
@@ -78,52 +95,30 @@ export interface HoudiniNetworkProps {
 }
 
 const NODE_TYPES: NodeTypes = {
-  houdiniSop: HoudiniSopNode,
-  houdiniDot: HoudiniDotNode,
-  houdiniSubnetInput: HoudiniSubnetInput,
-  houdiniNetBox: HoudiniNetBox,
-  houdiniSticky: HoudiniStickyNote,
+  houdiniSop: memo(HoudiniSopNode),
+  houdiniDot: memo(HoudiniDotNode),
+  houdiniSubnetInput: memo(HoudiniSubnetInput),
+  houdiniNetBox: memo(HoudiniNetBox),
+  houdiniSticky: memo(HoudiniStickyNote),
 };
 
 const EDGE_TYPES: EdgeTypes = {
-  houdiniWire: HoudiniWire,
+  houdiniWire: memo(HoudiniWire),
 };
 
 /** Maximum delay between two clicks or taps on the same node that counts as a double-click. */
 const DOUBLE_CLICK_MS = 400;
 
-const FIT_VIEW_OPTIONS = { padding: 0.14, duration: 250 } as const;
+/** Animation time of view changes (fit, frame); `0` when the visitor prefers reduced motion. */
+const VIEW_ANIMATION_MS = 300;
 
-const NO_DIVE_PATH: string[] = [];
+const FIT_PADDING = 0.14;
 
 /**
- * Subnetwork navigation of one document, like Houdini's path bar: `history[index]` is the network on
- * screen (names of the subnetworks dived into, from the exported root down), `history` the back /
- * forward list, and `trail` the deepest visited path below the network on screen (dimmed in the bar).
+ * Network levels with more items than this only render what is on screen. Smaller levels render
+ * everything, so the keyboard Tab order reaches every node.
  */
-interface NavigationState {
-  doc: HoudiniNetworkDocument;
-  history: string[][];
-  index: number;
-  trail: string[];
-}
-
-const START_HISTORY = [NO_DIVE_PATH];
-
-/** Navigation at the exported root, with no history. */
-function startNavigation(doc: HoudiniNetworkDocument): NavigationState {
-  return { doc, history: START_HISTORY, index: 0, trail: NO_DIVE_PATH };
-}
-
-/** `true` when `path` starts with all of `prefix`. */
-function isPathPrefix(prefix: readonly string[], path: readonly string[]): boolean {
-  return prefix.length <= path.length && prefix.every((name, i) => path[i] === name);
-}
-
-/** Subnetwork names of a level stack (the root level has none). */
-function levelNames(levels: SubnetLevel[]): string[] {
-  return levels.slice(1).map((level) => level.node?.name ?? '');
-}
+const VISIBLE_ONLY_ITEM_COUNT = 1000;
 
 /**
  * Color resolver for the React Flow `<MiniMap />` matching each Houdini node's RGB color.
@@ -150,6 +145,11 @@ function resolveMiniMapNodeColor(node: Node): string {
   return '#777777';
 }
 
+/** Escapes a node name for an attribute selector (`[data-id="..."]`). */
+function cssString(value: string): string {
+  return value.replace(/["\\]/g, '\\$&');
+}
+
 interface InnerCanvasProps extends HoudiniNetworkProps {
   normalizedDoc: HoudiniNetworkDocument;
   isFullscreen: boolean;
@@ -161,10 +161,11 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   fitView = true,
   showMiniMap = true,
   showToolbar = true,
-  showDebugActions = true,
+  showDebugActions = false,
   showInspector = true,
   labelSize: initialLabelSize = 'medium',
   wireStyle: wireStyleProp,
+  hotkeys = 'focus',
   onNodeSelect,
   isFullscreen,
   onToggleFullscreen,
@@ -172,6 +173,13 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   const { fitView: triggerFitView, getViewport, setViewport } = useReactFlow();
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [labelSize, setLabelSize] = useState<HoudiniLabelSize>(initialLabelSize);
+  // The inspector takes keyboard focus when the node was selected with the keyboard
+  const [focusInspector, setFocusInspector] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const duration = reducedMotion ? 0 : VIEW_ANIMATION_MS;
+  // Read by the level effect below, which must not run again when only the preference changes
+  const reducedMotionRef = useRef(reducedMotion);
+  reducedMotionRef.current = reducedMotion;
 
   const onNodeSelectRef = useRef(onNodeSelect);
   onNodeSelectRef.current = onNodeSelect;
@@ -187,14 +195,41 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     setMiniMapVisible(showMiniMap);
   }, [showMiniMap]);
 
-  // Subnetwork navigation (see `NavigationState`). It belongs to one document, so loading another
-  // file starts again at its root.
-  const [storedNav, setNav] = useState<NavigationState>(() => startNavigation(normalizedDoc));
-  const nav = storedNav.doc === normalizedDoc ? storedNav : startNavigation(normalizedDoc);
-  const divePath = nav.history[nav.index];
-  const levels = useMemo(() => resolveSubnetLevels(normalizedDoc.root, divePath), [normalizedDoc.root, divePath]);
-  const trailLevels = useMemo(() => resolveSubnetLevels(normalizedDoc.root, nav.trail), [normalizedDoc.root, nav.trail]);
-  const activeGraph = levels[levels.length - 1].graph;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const viewerSize = useElementSize(rootRef);
+  const isSidePanel = viewerSize.width >= SIDE_PANEL_MIN_VIEWER_WIDTH;
+  const lastClickRef = useRef<{ id: string; time: number } | null>(null);
+
+  // Viewport of every visited level (by network path), restored when coming back like in Houdini
+  const viewportsRef = useRef(new Map<string, Viewport>());
+  // Subnetwork node to select after going up, so the parent opens with the node you came from selected
+  const pendingSelectionRef = useRef<string | null>(null);
+  // Keyboard focus was inside the viewer when the network changed: keep it there afterwards
+  const restoreFocusRef = useRef(false);
+  const activePathRef = useRef('');
+
+  /** `true` when keyboard focus is inside this viewer (also inside the web component's Shadow DOM). */
+  const hasFocusInside = useCallback(() => {
+    const element = rootRef.current;
+    if (!element) return false;
+    const root = element.getRootNode() as Document | ShadowRoot;
+    return element.contains(root.activeElement);
+  }, []);
+
+  const beforeNavigate = useCallback<BeforeNavigate>(
+    (current, next) => {
+      viewportsRef.current.set(activePathRef.current, getViewport());
+      // Going up selects the subnetwork you came from
+      pendingSelectionRef.current =
+        next.length < current.length && isPathPrefix(next, current) ? current[next.length] : null;
+      restoreFocusRef.current = hasFocusInside();
+    },
+    [getViewport, hasFocusInside],
+  );
+
+  const navigation = useNavigationHistory(normalizedDoc, beforeNavigate);
+  const { activeGraph, levels, trailLevels, diveInto, navigateToDepth } = navigation;
+  activePathRef.current = activeGraph.path;
 
   const initialWireStyle = wireStyleProp ?? normalizedDoc.root.wireStyle ?? 'default';
   const [wireStyle, setWireStyle] = useState<HoudiniWireStyle>(initialWireStyle);
@@ -203,134 +238,79 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     setWireStyle(initialWireStyle);
   }, [initialWireStyle]);
 
-  const rootRef = useRef<HTMLDivElement>(null);
-  const viewerSize = useElementSize(rootRef);
-  const isSidePanel = viewerSize.width >= SIDE_PANEL_MIN_VIEWER_WIDTH;
-  const isPointerInsideRef = useRef(false);
-  const lastClickRef = useRef<{ id: string; time: number } | null>(null);
-
-  // Viewport of every visited level (by network path), restored when coming back like in Houdini
-  const viewportsRef = useRef(new Map<string, Viewport>());
-  // Subnetwork node to select after going up, so the parent opens with the node you came from selected
-  const pendingSelectionRef = useRef<string | null>(null);
-
   const selectedNode = useMemo(
     () => (selectedNodeId ? activeGraph.nodes.find((n) => n.name === selectedNodeId) ?? null : null),
     [activeGraph, selectedNodeId],
   );
 
-  const selectNode = useCallback((node: HoudiniNodeData | null) => {
+  // Last selection reported to `onNodeSelect`, so it only fires when the selection changes
+  const reportedSelectionRef = useRef<HoudiniNodeData | null>(null);
+
+  const selectNode = useCallback((node: HoudiniNodeData | null, byKeyboard = false) => {
     setSelectedNodeId(node?.name ?? null);
+    setFocusInspector(byKeyboard && node !== null);
+    if (reportedSelectionRef.current === node) return;
+    reportedSelectionRef.current = node;
     onNodeSelectRef.current?.(node);
   }, []);
 
-  /**
-   * Shows the network at `path`, remembering the current view. Adds it to the history, or moves to
-   * `historyIndex` for back / forward. The trail is kept while `path` lies on it, like Houdini.
-   */
-  const goTo = useCallback(
-    (path: string[], historyIndex?: number) => {
-      const current = levelNames(levels);
-      viewportsRef.current.set(activeGraph.path, getViewport());
-      // Going up selects the subnetwork you came from
-      pendingSelectionRef.current =
-        path.length < current.length && isPathPrefix(path, current) ? current[path.length] : null;
-      const trailPath = levelNames(trailLevels);
-      const trail = isPathPrefix(path, trailPath) ? trailPath : path;
-      if (historyIndex !== undefined) {
-        setNav({ ...nav, index: historyIndex, trail });
-      } else {
-        const history = [...nav.history.slice(0, nav.index + 1), path];
-        setNav({ doc: normalizedDoc, history, index: history.length - 1, trail });
-      }
-    },
-    [activeGraph.path, getViewport, levels, nav, normalizedDoc, trailLevels],
-  );
+  /** Moves keyboard focus to the canvas node `name` (after closing the inspector with the keyboard). */
+  const focusNode = useCallback((name: string) => {
+    const element = rootRef.current?.querySelector<HTMLElement>(`.react-flow__node[data-id="${cssString(name)}"]`);
+    element?.focus({ preventScroll: true });
+  }, []);
 
-  /** Shows the level at `depth` of the path bar trail (`0` is the exported root). */
-  const navigateToDepth = useCallback(
-    (depth: number) => {
-      if (depth < 0 || depth >= trailLevels.length || depth === levels.length - 1) return;
-      goTo(levelNames(trailLevels).slice(0, depth));
-    },
-    [goTo, levels.length, trailLevels],
-  );
-
-  /** Dives into a subnetwork node of the network on screen. */
-  const diveInto = useCallback(
-    (node: HoudiniNodeData) => {
-      if (!canDiveInto(node)) return;
-      goTo([...levelNames(levels), node.name]);
-    },
-    [goTo, levels],
-  );
-
-  const goBack = useCallback(() => {
-    if (nav.index > 0) goTo(nav.history[nav.index - 1], nav.index - 1);
-  }, [goTo, nav]);
-
-  const goForward = useCallback(() => {
-    if (nav.index < nav.history.length - 1) goTo(nav.history[nav.index + 1], nav.index + 1);
-  }, [goTo, nav]);
+  const closeInspector = useCallback(() => {
+    const name = selectedNodeId;
+    const returnFocus = hasFocusInside();
+    selectNode(null);
+    if (name && returnFocus) window.setTimeout(() => focusNode(name), 0);
+  }, [focusNode, hasFocusInside, selectNode, selectedNodeId]);
 
   const pathSegments = useMemo(
     () => buildNetworkPathSegments(trailLevels, levels.length - 1, normalizedDoc.icons),
     [trailLevels, levels.length, normalizedDoc.icons],
   );
 
-  // Latest values for the window key listener, which is registered once
-  const selectedNodeRef = useRef<HoudiniNodeData | null>(null);
-  selectedNodeRef.current = selectedNode;
-  const navigationRef = useRef({ diveInto, navigateToDepth, depth: levels.length - 1 });
-  navigationRef.current = { diveInto, navigateToDepth, depth: levels.length - 1 };
+  const fitAll = useCallback(() => {
+    triggerFitView({ padding: FIT_PADDING, duration });
+  }, [duration, triggerFitView]);
 
   // Houdini Network Editor hotkeys: Shift+S toggles the wire style, H fits the whole network,
-  // F frames the selected node, I dives into the selected subnetwork and U goes up a level.
-  // They only react while the pointer is over this viewer (or focus is inside it) and never while
-  // typing in a text field, so they never hijack keys on the host page.
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) {
-        return;
-      }
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('input, textarea, select, [contenteditable="true"]')) {
-        return;
-      }
-      // `getRootNode()` is the shadow root inside the `<houdini-network>` web component
-      const root = rootRef.current?.getRootNode() as Document | ShadowRoot | undefined;
-      const hasFocusInside = rootRef.current?.contains(root?.activeElement ?? null) ?? false;
-      if (!isPointerInsideRef.current && !hasFocusInside) {
-        return;
-      }
-      const selected = selectedNodeRef.current;
-      const navigation = navigationRef.current;
-      if (event.code === 'KeyS' && event.shiftKey) {
-        setWireStyle((style) => (style === 'rounded' ? 'default' : 'rounded'));
-      } else if (event.shiftKey) {
-        return;
-      } else if (event.code === 'KeyO') {
+  // F frames the selected node, I dives into the selected subnetwork, U goes up a level and O
+  // shows or hides the overview. When they react is set by the `hotkeys` prop.
+  const hotkeyHandlers = useViewerHotkeys(rootRef, hotkeys, (event) => {
+    if (event.code === 'KeyS' && event.shiftKey) {
+      setWireStyle((style) => (style === 'rounded' ? 'default' : 'rounded'));
+      return true;
+    }
+    if (event.shiftKey) return false;
+    switch (event.code) {
+      case 'KeyO':
         setMiniMapVisible((visible) => !visible);
-      } else if (event.code === 'KeyH') {
-        triggerFitView({ padding: 0.14, duration: 300 });
-      } else if (event.code === 'KeyF') {
-        triggerFitView(
-          selected
-            ? { nodes: [{ id: selected.name }], padding: 0.8, duration: 300, maxZoom: 1.6 }
-            : { padding: 0.14, duration: 300 },
-        );
-      } else if (event.code === 'KeyI' && selected && canDiveInto(selected)) {
-        navigation.diveInto(selected);
-      } else if (event.code === 'KeyU' && navigation.depth > 0) {
-        navigation.navigateToDepth(navigation.depth - 1);
-      } else {
-        return;
-      }
-      event.preventDefault();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [triggerFitView]);
+        return true;
+      case 'KeyH':
+        fitAll();
+        return true;
+      case 'KeyF':
+        if (selectedNode) {
+          triggerFitView({ nodes: [{ id: selectedNode.name }], padding: 0.8, duration, maxZoom: 1.6 });
+        } else {
+          fitAll();
+        }
+        return true;
+      case 'KeyI':
+        if (!selectedNode || !canDiveInto(selectedNode)) return false;
+        diveInto(selectedNode);
+        return true;
+      case 'KeyU':
+        if (navigation.depth === 0) return false;
+        navigateToDepth(navigation.depth - 1);
+        return true;
+      default:
+        return false;
+    }
+  });
 
   const { nodes: baseNodes, edges: baseEdges } = useMemo(
     () =>
@@ -352,24 +332,15 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     [baseNodes, selectedNodeId],
   );
 
-  // Highlight every wire attached to the selected node (continuing through routing dots)
-  const edges = useMemo(() => {
-    if (!selectedNodeId) {
-      return baseEdges;
-    }
-    const dotIds = new Set(baseNodes.filter((n) => n.type === 'houdiniDot').map((n) => n.id));
-    const connected = getConnectedWireIds(selectedNodeId, baseEdges, dotIds);
-    return baseEdges.map((e) =>
-      connected.has(e.id)
-        ? { ...e, zIndex: 6, data: { ...e.data, highlighted: true } satisfies HoudiniWireFlowEdgeData }
-        : e,
-    );
-  }, [baseEdges, baseNodes, selectedNodeId]);
+  const edges = useWireHighlight(baseNodes, baseEdges, selectedNodeId);
 
   // A new document starts with no remembered viewports
   useEffect(() => {
     viewportsRef.current.clear();
   }, [normalizedDoc]);
+
+  // React Flow's `fitView` prop already fits the first level on its first render
+  const firstLevelRef = useRef(true);
 
   // Entering a level: select the subnetwork we came up from (if any), then restore the
   // remembered view of this level or fit the whole network
@@ -377,21 +348,25 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     const pendingName = pendingSelectionRef.current;
     pendingSelectionRef.current = null;
     selectNode(pendingName ? activeGraph.nodes.find((n) => n.name === pendingName) ?? null : null);
+    if (restoreFocusRef.current) {
+      restoreFocusRef.current = false;
+      // Focus the viewer itself (the hotkeys keep working, Tab then reaches the nodes)
+      if (pendingName) window.setTimeout(() => focusNode(pendingName), 0);
+      else rootRef.current?.focus({ preventScroll: true });
+    }
+    const isFirstLevel = firstLevelRef.current;
+    firstLevelRef.current = false;
     const savedViewport = viewportsRef.current.get(activeGraph.path);
-    if (!savedViewport && !fitView) return;
+    if (!savedViewport && (!fitView || isFirstLevel)) return;
     const timer = setTimeout(() => {
       if (savedViewport) {
         setViewport(savedViewport);
       } else {
-        triggerFitView(FIT_VIEW_OPTIONS);
+        triggerFitView({ padding: FIT_PADDING, duration: reducedMotionRef.current ? 0 : 250 });
       }
     }, 30);
     return () => clearTimeout(timer);
-  }, [activeGraph, fitView, selectNode, setViewport, triggerFitView]);
-
-  const handleFitView = useCallback(() => {
-    triggerFitView({ padding: 0.14, duration: 300 });
-  }, [triggerFitView]);
+  }, [activeGraph, fitView, focusNode, selectNode, setViewport, triggerFitView]);
 
   // Double-clicks are detected from two clicks on the same node, so a double tap works on
   // touch screens too (mobile browsers do not reliably fire `dblclick`)
@@ -412,25 +387,52 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     [diveInto, selectNode],
   );
 
+  // Keyboard access to the canvas: Enter or Space on a focused node selects it and moves focus to the
+  // Parameter Inspector (which has the "Open subnetwork" button); Escape clears the selection
+  const handleCanvasKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const target = event.target as HTMLElement;
+      if (!target.classList.contains('react-flow__node')) return;
+      const node = activeGraph.nodes.find((n) => n.name === target.dataset.id);
+      if (!node) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        selectNode(node, showInspector);
+      } else if (event.key === 'Escape' && selectedNodeId) {
+        event.preventDefault();
+        selectNode(null);
+      }
+    },
+    [activeGraph, selectNode, selectedNodeId, showInspector],
+  );
+
   const handlePaneClick = useCallback(() => {
     selectNode(null);
   }, [selectNode]);
 
+  const itemCount = baseNodes.length + baseEdges.length;
+  const canGoUp = levels.length > 1;
+
   return (
     <div
       ref={rootRef}
-      onPointerEnter={() => {
-        isPointerInsideRef.current = true;
-      }}
-      onPointerLeave={() => {
-        isPointerInsideRef.current = false;
+      // Focusable by script and by clicking, so the `focus` hotkey mode works after a click anywhere inside
+      tabIndex={-1}
+      {...hotkeyHandlers}
+      onPointerDown={(event) => {
+        const target = event.target as HTMLElement;
+        if (!target.closest('button, a, input, [tabindex="0"]') && !hasFocusInside()) {
+          rootRef.current?.focus({ preventScroll: true });
+        }
       }}
       // The layout follows the viewer's own width, not the page width: an embed in a narrow blog column
       // gets the phone layout even on a wide screen (container queries for CSS, `viewerSize` for the panel)
-      className="@container relative w-full h-full bg-[#242424] overflow-hidden font-sans"
+      className={`@container relative w-full h-full ${CANVAS_BG_CLASS} overflow-hidden font-sans outline-none`}
     >
       <div className={`w-full h-full flex ${isSidePanel ? 'flex-row' : 'flex-col'}`}>
-        <div className="relative flex-1 min-w-0 min-h-0 select-none">
+        {/* Delegated key handling for the focusable canvas nodes inside (React Flow renders them) */}
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+        <div className="relative flex-1 min-w-0 min-h-0 select-none" onKeyDown={handleCanvasKeyDown}>
           {showToolbar && (
             <ViewerToolbar
               networkPath={activeGraph.path}
@@ -439,10 +441,10 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
                   segments={pathSegments}
                   nodeCount={activeGraph.nodes.length}
                   onNavigate={navigateToDepth}
-                  canGoBack={nav.index > 0}
-                  canGoForward={nav.index < nav.history.length - 1}
-                  onBack={goBack}
-                  onForward={goForward}
+                  canGoBack={navigation.canGoBack}
+                  canGoForward={navigation.canGoForward}
+                  onBack={navigation.goBack}
+                  onForward={navigation.goForward}
                 />
               }
               labelSize={labelSize}
@@ -451,7 +453,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
               onChangeWireStyle={setWireStyle}
               isFullscreen={isFullscreen}
               onToggleFullscreen={onToggleFullscreen}
-              onFitView={handleFitView}
+              onFitView={fitAll}
               document={normalizedDoc}
               showDebugActions={showDebugActions}
               miniMapVisible={miniMapVisible}
@@ -459,38 +461,41 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
             />
           )}
 
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={NODE_TYPES}
-            edgeTypes={EDGE_TYPES}
-            onNodeClick={handleNodeClick}
-            onPaneClick={handlePaneClick}
-            nodesDraggable={false}
-            nodesConnectable={false}
-            edgesReconnectable={false}
-            elementsSelectable={true}
-            nodesFocusable={false}
-            edgesFocusable={false}
-            panOnDrag={true}
-            zoomOnScroll={true}
-            zoomOnPinch={true}
-            zoomOnDoubleClick={false}
-            minZoom={0.08}
-            maxZoom={3.5}
-            fitView={fitView}
-            fitViewOptions={{ padding: 0.14 }}
-            proOptions={{ hideAttribution: true }}
+          {/* An error inside one subnetwork keeps the path bar and offers a way back up */}
+          <NetworkErrorBoundary
+            resetKey={activeGraph.path}
+            onReset={canGoUp ? () => navigateToDepth(0) : undefined}
+            resetLabel="Back to the top network"
           >
-            <Background
-              variant={BackgroundVariant.Lines}
-              gap={50}
-              size={1}
-              color="#2c2c2c"
-            />
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={NODE_TYPES}
+              edgeTypes={EDGE_TYPES}
+              onNodeClick={handleNodeClick}
+              onPaneClick={handlePaneClick}
+              nodesDraggable={false}
+              nodesConnectable={false}
+              edgesReconnectable={false}
+              elementsSelectable={true}
+              nodesFocusable={true}
+              edgesFocusable={false}
+              onlyRenderVisibleElements={itemCount > VISIBLE_ONLY_ITEM_COUNT}
+              panOnDrag={true}
+              zoomOnScroll={true}
+              zoomOnPinch={true}
+              zoomOnDoubleClick={false}
+              minZoom={0.08}
+              maxZoom={3.5}
+              fitView={fitView}
+              fitViewOptions={{ padding: FIT_PADDING }}
+              proOptions={{ hideAttribution: true }}
+            >
+              <Background variant={BackgroundVariant.Lines} gap={50} size={1} color={GRID_LINE_COLOR} />
 
-            {miniMapVisible && <NavigableMiniMap nodeColor={resolveMiniMapNodeColor} />}
-          </ReactFlow>
+              {miniMapVisible && <NavigableMiniMap nodeColor={resolveMiniMapNodeColor} />}
+            </ReactFlow>
+          </NetworkErrorBoundary>
         </div>
 
         {showInspector && selectedNode && (
@@ -499,12 +504,17 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
             viewerWidth={viewerSize.width}
             viewerHeight={viewerSize.height}
           >
-            <ParameterInspector
-              node={selectedNode}
-              exportMode={normalizedDoc.exportMode}
-              onClose={() => selectNode(null)}
-              onDiveInto={() => diveInto(selectedNode)}
-            />
+            <NetworkErrorBoundary resetKey={selectedNode}>
+              <React.Suspense fallback={<NetworkLoadingState message="Loading parameters..." />}>
+                <ParameterInspector
+                  node={selectedNode}
+                  exportMode={normalizedDoc.exportMode}
+                  onClose={closeInspector}
+                  onDiveInto={() => diveInto(selectedNode)}
+                  focusOnOpen={focusInspector}
+                />
+              </React.Suspense>
+            </NetworkErrorBoundary>
           </ResizableInspectorPanel>
         )}
       </div>
@@ -517,12 +527,11 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
  *
  * Visitors can pan, zoom, select nodes to read their parameters, and dive into exported
  * subnetworks (double-click or double-tap, `I` to enter and `U` to go up), but never edit the network.
+ * Keyboard users reach each node with Tab and open its parameters with Enter.
  */
 export const HoudiniNetwork: React.FC<HoudiniNetworkProps> = (props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  // `native`: browser Fullscreen API; `css`: full-viewport overlay where the API is unavailable (iPhone Safari)
-  const [fullscreenMode, setFullscreenMode] = useState<'off' | 'native' | 'css'>('off');
-  const isFullscreen = fullscreenMode !== 'off';
+  const fullscreen = useFullscreen(containerRef);
 
   // Never let a malformed file throw out of the component and crash the host page
   const parsed = useMemo(() => {
@@ -532,73 +541,29 @@ export const HoudiniNetwork: React.FC<HoudiniNetworkProps> = (props) => {
       return { doc: null, error: err instanceof Error ? err.message : 'Unknown error while reading the network.' };
     }
   }, [props.data]);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setFullscreenMode(window.document.fullscreenElement ? 'native' : 'off');
-    };
-    window.document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      window.document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
-  // The CSS fallback has no browser chrome to exit it: support Escape and stop the page behind from scrolling
-  useEffect(() => {
-    if (fullscreenMode !== 'css') return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setFullscreenMode('off');
-    };
-    const previousOverflow = window.document.body.style.overflow;
-    window.document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [fullscreenMode]);
-
-  const handleToggleFullscreen = useCallback(async () => {
-    const container = containerRef.current;
-    if (!container) return;
-    if (fullscreenMode === 'native') {
-      await window.document.exitFullscreen().catch(() => undefined);
-      return;
-    }
-    if (fullscreenMode === 'css') {
-      setFullscreenMode('off');
-      return;
-    }
-    // Feature-detect the Fullscreen API (regular elements cannot go fullscreen on iPhone Safari)
-    if (window.document.fullscreenEnabled && typeof container.requestFullscreen === 'function') {
-      try {
-        await container.requestFullscreen();
-        return;
-      } catch {
-        // Blocked (for example inside an iframe without `allowfullscreen`): use the CSS fallback
-      }
-    }
-    setFullscreenMode('css');
-  }, [fullscreenMode]);
+  const iconsReady = useLabsIcons(parsed.doc);
 
   return (
     <div
       ref={containerRef}
       className={
-        // `wop-root` scopes the library stylesheet's reset (see `src/styles/reset.css`)
-        isFullscreen
-          ? 'wop-root fixed inset-0 z-50 bg-[#242424] pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]'
+        // `wop-root` scopes the library stylesheet's reset (see `src/styles/reset.css`). The CSS
+        // fullscreen fallback sits above host page headers, which often use z-index 1000 or more.
+        fullscreen.isFullscreen
+          ? `wop-root fixed inset-0 z-[2147483000] ${CANVAS_BG_CLASS} pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]`
           : `wop-root w-full h-full min-h-80 relative ${props.className ?? ''}`
       }
     >
-      {parsed.doc ? (
+      {parsed.doc && !iconsReady ? (
+        <NetworkLoadingState />
+      ) : parsed.doc ? (
         <NetworkErrorBoundary resetKey={props.data}>
           <ReactFlowProvider>
             <HoudiniNetworkInnerCanvas
               {...props}
               normalizedDoc={parsed.doc}
-              isFullscreen={isFullscreen}
-              onToggleFullscreen={handleToggleFullscreen}
+              isFullscreen={fullscreen.isFullscreen}
+              onToggleFullscreen={fullscreen.toggle}
             />
           </ReactFlowProvider>
         </NetworkErrorBoundary>

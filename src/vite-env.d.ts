@@ -14,3 +14,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Package version from `package.json`, replaced at build time (`define` in `vite.config.ts`). */
+declare const __WOP_VERSION__: string;
+/** Package name from `package.json`, replaced at build time (`define` in `vite.config.ts`). */
+declare const __WOP_PACKAGE_NAME__: string;

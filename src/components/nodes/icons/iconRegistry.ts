@@ -1,6 +1,5 @@
 import { parseOperatorType } from '../../../schema/operatorType';
 import type { OperatorIconDef, OperatorIconQuery } from './iconTypes';
-import { LABS_BUILTIN_ICON_ALIASES, LABS_ICONS } from './labs';
 import { SOP_ATTRIBUTE_ICONS } from './sop/attributeIcons';
 import { SOP_FLOW_ICONS } from './sop/flowIcons';
 import { SOP_MODELING_ICONS } from './sop/modelingIcons';
@@ -18,31 +17,79 @@ export const SOP_ICONS: OperatorIconDef[] = [
 ];
 
 /**
- * Every registered operator icon drawing (built-in SOPs first, then SideFX Labs).
+ * Every registered operator icon drawing: the built-in SOPs, then the SideFX Labs drawings once
+ * they are loaded (see `loadLabsIcons`).
  */
-export const OPERATOR_ICONS: OperatorIconDef[] = [...SOP_ICONS, ...LABS_ICONS];
+export const OPERATOR_ICONS: OperatorIconDef[] = [...SOP_ICONS];
 
 const SUBNET_ICON_ID = 'sop.subnet';
 
 const sopByType = new Map<string, OperatorIconDef>();
 const labsByType = new Map<string, OperatorIconDef>();
 const byIcon = new Map<string, OperatorIconDef>();
-for (const def of OPERATOR_ICONS) {
-  const typeMap = def.family === 'labs' ? labsByType : sopByType;
-  // Keys are lowercased because queries are (some Houdini types use capitals, e.g. `straight_skeleton_2D`)
-  for (const t of def.types) {
-    typeMap.set(t.toLowerCase(), def);
-  }
-  for (const icon of def.icons ?? []) {
-    byIcon.set(icon.toLowerCase(), def);
+const iconsWithMatchers: OperatorIconDef[] = [];
+
+/** Adds drawings to the lookup maps (keys are lowercased because queries are). */
+function indexIcons(defs: readonly OperatorIconDef[]): void {
+  for (const def of defs) {
+    const typeMap = def.family === 'labs' ? labsByType : sopByType;
+    // Some Houdini types use capitals, e.g. `straight_skeleton_2D`
+    for (const t of def.types) {
+      typeMap.set(t.toLowerCase(), def);
+    }
+    for (const icon of def.icons ?? []) {
+      byIcon.set(icon.toLowerCase(), def);
+    }
+    if (def.matches) iconsWithMatchers.push(def);
   }
 }
-for (const [labsType, sopIconId] of Object.entries(LABS_BUILTIN_ICON_ALIASES)) {
-  const def = OPERATOR_ICONS.find((d) => d.id === sopIconId);
-  if (def) labsByType.set(labsType.toLowerCase(), def);
+
+indexIcons(SOP_ICONS);
+const subnetIcon = SOP_ICONS.find((def) => def.id === SUBNET_ICON_ID) ?? DEFAULT_OPERATOR_ICON;
+
+let labsLoaded = false;
+let labsLoading: Promise<void> | null = null;
+
+/**
+ * Registers the SideFX Labs drawings. `aliases` maps Labs base types that Houdini draws with a
+ * built-in SOP icon to that icon's id. Called by `loadLabsIcons`, or directly by code that bundles
+ * the Labs drawings anyway (the playground).
+ */
+export function registerLabsIcons(defs: readonly OperatorIconDef[], aliases: Readonly<Record<string, string>>): void {
+  if (labsLoaded) return;
+  labsLoaded = true;
+  OPERATOR_ICONS.push(...defs);
+  indexIcons(defs);
+  for (const [labsType, sopIconId] of Object.entries(aliases)) {
+    const def = SOP_ICONS.find((d) => d.id === sopIconId);
+    if (def) labsByType.set(labsType.toLowerCase(), def);
+  }
 }
-const iconsWithMatchers = OPERATOR_ICONS.filter((def) => def.matches);
-const subnetIcon = OPERATOR_ICONS.find((def) => def.id === SUBNET_ICON_ID) ?? DEFAULT_OPERATOR_ICON;
+
+/**
+ * `true` once the SideFX Labs drawings are registered. Before that, Labs nodes would show the
+ * default emblem.
+ */
+export function areLabsIconsLoaded(): boolean {
+  return labsLoaded;
+}
+
+/**
+ * Loads the SideFX Labs drawings (a separate download, so networks without Labs nodes never fetch
+ * them) and registers them. Safe to call many times.
+ */
+export function loadLabsIcons(): Promise<void> {
+  if (labsLoaded) return Promise.resolve();
+  labsLoading ??= import('./labs').then(({ LABS_ICONS, LABS_BUILTIN_ICON_ALIASES }) => {
+    registerLabsIcons(LABS_ICONS, LABS_BUILTIN_ICON_ALIASES);
+  });
+  return labsLoading;
+}
+
+/** `true` when an operator needs the SideFX Labs drawings (`labs::` type or `opdef:/labs::` icon). */
+export function needsLabsIcon(type: string, icon = ''): boolean {
+  return /^labs::/i.test(type) || /^opdef:\/labs::/i.test(icon);
+}
 
 /**
  * Splits a Houdini operator type and icon id into the normalized lookup query.

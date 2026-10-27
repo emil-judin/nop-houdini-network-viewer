@@ -1,7 +1,7 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.4.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-10-26T07:55:57.391711+00:00",
+  "exportedAt": "2026-10-27T09:38:21.289825+00:00",
   "exportMode": "full",
   "icons": {},
   "customShapes": {},
@@ -10,1172 +10,6 @@
     "type": "geo",
     "context": "Sop",
     "nodes": [
-      {
-        "name": "bend1",
-        "type": "bend",
-        "label": "Bend",
-        "icon": "SOP_bend",
-        "pos": [
-          0.2817,
-          -3.0851
-        ],
-        "size": [
-          1.1296,
-          0.2824
-        ],
-        "color": [
-          0.8,
-          0.8,
-          0.8
-        ],
-        "shape": "rect",
-        "flags": {
-          "bypass": false,
-          "display": true,
-          "render": true,
-          "template": true,
-          "selectableTemplate": false,
-          "lock": false,
-          "softLock": false
-        },
-        "maxInputs": 2,
-        "inputLabels": [
-          "Geometry to Bend",
-          "Rest Geometry"
-        ],
-        "maxOutputs": 1,
-        "outputLabels": [
-          "Output 1"
-        ],
-        "comment": "",
-        "showComment": false,
-        "isSubnetwork": false,
-        "hdaState": "locked",
-        "parms": [
-          {
-            "name": "group",
-            "label": "Group",
-            "type": "String",
-            "val": [
-              ""
-            ],
-            "expr": [
-              null
-            ],
-            "hasMenu": true
-          },
-          {
-            "name": "grouptype",
-            "label": "Group Type",
-            "type": "Menu",
-            "val": [
-              "guess"
-            ],
-            "expr": [
-              null
-            ],
-            "menuLabel": "Guess from Group"
-          },
-          {
-            "name": "mask",
-            "label": "Mask",
-            "type": "String",
-            "val": [
-              "bend_attrib"
-            ],
-            "expr": [
-              null
-            ],
-            "joinNext": "maskmode",
-            "hasMenu": true,
-            "disabled": true
-          },
-          {
-            "name": "maskmode",
-            "label": "Mask Mode",
-            "type": "Menu",
-            "val": [
-              "maskoff"
-            ],
-            "expr": [
-              null
-            ],
-            "labelHidden": true,
-            "menuLabel": "Mask Off"
-          },
-          {
-            "name": "folder1",
-            "label": "folder1",
-            "type": "FolderSet",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ]
-          },
-          {
-            "name": "dodeform",
-            "label": "Enable Deformation",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "limit_deformation",
-            "label": "Limit Deformation to Capture Region",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "symmetricdeformation",
-            "label": "Deform in Both Directions",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "enablebend",
-            "label": "Enable",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "bendfolder",
-            "label": "bendfolder",
-            "type": "FolderSet",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ]
-          },
-          {
-            "name": "bendmode",
-            "label": "Mode",
-            "type": "Menu",
-            "val": [
-              "angle"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Bend"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "menuLabel": "Angle"
-          },
-          {
-            "name": "bend",
-            "label": "Bend Angle",
-            "type": "Float",
-            "val": [
-              0.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Bend"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "bendscalemode_angle",
-            "range": [
-              -90.0,
-              90.0
-            ]
-          },
-          {
-            "name": "bendscalemode_angle",
-            "label": "Scale Mode",
-            "type": "Menu",
-            "val": [
-              "none"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Bend"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "labelHidden": true,
-            "menuLabel": "No Scaling"
-          },
-          {
-            "name": "enabletwist",
-            "label": "Enable",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "twistfolder",
-            "label": "twistfolder",
-            "type": "FolderSet",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ]
-          },
-          {
-            "name": "twist",
-            "label": "Twist",
-            "type": "Float",
-            "val": [
-              0.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Twist"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "twistscalemode",
-            "range": [
-              -180.0,
-              180.0
-            ]
-          },
-          {
-            "name": "twistscalemode",
-            "label": "Scale Mode",
-            "type": "Menu",
-            "val": [
-              "none"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Twist"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "labelHidden": true,
-            "menuLabel": "No Scaling"
-          },
-          {
-            "name": "enablelengthscale",
-            "label": "Enable",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "lengthscalefolder",
-            "label": "lengthscalefolder",
-            "type": "FolderSet",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ]
-          },
-          {
-            "name": "preservevolume",
-            "label": "Preserve Volume",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Length Scale"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "lengthscale",
-            "label": "Length Scale",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Length Scale"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "lengthscalescalemode",
-            "range": [
-              0.0,
-              2.0
-            ]
-          },
-          {
-            "name": "lengthscalescalemode",
-            "label": "Scale Mode",
-            "type": "Menu",
-            "val": [
-              "none"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Length Scale"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "labelHidden": true,
-            "menuLabel": "No Scaling"
-          },
-          {
-            "name": "enabletaper",
-            "label": "Enable",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "taperfolder",
-            "label": "taperfolder",
-            "type": "FolderSet",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ]
-          },
-          {
-            "name": "taperaxes",
-            "label": "Taper Along",
-            "type": "Menu",
-            "val": [
-              "3"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "tapermode",
-            "label": "Mode",
-            "type": "Menu",
-            "val": [
-              "linear"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "menuLabel": "Linear"
-          },
-          {
-            "name": "taper",
-            "label": "Taper",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "taperscalemode",
-            "range": [
-              0.0,
-              2.0
-            ]
-          },
-          {
-            "name": "taperscalemode",
-            "label": "Scale Mode",
-            "type": "Menu",
-            "val": [
-              "none"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "labelHidden": true,
-            "menuLabel": "No Scaling"
-          },
-          {
-            "name": "squish",
-            "label": "Squish",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "squishscalemode",
-            "range": [
-              0.0,
-              2.0
-            ]
-          },
-          {
-            "name": "squishscalemode",
-            "label": "Scale Mode",
-            "type": "Menu",
-            "val": [
-              "none"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "labelHidden": true,
-            "menuLabel": "No Scaling"
-          },
-          {
-            "name": "squishpivot",
-            "label": "Squish Pivot",
-            "type": "Float",
-            "val": [
-              0.5
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "range": [
-              0.01,
-              0.99
-            ]
-          },
-          {
-            "name": "enableramp",
-            "label": "Enable Ramp",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "taperprofile",
-            "label": "Profile",
-            "type": "Ramp",
-            "val": [
-              "4"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "ramp": {
-              "color": false,
-              "keys": [
-                0.0,
-                0.25,
-                0.7248,
-                0.8538
-              ],
-              "values": [
-                1.0,
-                0.3143,
-                0.8286,
-                0.3429
-              ],
-              "basis": [
-                "Constant",
-                "CatmullRom",
-                "BSpline",
-                "CatmullRom"
-              ]
-            }
-          },
-          {
-            "name": "folder0",
-            "label": "folder0",
-            "type": "FolderSet",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation"
-            ]
-          },
-          {
-            "name": "upvectorcontrol",
-            "label": "Up Vector Control",
-            "type": "Menu",
-            "val": [
-              "custom"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "menuLabel": "Custom"
-          },
-          {
-            "name": "up",
-            "label": "Up Vector",
-            "type": "Float",
-            "val": [
-              0.0,
-              1.0,
-              0.0
-            ],
-            "expr": [
-              null,
-              null,
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "upangle",
-            "label": "Up Vector Angle",
-            "type": "Float",
-            "val": [
-              0.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "range": [
-              0.0,
-              360.0
-            ]
-          },
-          {
-            "name": "origin",
-            "label": "Capture Origin",
-            "type": "Float",
-            "val": [
-              0.0,
-              0.0,
-              0.0
-            ],
-            "expr": [
-              null,
-              null,
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "dir",
-            "label": "Capture Direction",
-            "type": "Float",
-            "val": [
-              0.0,
-              0.0,
-              1.0
-            ],
-            "expr": [
-              null,
-              null,
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ]
-          },
-          {
-            "name": "length",
-            "label": "Capture Length",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "range": [
-              0.0,
-              10.0
-            ]
-          },
-          {
-            "name": "enableoutattrib",
-            "label": "Enable Attribute",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "joinNext": "outattrib",
-            "labelHidden": true
-          },
-          {
-            "name": "outattrib",
-            "label": "Output Attribute",
-            "type": "String",
-            "val": [
-              "capture"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Capture"
-            ],
-            "folderTypes": [
-              "tabs",
-              "collapsible"
-            ],
-            "disabled": true
-          },
-          {
-            "name": "userest",
-            "label": "Use Rest Positions",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Attributes"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "attribs",
-            "label": "Attributes to Transform",
-            "type": "String",
-            "val": [
-              "*"
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Attributes"
-            ],
-            "folderTypes": [
-              "tabs"
-            ],
-            "hasMenu": true
-          },
-          {
-            "name": "updateaffectednmls",
-            "label": "Recompute Affected Normals",
-            "type": "Toggle",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Attributes"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "vlength",
-            "label": "Preserve Normal Length",
-            "type": "Toggle",
-            "val": [
-              1
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Attributes"
-            ],
-            "folderTypes": [
-              "tabs"
-            ]
-          },
-          {
-            "name": "taperprofile1pos",
-            "label": "Position",
-            "type": "Float",
-            "val": [
-              0.0
-            ],
-            "expr": [
-              null
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile1value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile1interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "constant"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "menuLabel": "Constant"
-          },
-          {
-            "name": "taperprofile2pos",
-            "label": "Position",
-            "type": "Float",
-            "val": [
-              0.25
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile2value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              0.3143
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile2interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "catmull-rom"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "menuLabel": "Catmull-Rom"
-          },
-          {
-            "name": "taperprofile3pos",
-            "label": "Position",
-            "type": "Float",
-            "val": [
-              0.7248
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile3value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              0.8286
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile3interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "bspline"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "menuLabel": "B-Spline"
-          },
-          {
-            "name": "taperprofile4pos",
-            "label": "Position",
-            "type": "Float",
-            "val": [
-              0.8538
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile4value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              0.3429
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ]
-          },
-          {
-            "name": "taperprofile4interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "catmull-rom"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Deformation",
-              "Taper"
-            ],
-            "menuLabel": "Catmull-Rom"
-          }
-        ]
-      },
       {
         "name": "transform1",
         "type": "xform",
@@ -1301,19 +135,14 @@
             "label": "Scale",
             "type": "Float",
             "val": [
-              240.0,
-              3.0,
-              0.0
+              1.0,
+              1.0,
+              1.0
             ],
             "expr": [
-              "$F",
-              "1+2",
+              null,
+              null,
               null
-            ],
-            "changed": [
-              true,
-              true,
-              true
             ]
           },
           {
@@ -1347,9 +176,6 @@
             "range": [
               0.0,
               10.0
-            ],
-            "keyframed": [
-              true
             ]
           },
           {
@@ -1632,6 +458,157 @@
             "labelHidden": true,
             "disabled": true,
             "menuLabel": "Post-Multiply"
+          }
+        ]
+      },
+      {
+        "name": "circuit_gen",
+        "type": "emjud::circuit_gen::1.0",
+        "label": "circuit_gen",
+        "icon": "SOP_subnet",
+        "pos": [
+          0.2817,
+          -3.0851
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Sub-Network Input #1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "seed",
+            "label": "Seed",
+            "type": "Int",
+            "val": [
+              1866
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0,
+              10000
+            ]
+          },
+          {
+            "name": "circuit_curve_resolution",
+            "label": "Circuit Curve Resolution",
+            "type": "Float",
+            "val": [
+              5.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1.0,
+              10.0
+            ]
+          },
+          {
+            "name": "grid_cell_length",
+            "label": "Grid Cell Length",
+            "type": "Float",
+            "val": [
+              0.15
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.05,
+              1.0
+            ]
+          },
+          {
+            "name": "iterations",
+            "label": "Iterations",
+            "type": "Int",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              10
+            ]
+          },
+          {
+            "name": "fan_size",
+            "label": "Fan Size",
+            "type": "Int",
+            "val": [
+              20
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              20
+            ]
+          },
+          {
+            "name": "min_lot_size",
+            "label": "Min Lot Size",
+            "type": "Float",
+            "val": [
+              3.23
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1.0,
+              10.0
+            ]
           }
         ]
       },
@@ -2541,67 +1518,6 @@
             ]
           }
         ]
-      },
-      {
-        "name": "output0",
-        "type": "output",
-        "label": "Output",
-        "icon": "SOP_output",
-        "pos": [
-          2.0252,
-          -4.0851
-        ],
-        "size": [
-          1.1296,
-          0.2824
-        ],
-        "color": [
-          0.8,
-          0.8,
-          0.8
-        ],
-        "shape": "rect",
-        "flags": {
-          "bypass": false,
-          "display": false,
-          "render": false,
-          "template": false,
-          "selectableTemplate": false,
-          "lock": false,
-          "softLock": false
-        },
-        "maxInputs": 1,
-        "inputLabels": [
-          "Input 1"
-        ],
-        "maxOutputs": 1,
-        "outputLabels": [
-          "Output 1"
-        ],
-        "comment": "",
-        "showComment": false,
-        "isSubnetwork": false,
-        "hdaState": null,
-        "parms": [
-          {
-            "name": "outputidx",
-            "label": "Output Index",
-            "type": "Int",
-            "val": [
-              0
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "range": [
-              0,
-              10
-            ]
-          }
-        ]
       }
     ],
     "dots": [],
@@ -2609,25 +1525,31 @@
     "stickies": [],
     "wires": [
       {
-        "from": "transform1",
-        "fromOutput": 0,
-        "to": "bend1",
-        "toInput": 0
-      },
-      {
         "from": "curve1",
         "fromOutput": 0,
         "to": "transform1",
         "toInput": 0
       },
       {
-        "from": "bend1",
+        "from": "transform1",
         "fromOutput": 0,
-        "to": "output0",
+        "to": "circuit_gen",
         "toInput": 0
       }
     ],
     "subnetInputs": [],
-    "wireStyle": "default"
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "circuit_board",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
   }
 }

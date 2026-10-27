@@ -83,14 +83,15 @@ export function getNodeShapeDef(
 ): HoudiniNodeShapeDef {
   const normalized = !shapeName || shapeName.trim() === '' ? 'rect' : shapeName.trim();
 
-  if (customShapes && customShapes[normalized]) {
-    const candidate = customShapes[normalized] as Partial<HoudiniNodeShapeDef>;
-    if (Array.isArray(candidate.outline) && candidate.outline.length > 2) {
+  // Own properties only: a shape named `toString` must not find `Object.prototype.toString`
+  if (customShapes && Object.hasOwn(customShapes, normalized)) {
+    const candidate = customShapes[normalized] as Partial<HoudiniNodeShapeDef> | null;
+    if (candidate && Array.isArray(candidate.outline) && candidate.outline.length > 2) {
       return candidate as HoudiniNodeShapeDef;
     }
   }
 
-  return BUILTIN_SHAPES[normalized] ?? BUILTIN_SHAPES.rect;
+  return Object.hasOwn(BUILTIN_SHAPES, normalized) ? BUILTIN_SHAPES[normalized] : BUILTIN_SHAPES.rect;
 }
 
 /**

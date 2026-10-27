@@ -1,0 +1,10 @@
+# Build outputs, generated files and data that Prettier must not touch
+dist/
+dist-playground/
+public/
+local-refs/
+design/
+fixtures/
+package-lock.json
+src/components/nodes/shapes/houdiniShapesData.json
+src/components/nodes/icons/labs/labsNodeCatalog.ts

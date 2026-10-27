@@ -1,4 +1,3 @@
-import packageJson from '../../package.json';
 
 /** Web3Forms forwards each submission to the owner's email address, which never appears in the page. */
 const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
@@ -36,15 +35,16 @@ export async function sendFeedback(feedback: FeedbackMessage): Promise<void> {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         access_key: FEEDBACK_ACCESS_KEY,
-        subject: `WOP feedback (${packageJson.version})`,
+        subject: `WOP feedback (${__WOP_VERSION__})`,
         from_name: 'WOP playground',
         // An email address becomes the reply-to address
         ...(isEmail ? { email: contact } : {}),
         message: feedback.message.trim(),
         contact: contact || '(not given)',
         network: feedback.network,
-        version: packageJson.version,
-        page: window.location.href,
+        version: __WOP_VERSION__,
+        // Without the query: `?embed=true&src=...` can hold a private file address
+        page: window.location.origin + window.location.pathname,
         browser: navigator.userAgent,
         botcheck: feedback.botcheck,
       }),

@@ -21,7 +21,6 @@ export type ParmDisplayKind =
   | 'ramp'
   | 'label'
   | 'separator'
-  | 'button'
   | 'hidden';
 
 /**
@@ -117,8 +116,6 @@ export function toDisplayRow(parm: HoudiniParmTupleData, operatorType: string): 
     kind = 'hidden';
   } else if (type === 'Separator') {
     kind = 'separator';
-  } else if (type === 'Button') {
-    kind = 'button';
   } else if (type === 'Label') {
     kind = 'label';
   } else if (language && !parm.expr.some(Boolean)) {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { formatMegabytes, MAX_NETWORK_BYTES } from '../embed/fetchNetwork';
 import { normalizeNetworkDocument } from '../schema/converter';
 import type { HoudiniNetworkDocument } from '../schema/types';
 
@@ -53,6 +54,10 @@ export function useNetworkFileLoader(onLoad: (network: LoadedNetwork) => void): 
   onLoadRef.current = onLoad;
 
   const loadText = useCallback((text: string, sourceName: string) => {
+    if (text.length > MAX_NETWORK_BYTES) {
+      setError(`${sourceName} is larger than ${formatMegabytes(MAX_NETWORK_BYTES)}, which is more than the viewer can show.`);
+      return;
+    }
     try {
       const doc = normalizeNetworkDocument(JSON.parse(text));
       setError(null);
@@ -65,6 +70,11 @@ export function useNetworkFileLoader(onLoad: (network: LoadedNetwork) => void): 
 
   const openFile = useCallback(
     (file: File) => {
+      // Checked before reading, so a huge file never has to be loaded into memory
+      if (file.size > MAX_NETWORK_BYTES) {
+        setError(`${file.name} is larger than ${formatMegabytes(MAX_NETWORK_BYTES)}, which is more than the viewer can show.`);
+        return;
+      }
       file.text().then(
         (text) => loadText(text, file.name),
         () => setError(`Could not read ${file.name}.`),

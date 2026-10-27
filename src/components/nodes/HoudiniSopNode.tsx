@@ -3,6 +3,7 @@ import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { houdiniRgbToCss, type HoudiniSopFlowNodeData } from '../../schema/converter';
 import { parseOperatorType } from '../../schema/operatorType';
 import type { HoudiniRgbColor } from '../../schema/types';
+import { CANVAS_RGB } from '../theme';
 import { OperatorSvgIcon } from './icons/OperatorSvgIcon';
 import { svgToDataUri } from './icons/svgDataUri';
 import { LABEL_SIZE_STYLES } from './labelSizeStyles';
@@ -70,10 +71,6 @@ const SELECTION_OUTLINE_COLOR = '#ffd400';
  */
 const DEFAULT_NODE_COLOR: HoudiniRgbColor = [0.8, 0.8, 0.8];
 
-/**
- * Network Editor canvas color (`#262626`) that bypassed node bodies are blended toward.
- */
-const CANVAS_COLOR: HoudiniRgbColor = [38 / 255, 38 / 255, 38 / 255];
 
 /**
  * How much of the node color remains in a bypassed node's faded body.
@@ -84,7 +81,8 @@ const BYPASS_BODY_STRENGTH = 0.16;
  * Blends a node color over the canvas color, giving the opaque equivalent of drawing it at `strength` opacity.
  */
 function blendOverCanvas(color: HoudiniRgbColor, strength: number): HoudiniRgbColor {
-  return [0, 1, 2].map((i) => CANVAS_COLOR[i] + (color[i] - CANVAS_COLOR[i]) * strength) as HoudiniRgbColor;
+  // Bypassed node bodies are blended toward the Network Editor canvas color
+  return [0, 1, 2].map((i) => CANVAS_RGB[i] + (color[i] - CANVAS_RGB[i]) * strength) as HoudiniRgbColor;
 }
 
 /**
@@ -413,7 +411,7 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
       >
         {isRenamedFromType && (
           <span
-            className={`${sizeClasses.typeText} text-[#7a7a7a] font-normal tracking-normal mb-0.5`}
+            className={`${sizeClasses.typeText} text-[#8c8c8c] font-normal tracking-normal mb-0.5`}
           >
             {node.label}
           </span>

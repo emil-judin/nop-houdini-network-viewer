@@ -1,6 +1,7 @@
 # Builds the WOP playground and publishes it to GitHub Pages on every push to main.
 # One-time setup in the repository: Settings > Pages > Source: GitHub Actions.
 # Optional: Settings > Secrets and variables > Actions > Variables > WEB3FORMS_KEY turns on the feedback form.
+# Actions are pinned to full commit SHAs (Dependabot keeps them current, see .github/dependabot.yml).
 name: Deploy playground
 
 on:
@@ -13,28 +14,30 @@ permissions:
   pages: write
   id-token: write
 
+# One deployment at a time; a newer push waits instead of cancelling a deployment halfway
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - id: pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
       - run: npm ci
       - run: npm run check
+      - run: npm run lint
       - run: npm run build
         env:
           VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}
           VITE_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
         with:
           path: dist-playground
 
@@ -46,4 +49,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

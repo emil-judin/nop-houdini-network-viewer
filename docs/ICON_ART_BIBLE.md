@@ -14,7 +14,7 @@ Every operator node in the viewer shows a small icon centered in its body. Ours 
   - `labs/*.tsx`: SideFX Labs operators (`labs.<type>` ids), grouped as flask, geometry, modeling, UV, world, FX and pipeline icons.
   - `defaultIcon.tsx`: the fallback emblem.
   - `iconRegistry.ts`: lookup (`resolveOperatorIcon`), `iconTypes.ts`: the `OperatorIconDef` contract.
-- The **Icon Review Gallery** (playground header, "Icon Overview") shows every drawing with its description, the node types that use it, and the Houdini reference side by side.
+- The **Icon Review Gallery** ("Icons Overview" tab, only in the dev server `npm.cmd run dev`, not in the hosted playground) shows every drawing with its description, the node types that use it, and the Houdini reference side by side.
 
 ---
 

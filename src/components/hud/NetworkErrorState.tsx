@@ -1,5 +1,6 @@
 import React from 'react';
 import { TriangleAlert } from 'lucide-react';
+import { TOUCH_TARGET } from './touchTarget';
 
 /**
  * Props for the in-viewer error panel (`NetworkErrorState`).
@@ -9,6 +10,8 @@ export interface NetworkErrorStateProps {
   message: string;
   /** Plain-language explanation under the headline. Defaults to the "invalid or damaged file" text. */
   hint?: string;
+  /** Optional button that leads out of the error (for example back to the top network). */
+  action?: { label: string; onClick: () => void };
 }
 
 const DEFAULT_HINT =
@@ -18,7 +21,7 @@ const DEFAULT_HINT =
  * Friendly error panel shown inside the viewer when a network file cannot be read or drawn,
  * so a broken file never crashes the page that embeds the viewer.
  */
-export const NetworkErrorState: React.FC<NetworkErrorStateProps> = ({ message, hint = DEFAULT_HINT }) => (
+export const NetworkErrorState: React.FC<NetworkErrorStateProps> = ({ message, hint = DEFAULT_HINT, action }) => (
   <div role="alert" className="wop-root w-full h-full min-h-80 bg-[#242424] flex items-center justify-center p-4 font-sans">
     <div className="max-w-md rounded border border-[#4a3a2a] bg-[#1b1b1b] px-4 py-3 text-sm text-[#dcdcdc] shadow-md">
       <div className="flex items-center gap-2 font-semibold text-amber-300">
@@ -27,6 +30,15 @@ export const NetworkErrorState: React.FC<NetworkErrorStateProps> = ({ message, h
       </div>
       <p className="mt-1.5 text-xs text-[#a0a0a0]">{hint}</p>
       <p className="mt-2 font-mono text-[11px] text-[#c8a070] break-words">{message}</p>
+      {action && (
+        <button
+          type="button"
+          onClick={action.onClick}
+          className={`mt-3 px-3 h-7 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-[13px] text-[#ecedef] cursor-pointer ${TOUCH_TARGET}`}
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   </div>
 );

@@ -8,9 +8,12 @@ Features:
 - Supports exporting to the OS Clipboard (for instant browser pasting) or saving to a .json file.
 - Dialog-free "copy for web" entry point (`copy_selection_for_web()`) for a hotkey such as Ctrl+Shift+Alt+C.
 - Supports Compact Mode (modified parameters + VEX/Python code) and Full Mode (all visible parameters).
-- Smart subnetwork recursion: exports user Subnets and custom HDAs while skipping built-in SideFX/Labs atomic SOP wrappers.
-- Legal Icon Extraction: Only extracts custom user-authored SVG icons (from user HDAs outside $HFS and outside SideFX Labs).
-  Built-in SideFX icons from $HFS are never extracted or redistributed; they are referenced by identifier only.
+- Smart subnetwork recursion: exports the insides of subnets and unlocked HDAs. Built-in SideFX / Labs nodes are
+  never opened, and other locked HDAs (purchased, studio or colleagues' assets) only when the user confirms.
+- Legal Icon Extraction: Only extracts custom SVG icons of HDAs outside $HFS and outside SideFX Labs, with editor
+  metadata removed. Built-in SideFX icons from $HFS are never extracted or redistributed; they are referenced by
+  identifier only.
+- Privacy: paths inside $HIP and $JOB become variables, every other absolute path keeps only its file name.
 """
 
 import datetime
@@ -21,7 +24,7 @@ import re
 import hou
 
 
-SCHEMA_VERSION = "1.3.0"
+SCHEMA_VERSION = "1.4.0"
 
 # Keyframe segment functions: an animated parameter reports the function of its current segment
 # as its "expression". Houdini stores a real expression (ch(), $F, ...) as one keyframe holding it.
@@ -93,16 +96,74 @@ def safe_folders(parm):
         return []
 
 
-# Folders replaced by variables in exported text, most specific first, so published networks do not
-# reveal user names or project locations (e.g. `C:/Users/me/projects/fan/geo/a.bgeo` -> `$HIP/geo/a.bgeo`).
-SCRUB_VARIABLES = ("HIP", "JOB", "HOUDINI_USER_PREF_DIR", "HSITE", "HFS", "HOME")
-# Any remaining home folder (`C:/Users/<name>`, `/home/<name>`, `/Users/<name>`) becomes `~`
-# (only at the start of a path, so URLs such as `https://site.com/users/x` in code comments stay intact)
+# Exports should be as safe to share as a screenshot of the network: no user, client, project, server
+# or drive names. Path scrubbing has two steps:
+#
+# 1. Folders that Houdini names with a variable are replaced by it, most specific first, so paths
+#    inside the project keep their structure (`C:/Users/me/projects/fan/geo/a.bgeo` -> `$HIP/geo/a.bgeo`).
+# 2. Every other absolute path keeps only its file name: `D:/Clients/Acme/tex/rock.exr`,
+#    `\\studio-nas\acme\rock.exr` and `/mnt/acme/rock.exr` all become `<path>/rock.exr`.
+#    Absolute Houdini node paths (`/obj/geo1/OUT`) are not files and stay as written.
+SCRUB_VARIABLES = ("HIP", "JOB", "HOUDINI_USER_PREF_DIR", "HSITE", "HFS")
+
+# Placeholder for removed folders
+PATH_PLACEHOLDER = "<path>"
+
+# First segments of absolute Houdini node paths (`/obj/...`, `/out/...`), which are kept
+HOUDINI_NETWORK_ROOTS = frozenset(("obj", "out", "mat", "shop", "stage", "tasks", "ch", "img", "vex"))
+
+# Start of an absolute path: a drive (`C:/`, `C:\`, `C:\\` inside code) or a home folder (`~/`), a
+# server share (`\\host\share`, `//host/share`, but not the `//` of `https://`, VEX comments such as
+# `//@Cd = 1;` or `//if (x)`, or the `\\n` of code strings) or a POSIX root (`/mnt`, but not `a/b`
+# or `$HIP/geo`)
+_ABSOLUTE_PATH_START = (
+    r"(?:(?<![\w])(?:[A-Za-z]:|~)[/\\]{1,2}"
+    r"|(?<![\w:/\\])(?:\\{2,4}|//)(?=[A-Za-z][\w.$-]*[/\\]{1,2}[A-Za-z0-9_$])"
+    r"|(?<![\w$~.:/\\)\]-])/(?=[^\s/\\]))"
+)
+# A whole value that is only a server name (`\\studio-nas`), which the rule above leaves alone
+SERVER_ONLY = re.compile(r"^\s*(?:\\{2,4}|//)[A-Za-z][\w.$-]*[/\\]{0,2}\s*$")
+# Folder segments may contain spaces (`Program Files`) but not start with one; the file name ends at
+# whitespace. Quotes, backticks and code punctuation (`%s`, `{`, `;`, `=`, `+`, `,`) end a path.
+ABSOLUTE_PATH = re.compile(
+    _ABSOLUTE_PATH_START
+    + r"(?:[^\s/\\\"'`<>|*?%{};=+,][^/\\\n\"'`<>|*?%{};=+,]*[/\\]{1,2})*"
+    + r"[^\s/\\\"'`<>|*?%{};=+,]*"
+)
+DRIVE_PREFIX = re.compile(r"^(?:[A-Za-z]:|~)")
+# Fallback for home folders without a drive (`\Users\<name>` or `/home/<name>` inside other text)
 HOME_FOLDER = re.compile(r"(?i)(?:\b[a-z]:|(?<![\w.:/\\]))[/\\](?:users|home)[/\\][^/\\\"'\s]+")
 
 
+def scrub_absolute_path(match):
+    """Replaces the folders of one `ABSOLUTE_PATH` match with `<path>`, keeping the file name."""
+    path = match.group(0)
+    is_share = path.startswith(("\\\\", "//"))
+    is_drive = bool(DRIVE_PREFIX.match(path))
+    body = DRIVE_PREFIX.sub("", path) if is_drive else path
+    inner = body.strip("/\\")
+    parts = re.split(r"[/\\]+", inner) if inner else []
+    if body.endswith(("/", "\\")):
+        folders, name = parts, ""
+    else:
+        folders, name = parts[:-1], (parts[-1] if parts else "")
+    if is_share:
+        # The first two parts are the server and the share name: never keep them
+        return PATH_PLACEHOLDER + ("/" + name if len(folders) >= 2 else "")
+    if is_drive:
+        return PATH_PLACEHOLDER + "/" + name
+    # POSIX: a lone `/name` reveals nothing, and node paths such as `/obj/geo1` are kept
+    if not folders or parts[0].lower() in HOUDINI_NETWORK_ROOTS:
+        return path
+    return PATH_PLACEHOLDER + "/" + name
+
+
 def path_scrubber():
-    """Returns a function that replaces local folders in a string with `$HIP`, `$JOB`, ... or `~`."""
+    """Returns a function that makes exported text safe to share.
+
+    Replaces project and Houdini folders with `$HIP`, `$JOB`, `$HOUDINI_USER_PREF_DIR`, `$HSITE` or
+    `$HFS`, then removes the folders of every other absolute path (see `ABSOLUTE_PATH`).
+    """
     replacements = []
     for var in SCRUB_VARIABLES:
         try:
@@ -117,10 +178,14 @@ def path_scrubber():
     def scrub(text):
         if not isinstance(text, str) or not text:
             return text
+        if SERVER_ONLY.match(text):
+            return PATH_PLACEHOLDER
         result = text
         for folder, variable in replacements:
-            for variant in (folder, folder.replace("/", "\\")):
+            # Forward slashes, backslashes, and doubled backslashes as written inside code strings
+            for variant in (folder, folder.replace("/", "\\"), folder.replace("/", "\\\\")):
                 result = re.sub(re.escape(variant), lambda _match, variable=variable: variable, result, flags=re.IGNORECASE)
+        result = ABSOLUTE_PATH.sub(scrub_absolute_path, result)
         return HOME_FOLDER.sub("~", result)
 
     return scrub
@@ -225,20 +290,36 @@ def condition_text(template, kind):
         return ""
 
 
-def check_condition(node, name, op, raw):
-    """Evaluates one `name op value` condition against the node's current parameter values."""
+def condition_value(node, name, cache=None):
+    """Returns `(text, value)` of the parameter a condition refers to, or None.
+
+    `cache` (a dict per node) keeps each parameter's value, because evaluating a parameter can be slow
+    (an expression such as `npoints()` cooks geometry) and many rules refer to the same parameter.
+    """
+    if cache is not None and name in cache:
+        return cache[name]
     parm = node.parm(name)
     if parm is None:
         tup = node.parmTuple(name)
         parm = tup[0] if tup is not None and len(tup) > 0 else None
-    if parm is None:
+    result = None
+    if parm is not None:
+        try:
+            result = (parm.evalAsString(), parm.eval())
+        except Exception:
+            result = None
+    if cache is not None:
+        cache[name] = result
+    return result
+
+
+def check_condition(node, name, op, raw, cache=None):
+    """Evaluates one `name op value` condition against the node's current parameter values."""
+    value = condition_value(node, name, cache)
+    if value is None:
         return False
+    current_text, current = value
     expected = raw[1:-1] if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "\"'" else raw
-    try:
-        current_text = parm.evalAsString()
-        current = parm.eval()
-    except Exception:
-        return False
     if op in ("=~", "!~"):
         matched = fnmatch.fnmatchcase(current_text, expected)
         return matched if op == "=~" else not matched
@@ -261,14 +342,15 @@ def check_condition(node, name, op, raw):
         return False
 
 
-def evaluate_conditional(node, text):
+def evaluate_conditional(node, text, cache=None):
     """Returns True when a hide-when / disable-when rule currently applies to `node`.
 
-    Rules on multiparm instances (names with `#`) are not resolved and never apply.
+    Rules on multiparm instances (names with `#`) are not resolved and never apply. `cache` is passed
+    on to `condition_value()`.
     """
     for group in CONDITION_GROUP.findall(text or ""):
         conditions = CONDITION.findall(group)
-        if conditions and all(check_condition(node, *c) for c in conditions):
+        if conditions and all(check_condition(node, *c, cache=cache) for c in conditions):
             return True
     return False
 
@@ -284,6 +366,7 @@ def collect_parm_layout(node):
     """
     by_name = {}
     patterns = []
+    values = {}
 
     def walk(templates, folders, folder_types, hidden, disabled):
         templates = list(templates)
@@ -291,9 +374,9 @@ def collect_parm_layout(node):
             is_hidden = (
                 hidden
                 or bool(getattr(template, "isHidden", lambda: False)())
-                or evaluate_conditional(node, condition_text(template, "HideWhen"))
+                or evaluate_conditional(node, condition_text(template, "HideWhen"), values)
             )
-            is_disabled = disabled or evaluate_conditional(node, condition_text(template, "DisableWhen"))
+            is_disabled = disabled or evaluate_conditional(node, condition_text(template, "DisableWhen"), values)
             if template.type() == hou.parmTemplateType.Folder:
                 walk(
                     template.parmTemplates(),
@@ -385,7 +468,8 @@ def serialize_parm_tuple(pt, layout_info=None):
     if template.type() == hou.parmTemplateType.Menu and parms:
         menu_label = safe_menu_label(parms[0])
         if menu_label:
-            data["menuLabel"] = menu_label
+            # Generated menus can list file paths
+            data["menuLabel"] = scrub_path(menu_label)
     if template.type() == hou.parmTemplateType.Ramp and parms:
         ramp = safe_ramp(parms[0])
         if ramp:
@@ -413,18 +497,42 @@ def is_sidefx_or_labs_hda(node):
     return False
 
 
-def should_recurse_subnet(node):
+def has_insides(node):
+    """True for a subnetwork that holds nodes and is not one of the atomic built-in wrappers."""
+    try:
+        return (
+            node.isSubNetwork()
+            and len(node.children()) > 0
+            and node.type().name() not in ATOMIC_BUILTIN_SUBNET_TYPES
+        )
+    except Exception:
+        return False
+
+
+def is_locked_third_party_asset(node):
+    """True for a locked digital asset that does not come from SideFX or SideFX Labs.
+
+    These are purchased assets, studio tools, colleagues' assets or the user's own finished assets.
+    Their authors locked them, and they can be under a license or an NDA.
+    """
+    try:
+        return node.type().definition() is not None and node.isLockedHDA() and not is_sidefx_or_labs_hda(node)
+    except Exception:
+        return False
+
+
+def should_recurse_subnet(node, include_locked_assets=False):
     """
     Determines whether a subnetwork node should have its internal children exported.
-    Skips built-in SideFX/Labs atomic SOP wrappers to keep the JSON lean and authentic.
+
+    Exports the insides of plain subnetworks and of unlocked digital assets (assets the user is editing).
+    Never exports the insides of built-in SideFX / Labs nodes. The insides of other locked assets are only
+    exported when `include_locked_assets` is True (the user confirmed that they made those assets).
     """
-    if not node.isSubNetwork() or len(node.children()) == 0:
+    if not has_insides(node):
         return False
 
     type_name = node.type().name()
-    if type_name in ATOMIC_BUILTIN_SUBNET_TYPES:
-        return False
-
     if type_name in ("subnet", "geo", "dopnet", "topnet", "lopnet", "objnet"):
         return True
 
@@ -433,11 +541,28 @@ def should_recurse_subnet(node):
     if node.type().definition() is None:
         return False
 
-    if is_sidefx_or_labs_hda(node):
-        # Only recurse if the user explicitly unlocked a built-in HDA to edit internals
-        return not node.isLockedHDA()
+    if not node.isLockedHDA():
+        # An unlocked asset (also a built-in one the user unlocked) is being edited by the user
+        return True
 
-    return True
+    if is_sidefx_or_labs_hda(node):
+        return False
+
+    return include_locked_assets
+
+
+# Editor metadata in SVG files saved by Inkscape or Illustrator: `<metadata>` (author, license),
+# Inkscape's `<sodipodi:namedview>` and `sodipodi:` / `inkscape:` attributes such as
+# `inkscape:export-filename="C:\Users\<name>\..."`
+SVG_METADATA = re.compile(r"<metadata\b.*?</metadata\s*>|<sodipodi:namedview\b.*?(?:/>|</sodipodi:namedview\s*>)", re.S | re.I)
+SVG_EDITOR_ATTRIBUTE = re.compile(r"""\s(?:sodipodi|inkscape):[\w.-]+\s*=\s*(?:"[^"]*"|'[^']*')""", re.I)
+SVG_COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
+def clean_svg(svg):
+    """Removes editor metadata, comments and local folders from an SVG icon before it is embedded."""
+    cleaned = SVG_EDITOR_ATTRIBUTE.sub("", SVG_METADATA.sub("", SVG_COMMENT.sub("", svg)))
+    return scrub_path(cleaned)
 
 
 class CustomUserAssetExtractor:
@@ -463,7 +588,7 @@ class CustomUserAssetExtractor:
         svg_content = self._read_custom_svg(icon_id)
         if svg_content:
             # Stored under the scrubbed id, matching the node's scrubbed `icon` field
-            self.icons[scrub_path(icon_id)] = svg_content
+            self.icons[scrub_path(icon_id)] = clean_svg(svg_content)
 
     def _read_custom_svg(self, icon_id):
         # 1. Embedded SVG section inside the user's custom HDA (`opdef:/user::Sop/my_hda?IconSVG`)
@@ -499,8 +624,28 @@ def selected_items_in(net):
     return [it for it in hou.selectedItems() if it.parent() == net]
 
 
-def serialize_network(net, extractor, export_mode="compact", selected_only=False):
+class ExportState:
+    """Settings and results of one export, shared by all levels of `serialize_network()`.
+
+    - `export_mode`: `"compact"` (changed parameters and code) or `"full"` (all visible parameters).
+    - `include_locked_assets`: export the insides of locked non-SideFX assets (see `should_recurse_subnet()`).
+    - `extractor`: collects the custom icons of the user's assets.
+    - `warnings`: parameters that could not be read and were left out.
+    - `closed_assets`: type names of locked assets exported without their insides.
+    """
+
+    def __init__(self, export_mode="compact", include_locked_assets=False):
+        self.export_mode = export_mode
+        self.include_locked_assets = include_locked_assets
+        self.extractor = CustomUserAssetExtractor()
+        self.warnings = 0
+        self.closed_assets = set()
+
+
+def serialize_network(net, state, selected_only=False):
     """Recursively serializes a Houdini network into our canonical JSON structure."""
+    extractor = state.extractor
+    export_mode = state.export_mode
     items = selected_items_in(net) if selected_only else net.allItems()
     if selected_only and not items:
         items = net.allItems()
@@ -570,7 +715,7 @@ def serialize_network(net, extractor, export_mode="compact", selected_only=False
 
                     parms.append(serialize_parm_tuple(pt, layout_info))
                 except Exception:
-                    pass
+                    state.warnings += 1
 
             node_obj = {
                 "name": it.name(),
@@ -596,14 +741,16 @@ def serialize_network(net, extractor, export_mode="compact", selected_only=False
                 "outputLabels": list(it.outputLabels()),
                 "comment": scrub_path(it.comment()),
                 "showComment": it.isGenericFlagSet(hou.nodeFlag.DisplayComment),
-                "isSubnetwork": should_recurse_subnet(it),
+                "isSubnetwork": should_recurse_subnet(it, state.include_locked_assets),
                 # "locked" / "unlocked" digital asset, None for other nodes (padlock badge under the name)
                 "hdaState": hda_state(it),
                 "parms": parms,
             }
 
             if node_obj["isSubnetwork"]:
-                node_obj["children"] = serialize_network(it, extractor, export_mode=export_mode, selected_only=False)
+                node_obj["children"] = serialize_network(it, state, selected_only=False)
+            elif has_insides(it) and is_locked_third_party_asset(it):
+                state.closed_assets.add(it.type().name())
 
             out["nodes"].append(node_obj)
 
@@ -689,28 +836,62 @@ def path_nodes(net, extractor):
     return list(reversed(chain))
 
 
-def build_document(parent, export_mode="compact"):
+def build_document(parent, export_mode="compact", include_locked_assets=False):
     """Builds the complete JSON document for `parent`.
 
     Exports the items selected inside `parent`, or the whole network when nothing is selected there.
-    Returns `(document, selected_only)`.
+    Returns `(document, selected_only, state)`; `state` is the `ExportState` with the warning count and
+    the locked assets that were exported without their insides.
     """
     global scrub_path
     scrub_path = path_scrubber()
-    extractor = CustomUserAssetExtractor()
+    state = ExportState(export_mode, include_locked_assets)
     selected_only = len(selected_items_in(parent)) > 0
-    root_net = serialize_network(parent, extractor, export_mode=export_mode, selected_only=selected_only)
-    root_net["pathNodes"] = path_nodes(parent, extractor)
+    root_net = serialize_network(parent, state, selected_only=selected_only)
+    root_net["pathNodes"] = path_nodes(parent, state.extractor)
     doc = {
         "schemaVersion": SCHEMA_VERSION,
         "houdiniVersion": hou.applicationVersionString(),
         "exportedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "exportMode": export_mode,
-        "icons": extractor.icons,
-        "customShapes": extractor.custom_shapes,
+        "icons": state.extractor.icons,
+        "customShapes": state.extractor.custom_shapes,
         "root": root_net,
     }
-    return doc, selected_only
+    if state.warnings:
+        doc["exportWarnings"] = state.warnings
+    return doc, selected_only, state
+
+
+def export_notes(state):
+    """Short sentences about what an export left out, for status messages (empty string if nothing)."""
+    notes = []
+    if state.closed_assets:
+        notes.append(f"{len(state.closed_assets)} locked asset type(s) exported without their insides.")
+    if state.warnings:
+        notes.append(f"{state.warnings} parameter(s) could not be read and were left out.")
+    return " ".join(notes)
+
+
+def ask_about_locked_assets(closed_assets):
+    """Asks whether to include the insides of locked assets. Returns True, False, or None to cancel."""
+    names = sorted(closed_assets)
+    listed = "\n".join("  " + name for name in names[:10])
+    if len(names) > 10:
+        listed += f"\n  ... and {len(names) - 10} more"
+    choice = hou.ui.displayMessage(
+        "These locked assets are exported as closed nodes, without their insides:\n\n"
+        + listed
+        + "\n\nOnly include their insides for assets you made yourself. Purchased assets, studio tools "
+        "and colleagues' assets can be under a license or an NDA.",
+        buttons=("Export Closed (Recommended)", "Include Insides", "Cancel"),
+        default_choice=0,
+        close_choice=2,
+        title="WOP Exporter",
+    )
+    if choice == 2:
+        return None
+    return choice == 1
 
 
 def copy_selection_for_web(pane=None):
@@ -729,14 +910,17 @@ def copy_selection_for_web(pane=None):
         )
         return
 
-    doc, selected_only = build_document(parent, export_mode="compact")
+    # The hotkey never asks, so locked assets always stay closed
+    doc, selected_only, state = build_document(parent, export_mode="compact")
     # Minified JSON keeps large networks quick to paste
     hou.ui.copyTextToClipboard(json.dumps(doc, separators=(",", ":")))
     node_count = len(doc["root"]["nodes"])
     scope = "selected" if selected_only else "all"
+    notes = export_notes(state)
     hou.ui.setStatusMessage(
-        f"Copied {node_count} {scope} node(s) from {parent.path()} for the web. Paste them with Ctrl+V.",
-        severity=hou.severityType.ImportantMessage,
+        f"Copied {node_count} {scope} node(s) from {parent.path()} for the web. Paste them with Ctrl+V."
+        + (" " + notes if notes else ""),
+        severity=hou.severityType.Warning if notes else hou.severityType.ImportantMessage,
     )
 
 
@@ -749,7 +933,10 @@ def run_interactive_export(pane=None):
         return
 
     choice = hou.ui.displayMessage(
-        f"Export network '{parent.path()}' for WOP:",
+        f"Export network '{parent.path()}' for WOP:\n\n"
+        "Paths inside $HIP and $JOB keep their folders. Every other path keeps only its file name. "
+        "Network box comments are exported exactly as written, and sticky notes apart from their paths: "
+        "check both before sharing.",
         buttons=(
             "Copy to Clipboard (Compact Parms)",
             "Save .json File (Compact Parms)",
@@ -765,15 +952,23 @@ def run_interactive_export(pane=None):
         return
 
     export_mode = "full" if choice == 2 else "compact"
-    doc, _selected_only = build_document(parent, export_mode=export_mode)
+    doc, _selected_only, state = build_document(parent, export_mode=export_mode)
+    if state.closed_assets:
+        include = ask_about_locked_assets(state.closed_assets)
+        if include is None:
+            return
+        if include:
+            doc, _selected_only, state = build_document(parent, export_mode=export_mode, include_locked_assets=True)
     root_net = doc["root"]
     json_str = json.dumps(doc, indent=2)
+    notes = export_notes(state)
+    severity = hou.severityType.Warning if notes else hou.severityType.ImportantMessage
 
     if choice == 0:
         hou.ui.copyTextToClipboard(json_str)
         hou.ui.setStatusMessage(
-            f"Copied {len(root_net['nodes'])} nodes from {parent.path()} to clipboard!",
-            severity=hou.severityType.ImportantMessage,
+            f"Copied {len(root_net['nodes'])} nodes from {parent.path()} to clipboard!" + (" " + notes if notes else ""),
+            severity=severity,
         )
     else:
         default_filename = f"{parent.name()}-network.json"
@@ -785,13 +980,24 @@ def run_interactive_export(pane=None):
         )
         if file_path:
             expanded_path = hou.expandString(file_path)
-            if not expanded_path.endswith(".json"):
+            if not expanded_path.lower().endswith(".json"):
                 expanded_path += ".json"
+                # The file chooser only asked about the name without `.json`
+                if os.path.exists(expanded_path):
+                    overwrite = hou.ui.displayMessage(
+                        f"{os.path.basename(expanded_path)} already exists. Overwrite it?",
+                        buttons=("Overwrite", "Cancel"),
+                        default_choice=1,
+                        close_choice=1,
+                        title="WOP Exporter",
+                    )
+                    if overwrite != 0:
+                        return
             with open(expanded_path, "w", encoding="utf-8") as f:
                 f.write(json_str)
             hou.ui.setStatusMessage(
-                f"Saved {len(root_net['nodes'])} nodes to {expanded_path}",
-                severity=hou.severityType.ImportantMessage,
+                f"Saved {len(root_net['nodes'])} nodes to {expanded_path}" + (" " + notes if notes else ""),
+                severity=severity,
             )
 
 

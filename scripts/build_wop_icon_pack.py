@@ -1,10 +1,10 @@
-"""Archive prototype WOP icons and generate the production WOP website icon pack.
+"""Generate the production WOP website icon pack.
 
 Final chosen design: ``wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg``
+(the master SVG in ``design/wop-icon/``). The earlier prototypes are in the git history.
 
-1. Moves all non-final prototype SVGs and old HTML preview pages in ``design/wop-icon/``
-   into ``design/wop-icon/archive/`` (nothing is deleted).
-2. Writes vector SVG variants in ``design/wop-icon/`` and ``design/wop-icon/pack/``:
+1. Writes the master SVG to ``design/wop-icon/``.
+2. Writes vector SVG variants to ``design/wop-icon/pack/``:
    - ``wop-icon.svg`` (and ``favicon.svg``): 512x512 square icon (Houdini orange #FE4703 + white web)
    - ``wop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
    - ``wop-icon-circle.svg``: 512x512 circular badge (white web on orange)
@@ -36,7 +36,6 @@ from build_wop_web_prototypes import SAG_RATIO, SPOKE_LEN, SpiralSpiderWeb
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ICON_DIR = ROOT_DIR / "design" / "wop-icon"
-ARCHIVE_DIR = ICON_DIR / "archive"
 PACK_DIR = ICON_DIR / "pack"
 
 FINAL_SOURCE_NAME = "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg"
@@ -284,25 +283,6 @@ def build_og_image(rounded_icon_1024: Image.Image) -> Image.Image:
     return card.convert("RGB")
 
 
-def archive_old_prototypes(keep_names: set[str]) -> int:
-    """Move all non-final SVGs and old HTML pages into ``design/wop-icon/archive/``."""
-    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
-    moved = 0
-    for item in list(ICON_DIR.iterdir()):
-        if item.is_dir():
-            continue
-        if item.name == FINAL_SOURCE_NAME:
-            shutil.copy2(item, ARCHIVE_DIR / item.name)
-            continue
-        if item.name not in keep_names:
-            target = ARCHIVE_DIR / item.name
-            if target.exists():
-                target.unlink()
-            shutil.move(str(item), str(target))
-            moved += 1
-    return moved
-
-
 def main() -> None:
     ICON_DIR.mkdir(parents=True, exist_ok=True)
     PACK_DIR.mkdir(parents=True, exist_ok=True)
@@ -367,12 +347,8 @@ def main() -> None:
             build_svg_variant(FINAL_WEB, bg_color="#000000", fg_color=None, shape="square"),
         ),
     ]
-    keep_names = {FINAL_SOURCE_NAME, "web.html"} | {name for name, _, _ in svg_variants}
     for filename, _, content in svg_variants:
-        (ICON_DIR / filename).write_text(content, encoding="utf-8")
         (PACK_DIR / filename).write_text(content, encoding="utf-8")
-
-    moved_count = archive_old_prototypes(keep_names)
 
     # Render high-resolution master mask and raster pack
     web_mask = render_web_alpha_mask(FINAL_WEB, out_px=1024)
@@ -462,11 +438,11 @@ def main() -> None:
 
     svg_cards = []
     for filename, desc, _ in svg_variants:
-        small = "".join(f"<img src='{filename}' width='{n}' height='{n}' alt=''>" for n in (64, 32, 24, 16))
-        light = "".join(f"<img src='{filename}' width='{n}' height='{n}' alt=''>" for n in (32, 16))
+        small = "".join(f"<img src='pack/{filename}' width='{n}' height='{n}' alt=''>" for n in (64, 32, 24, 16))
+        light = "".join(f"<img src='pack/{filename}' width='{n}' height='{n}' alt=''>" for n in (32, 16))
         svg_cards.append(
             f"<div class='card'><code>{filename}</code><p>{desc}</p><div class='sizes'>"
-            f"<img class='big checker' src='{filename}' alt='{filename}'>{small}"
+            f"<img class='big checker' src='pack/{filename}' alt='{filename}'>{small}"
             f"<span class='light'>{light}</span></div></div>"
         )
 
@@ -498,7 +474,7 @@ def main() -> None:
   pre {{ background: #141414; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #ccc; overflow-x: auto; font-size: 13px; }}
 </style></head><body>
 <h1>WOP Final Icon Pack</h1>
-<p>Chosen final icon: <code>{FINAL_SOURCE_NAME}</code> (also saved as <code>wop-icon.svg</code> and <code>favicon.svg</code>). All earlier prototypes are archived in <a href="archive/"><code>design/wop-icon/archive/</code></a>.</p>
+<p>Chosen final icon: <code>{FINAL_SOURCE_NAME}</code> (also saved as <code>wop-icon.svg</code> and <code>favicon.svg</code>).</p>
 
 <h2>1. Vector SVG Variants (<code>design/wop-icon/</code> &amp; <code>design/wop-icon/pack/</code>)</h2>
 <div class="row">{"".join(svg_cards)}</div>
@@ -515,7 +491,6 @@ def main() -> None:
 </body></html>
 """
     (ICON_DIR / "web.html").write_text(html, encoding="utf-8")
-    print(f"archived {moved_count} prototype files to {ARCHIVE_DIR}")
     print(f"wrote {len(svg_variants)} SVGs, {len(png_specs)} PNGs, favicon.ico, og-image.png, and site.webmanifest to {PACK_DIR}")
 
 

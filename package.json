@@ -4,6 +4,14 @@
   "description": "WOP: View and share Houdini node networks on the web. Interactive, view-only viewer for SideFX Houdini node networks on portfolio websites and technical documentation. Not affiliated with SideFX.",
   "author": "Emil Judin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emil-judin/wop-houdini-network-viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emil-judin/wop-houdini-network-viewer/issues"
+  },
+  "homepage": "https://github.com/emil-judin/wop-houdini-network-viewer#readme",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -26,21 +34,27 @@
   ],
   "files": [
     "dist",
-    "exporter",
+    "exporter/wop_exporter.py",
+    "exporter/README.md",
+    "schema",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "dev": "npm run build:exporter && vite",
     "check": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "build": "npm run build:exporter && vite build",
     "build:exporter": "node scripts/build_exporter_package.mjs",
     "build:lib": "vite build -c vite.lib.config.ts --mode npm && vite build -c vite.lib.config.ts --mode web-component && tsc -p tsconfig.lib.json",
-    "prepublishOnly": "npm run check && npm run build:lib"
+    "prepublishOnly": "npm run check && npm run lint && npm run build:lib",
+    "sri": "node scripts/print_sri.mjs"
   },
   "keywords": [
     "houdini",
@@ -55,25 +69,33 @@
     "technical-art"
   ],
   "peerDependencies": {
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "dependencies": {
     "@xyflow/react": "^12.4.2",
     "lucide-react": "^0.475.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@fontsource/source-code-pro": "^5.3.1",
     "@fontsource/source-sans-pro": "^5.3.0",
     "@tailwindcss/vite": "^4.0.6",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "magic-string": "^0.30.21",
     "postcss": "^8.5.31",
+    "prettier": "3.9.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.0.6",
     "typescript": "^5.7.3",
+    "typescript-eslint": "^8.71.1",
     "vite": "^6.1.0"
   }
 }

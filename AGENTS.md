@@ -1,6 +1,6 @@
 # AGENTS.md - Agentic Engineering Guidelines
 
-This file provides essential context, architectural invariants, and coding conventions for AI coding agents working in WOP (npm package `wop-houdini-network-viewer`).
+This file provides essential context, architectural invariants, and coding conventions for AI coding agents working in WOP (npm package `wop-houdini-network-viewer`). It is the canonical copy of the project pillars: other docs link here instead of repeating them.
 
 ## 1. Project Overview & Core Pillars
 
@@ -28,9 +28,14 @@ Every change must strictly follow our **6 Core Pillars**:
 - **Windows PowerShell Note:** On Windows PowerShell where script execution policy blocks `npm.ps1` and `&&` is unsupported in PS 5.1, invoke `npm.cmd` and separate commands with `;`.
 - **Install Dependencies:** `npm.cmd install`
 - **Start Dev Server:** `npm.cmd run dev`
-- **Typecheck & Verify:** `npm.cmd run check` (runs `tsc --noEmit`)
+- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/`)
+- **Lint:** `npm.cmd run lint` (ESLint: TypeScript, React hooks, JSX accessibility)
 - **Build Playground:** `npm.cmd run build` (output: `dist-playground/`)
 - **Build Library / Web Component:** `npm.cmd run build:lib` (output: `dist/`)
+
+### Definition of Done
+
+A task is finished only when `check`, `lint`, `build` and `build:lib` pass, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `wop-verify` skill has the full list. Report failures with their output instead of skipping a step.
 
 ## 3. Critical Architectural Rules
 
@@ -51,8 +56,30 @@ Every change must strictly follow our **6 Core Pillars**:
   - Every icon is an original drawing registered as an `OperatorIconDef` (built-in SOPs in `sop/`, SideFX Labs in `labs/`). Follow [docs/ICON_ART_BIBLE.md](./docs/ICON_ART_BIBLE.md) for style, palette, legal rules and workflow.
   - Never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (owner decision, see the art bible's legal rules). SideFX reference icons stay in the gitignored `local-refs/` folder (built by `scripts/build_local_reference_icons.py`) and are served only by the dev server, never from `public/` or a build.
 
-## 4. Continuity & On-Demand Skills
+## 4. Security & Privacy Rules
 
-- **Before starting work:** Read [docs/STATUS.md](./docs/STATUS.md) to see the current milestone state and next tasks.
-- **After completing a task:** Update [docs/STATUS.md](./docs/STATUS.md) so the next agent or human developer can continue seamlessly.
-- **Specialized Skills:** Check `.agents/skills/` for detailed runbooks on the Houdini Graph Renderer (`houdini-graph-renderer`) and Houdini Python Exporter (`houdini-python-exporter`).
+The viewer renders untrusted JSON, and the exporter writes files people publish. Never weaken these:
+
+- No `dangerouslySetInnerHTML`, `innerHTML` or `eval` for anything that comes from a network file. Custom SVG icons are shown only through `<img>` data URIs (`svgDataUri.ts`).
+- Every network file goes through `normalizeNetworkDocument` (`src/schema/normalize.ts`) before it is drawn. Look up file-provided maps (icons, custom shapes) with `Object.hasOwn`.
+- Downloads use `fetchNetworkJson` (no credentials to other sites, size and time limits).
+- Never add network calls that send a network file anywhere: the playground promises files stay in the browser. The feedback form sends only what its notice lists.
+- Exporter: every exported free-text field goes through `scrub_path`; locked third-party assets stay closed unless the user confirms; SideFX icons are never read or embedded. See the `houdini-python-exporter` skill.
+- Report security issues as described in [SECURITY.md](./SECURITY.md).
+
+## 5. Git Conventions
+
+- Work on a branch; one topic per commit. Commit or push only when the owner asks.
+- Never commit `local-refs/`, `public/downloads/`, `complex-network.json`, build outputs or real customer exports (all gitignored).
+- Known follow-ups live in the "Next Tasks" list of [docs/STATUS.md](./docs/STATUS.md). Review reports and progress logs are working files: delete them once their findings are fixed and keep the decisions in [docs/HISTORY.md](./docs/HISTORY.md).
+
+## 6. Continuity & On-Demand Skills
+
+- **Before starting work:** Read [docs/STATUS.md](./docs/STATUS.md) to see the current state and next tasks.
+- **After completing a task:** Update [docs/STATUS.md](./docs/STATUS.md) so the next agent or human developer can continue seamlessly. History of finished work goes to [docs/HISTORY.md](./docs/HISTORY.md) and [CHANGELOG.md](./CHANGELOG.md).
+- **Specialized Skills** (in `.agents/skills/`, with pointers in `.claude/skills/` so Claude Code finds them):
+  - `houdini-graph-renderer`: drawing the network, coordinates, viewer components.
+  - `houdini-python-exporter`: the Houdini exporter, privacy rules, schema versioning.
+  - `wop-icon-drawing`: operator icon drawings and their legal rules.
+  - `wop-verify`: the definition of done.
+  - `wop-release`: release checklist.

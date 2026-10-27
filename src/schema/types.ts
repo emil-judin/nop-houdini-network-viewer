@@ -18,18 +18,47 @@ export type HoudiniRgbColor = [number, number, number];
 export type HoudiniVec2 = [number, number];
 
 /**
- * Built-in Houdini node shape identifiers supported natively by the renderer.
+ * The 36 built-in Houdini node shapes the renderer draws (the keys of
+ * `src/components/nodes/shapes/houdiniShapesData.json`). Other names fall back to `rect` unless the
+ * document's `customShapes` defines them.
  */
 export type HoudiniBuiltinNodeShape =
-  | 'rect'
-  | 'wave'
-  | 'cigar'
-  | 'diamond'
-  | 'null'
+  | 'bone'
+  | 'bulge'
+  | 'bulge_down'
+  | 'burst'
+  | 'camera'
   | 'chevron_down'
   | 'chevron_up'
+  | 'cigar'
+  | 'circle'
+  | 'clipped_left'
+  | 'clipped_right'
+  | 'cloud'
+  | 'cop'
+  | 'cop2'
+  | 'diamond'
+  | 'ensign'
+  | 'gurgle'
+  | 'light'
+  | 'null'
+  | 'oval'
+  | 'peanut'
+  | 'pointy'
+  | 'rect'
+  | 'shop'
+  | 'slash'
+  | 'squared'
+  | 'star'
+  | 'subnet_input'
+  | 'tabbed_left'
+  | 'tabbed_right'
+  | 'task'
   | 'tilted'
-  | 'circle';
+  | 'trapezoid_down'
+  | 'trapezoid_up'
+  | 'vop'
+  | 'wave';
 
 /**
  * Read-only visual status flags for a Houdini SOP node.
@@ -132,7 +161,10 @@ export interface HoudiniNodeData {
   icon: string;
   /** Bottom-left position `[x, y]` in Houdini network units (`+Y` is up). */
   pos: HoudiniVec2;
-  /** Width and height `[w, h]` in Houdini network units (standard SOP is `[1.1296, 0.2824]`). */
+  /**
+   * Width and height `[w, h]` in Houdini network units (standard SOP is `[1.1296, 0.2824]`).
+   * Informational: the viewer always draws operator nodes with Houdini's 10:3 shape box (100 x 30 px).
+   */
   size: HoudiniVec2;
   /** Node RGB color in `[0.0, 1.0]` range. */
   color: HoudiniRgbColor;
@@ -325,5 +357,7 @@ export interface HoudiniNetworkDocument {
   customShapes?: Record<string, unknown>;
   /** Root network graph. */
   root: HoudiniNetworkGraph;
+  /** Number of parameters the exporter could not read and left out (schema 1.4.0, missing when none). */
+  exportWarnings?: number;
 }
 

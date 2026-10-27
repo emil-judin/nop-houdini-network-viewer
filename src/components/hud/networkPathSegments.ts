@@ -36,7 +36,7 @@ type PathNodeInfo = Pick<HoudiniPathNode, 'type' | 'icon'>;
  */
 function resolveSegmentIcon(info: PathNodeInfo | null, documentIcons: Record<string, string>): PathSegmentIcon | null {
   if (!info) return null;
-  const src = info.icon ? svgToDataUri(documentIcons[info.icon]) : null;
+  const src = info.icon && Object.hasOwn(documentIcons, info.icon) ? svgToDataUri(documentIcons[info.icon]) : null;
   if (src) return { src };
   const icon = (info.icon ?? '').toLowerCase();
   const pathDef = PATH_ICONS.find((def) => def.types.includes(info.type) || (icon && def.icons?.includes(icon)));

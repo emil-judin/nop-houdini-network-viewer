@@ -82,7 +82,6 @@ export function buildReactSnippet(options: EmbedSnippetOptions): string {
   if (!options.showMiniMap) props.push('showMiniMap={false}');
   if (!options.showToolbar) props.push('showToolbar={false}');
   if (!options.showInspector) props.push('showInspector={false}');
-  props.push('showDebugActions={false}');
   const fileName = options.jsonUrl.split('/').pop() || 'my-network.json';
   return [
     `import { HoudiniNetwork } from 'wop-houdini-network-viewer';`,

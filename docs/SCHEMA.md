@@ -1,6 +1,6 @@
 # Canonical JSON Schema Specification (`SCHEMA.md`)
 
-This document defines the JSON contract produced by `exporter/wop_exporter.py` and consumed by `src/schema/types.ts`.
+This document defines the JSON contract produced by `exporter/wop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/wop-network-1.schema.json](../schema/wop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields).
 
 ---
 
@@ -8,12 +8,12 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 
 ```json
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "1.4.0",
   "houdiniVersion": "22.0.466",
   "exportedAt": "2026-10-23T15:00:00Z",
   "exportMode": "compact",
   "icons": {
-    "SOP_attribwrangle": "<svg ...>...</svg>"
+    "opdef:/emjud::Sop/circuit_gen::1.0?IconSVG": "<svg ...>...</svg>"
   },
   "customShapes": {},
   "root": {
@@ -38,14 +38,19 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 
 `pathNodes` (schema 1.3.0, exported root only) lists every node from the top (`/obj`) down to the exported network itself, with its operator type and icon id (`node.type().icon()`), so the web path bar can show the same icons as Houdini's. Custom icons of user assets on the path are added to `icons` like node icons. The icon ids above are examples. The path bar starts at the exported network (nodes above it cannot be opened), so the viewer currently uses the last entry: the exported network's own icon. Older exports omit `pathNodes`; the viewer then picks the icon from the root `type` (a box for digital assets without an icon).
 
+`icons` only ever holds custom SVG icons of assets outside the Houdini install and SideFX Labs (cleaned of editor metadata). Built-in SideFX icons are never embedded: nodes reference them by id (`SOP_box`) and the viewer draws its own original icons.
+
+`exportWarnings` (schema 1.4.0, optional) counts parameters the exporter could not read and left out. It is missing when there were none.
+
 `wireStyle` is the Network Editor wire style of the network's node category (`hou.NodeTypeCategory.defaultWireStyle()`): `"default"` draws straight wires with short vertical stubs and rounded bends, `"rounded"` draws orthogonal wires (a short drop below the output, a horizontal run shared by all wires of that output, then a vertical drop into the input) with rounded corners. Older exports without the field render as `"default"`; the viewer's `wireStyle` prop and toolbar switch can override it.
 
 ---
 
 ## 2. Key Schema Rules & Edge Cases (Verified in Houdini 22.0)
 
-1. **Backward Compatibility with Raw Dumps:**
-   - The converter accepts both full `HoudiniNetworkDocument` objects and raw diagnostic dumps (where `icons` or `schemaVersion` may be omitted).
+1. **Untrusted input and raw dumps:**
+   - The viewer accepts both full `HoudiniNetworkDocument` objects and raw diagnostic dumps (where `icons` or `schemaVersion` may be omitted).
+   - Every file is checked once on load (`normalizeNetworkDocument` in `src/schema/normalize.ts`): items without a name are dropped, missing or wrong values get the defaults documented here (for example `pos` `[0, 0]`, a scalar `val` becomes a one-item list), unknown extra fields are kept. Only files that are not networks at all, or that use a newer major schema, are refused with a message.
 2. **Node Shape Normalization:**
    - In Houdini, nodes with the default rectangular shape report `"shape": ""`. The converter normalizes `""` to `"rect"`.
 3. **Multi-Input Connector Cap (`maxInputs`):**
@@ -53,7 +58,7 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
    - Any node with `maxInputs > 4` renders a single wide multi-input bar connector at the top of the node rather than discrete circular connectors.
 4. **Subnetwork Indirect Inputs (`subnetInputs`):**
    - Inside a Subnet or HDA, parent inputs are represented in `subnetInputs` with `"name": "1"`, `"name": "2"`, etc.
-   - Wires originating from a subnet input reference `"from": "1"`. During conversion, these are mapped to synthetic node IDs (`__subnet_input_1`) to prevent ID collisions and ensure clean wire routing.
+   - Wires originating from a subnet input reference `"from": "1"`. During conversion, these are mapped to synthetic node IDs (`input:1`) to prevent ID collisions and ensure clean wire routing. Boxes, sticky notes and dots get the same kind of prefix (`box:`, `sticky:`, `dot:`).
    - Optional `"inputName"` holds the name of the node wired into the matching input of the parent subnetwork (e.g. `"transform1"`). Houdini shows it as a second label line under `Sub-Network Input #1`. It is `""` (or missing in older exports) when the input is unconnected.
 5. **Parameter Tuples (`parms`):**
    - Parameters are exported as grouped `ParmTuple` entries (`val: (string | number)[]` and `expr: (string | null)[]`) so multi-component parameters like `Translate` (`tx, ty, tz`) render on a single row in the inspector.
@@ -73,8 +78,14 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
      - `ramp: { color, keys, values, basis }`: points of a `Ramp` parameter from `hou.Parm.evalAsRamp()` (`values` are numbers for float ramps, `[r, g, b]` for color ramps; `basis[i]` is the interpolation from point `i` to the next). The inspector draws a curve or a gradient; without it only the point count (`val`) is shown.
    - `parms` follows `hou.Node.parmTuples()` order, which lists spare parameters (for example a wrangle's generated channel parameters) last; the viewer places every parameter inside its folder or tab regardless of where it appears in the list.
 6. **Digital asset state (`hdaState`, schema 1.2.0):** `"locked"` (grey padlock under the node name), `"unlocked"` (red open padlock: the asset is being edited), or `null` for nodes that are not assets. Older exports omit it.
-7. **Path scrubbing:** exported text never contains local folders. The exporter replaces them with `$HIP`, `$JOB`, `$HOUDINI_USER_PREF_DIR`, `$HSITE`, `$HFS` or `$HOME`, and any remaining home folder (`C:/Users/<name>`, `/home/<name>`) with `~`, in parameter values, expressions, comments, sticky notes and custom icon ids.
-8. **Minimized Network Boxes:**
+7. **Path scrubbing:** exports are meant to be as safe to share as a screenshot. In parameter values, expressions, menu labels, node comments, sticky notes, custom icon ids and embedded custom icons:
+   - folders inside the project and Houdini folders become `$HIP`, `$JOB`, `$HOUDINI_USER_PREF_DIR`, `$HSITE` or `$HFS` (`$HIP/geo/a.bgeo` keeps its structure);
+   - every other absolute path keeps only its file name: drive paths (`D:/Clients/Acme/rock.exr`), home folders (`C:/Users/<name>/...`, `~/...`), server shares (`\\studio-nas\acme\...`, both server and share names are removed) and POSIX mounts (`/mnt/...`, `/Volumes/...`) all become `<path>/rock.exr`;
+   - absolute Houdini node paths (`/obj/geo1/OUT`) and URLs are kept.
+   - Network box comments are exported as the user wrote them (owner decision), and so are file names: rename a file if its name is confidential.
+8. **Locked assets:** the insides of locked digital assets that are not from SideFX or SideFX Labs (purchased, studio or colleagues' assets) are not exported unless the user confirms in the export dialog. Such a node is exported closed (`isSubnetwork: false`, no `children`, `hdaState: "locked"`), with its parameters and its icon.
+9. **Node size:** `size` is informational. The viewer always draws operator nodes in Houdini's 10:3 shape box (100 x 30 px).
+10. **Minimized Network Boxes:**
    - When `minimized: true`, Houdini reports `size[1]: 0.0`. The exporter includes `items: string[]` (names of nodes/dots inside the box) so the viewer can hide internal items when a box is minimized and render the collapsed header bar accurately.
 
 
@@ -82,7 +93,7 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 
 ## 3. Versioning Policy
 
-`schemaVersion` follows semantic versioning (`MAJOR.MINOR.PATCH`). The exporter always writes the newest version (`SCHEMA_VERSION` in `exporter/wop_exporter.py`); the viewer declares the major version it reads (`SUPPORTED_SCHEMA_MAJOR` in `src/schema/converter.ts`).
+`schemaVersion` follows semantic versioning (`MAJOR.MINOR.PATCH`). The exporter always writes the newest version (`SCHEMA_VERSION` in `exporter/wop_exporter.py`); the viewer declares the major version it reads (`SUPPORTED_SCHEMA_MAJOR` in `src/schema/normalize.ts`). Every new field also goes into `schema/wop-network-1.schema.json`.
 
 - **PATCH** (`1.3.0` to `1.3.1`): the exporter fills existing fields more correctly. The shape and meaning of every field stay the same.
 - **MINOR** (`1.3.0` to `1.4.0`): adds optional fields. Old viewers ignore fields they do not know, and new viewers fall back to the old behavior when a field is missing. Every new field is marked with the version that added it ("schema 1.4.0") in this document.

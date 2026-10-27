@@ -9,6 +9,13 @@ export interface NetworkErrorBoundaryProps {
   resetKey: unknown;
   /** The viewer content to protect. */
   children: React.ReactNode;
+  /**
+   * Optional way out of the error, shown as a button (for example "Back to the top network" when a
+   * subnetwork cannot be drawn). It should change `resetKey`, which clears the error.
+   */
+  onReset?: () => void;
+  /** Label of the `onReset` button. */
+  resetLabel?: string;
 }
 
 interface NetworkErrorBoundaryState {
@@ -34,7 +41,13 @@ export class NetworkErrorBoundary extends React.Component<NetworkErrorBoundaryPr
 
   render(): React.ReactNode {
     if (this.state.error) {
-      return <NetworkErrorState message={this.state.error.message} />;
+      const { onReset, resetLabel } = this.props;
+      return (
+        <NetworkErrorState
+          message={this.state.error.message}
+          action={onReset && resetLabel ? { label: resetLabel, onClick: onReset } : undefined}
+        />
+      );
     }
     return this.props.children;
   }

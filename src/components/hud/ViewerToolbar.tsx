@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Copy, Download, Map as MapIcon, Maximize2, Minimize2, Scan, Type } from 'lucide-react';
+import { Ban, Check, Copy, Download, Map as MapIcon, Maximize2, Minimize2, Scan, Type } from 'lucide-react';
 import type { HoudiniLabelSize } from '../../schema/converter';
 import type { HoudiniNetworkDocument, HoudiniWireStyle } from '../../schema/types';
 import { TOUCH_TARGET } from './touchTarget';
@@ -36,7 +36,7 @@ export interface ViewerToolbarProps {
   onFitView: () => void;
   /** Full normalized document for debugging copy/download actions. */
   document: HoudiniNetworkDocument;
-  /** Whether to show debug copy/download JSON buttons. */
+  /** Whether to show debug copy/download JSON buttons. Defaults to `false`. */
   showDebugActions?: boolean;
   /** Whether the network overview (minimap) is shown. */
   miniMapVisible: boolean;
@@ -58,20 +58,21 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
   onToggleFullscreen,
   onFitView,
   document,
-  showDebugActions = true,
+  showDebugActions = false,
   miniMapVisible,
   onToggleMiniMap,
 }) => {
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'blocked'>('idle');
 
   const handleCopyJson = async () => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(document, null, 2));
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setCopyState('copied');
     } catch {
-      // Clipboard API may be restricted in some insecure contexts
+      // The Clipboard API is blocked in insecure contexts and some iframes: say so, the download still works
+      setCopyState('blocked');
     }
+    window.setTimeout(() => setCopyState('idle'), 2000);
   };
 
   const handleDownloadJson = () => {
@@ -105,25 +106,29 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
           aria-label="Fit network to view"
           className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-xs text-[#d4d4d4] hover:bg-[#323232] hover:text-white transition-colors cursor-pointer ${TOUCH_TARGET}`}
         >
-          <Scan className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Fit</span>
+          <Scan className="w-3.5 h-3.5" aria-hidden="true" />
+          <span className="hidden @md:inline">Fit</span>
         </button>
 
         {/* Label Font Size Preset Switcher (Small / Standard / Large) */}
         <div
+          role="group"
+          aria-label="Node label size"
           className="flex items-center rounded bg-[#252525] border border-[#383838] p-0.5 text-[11px]"
           title="Node Label Font Size"
         >
-          <Type className="w-3 h-3 text-[#888888] mx-1 hidden sm:inline" />
+          <Type className="w-3 h-3 text-[#888888] mx-1 hidden @md:inline" aria-hidden="true" />
           {(['small', 'medium', 'large'] as const).map((sz) => (
             <button
               key={sz}
               type="button"
               onClick={() => onChangeLabelSize(sz)}
-              className={`flex items-center justify-center px-1.5 py-0.5 rounded capitalize transition-colors cursor-pointer ${TOUCH_TARGET} ${
+              aria-label={`${sz[0].toUpperCase()}${sz.slice(1)} labels`}
+              aria-pressed={labelSize === sz}
+              className={`flex items-center justify-center min-w-6 min-h-6 px-1.5 py-0.5 rounded capitalize transition-colors cursor-pointer ${TOUCH_TARGET} ${
                 labelSize === sz
                   ? 'bg-[#474e62] text-white font-bold'
-                  : 'text-[#909090] hover:text-white'
+                  : 'text-[#b0b0b0] hover:text-white'
               }`}
             >
               {sz === 'small' ? 'S' : sz === 'medium' ? 'M' : 'L'}
@@ -132,7 +137,7 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
         </div>
 
         {/* Wire Style Switcher (Houdini `default` / `rounded`) */}
-        <div className="flex items-center rounded bg-[#252525] border border-[#383838] p-0.5" title="Wire Style">
+        <div role="group" aria-label="Wire style" className="flex items-center rounded bg-[#252525] border border-[#383838] p-0.5" title="Wire Style">
           {WIRE_STYLE_OPTIONS.map(({ style, label, glyph }) => (
             <button
               key={style}
@@ -141,8 +146,8 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
               title={label}
               aria-label={label}
               aria-pressed={wireStyle === style}
-              className={`flex items-center justify-center px-1 py-0.5 rounded transition-colors cursor-pointer ${TOUCH_TARGET} ${
-                wireStyle === style ? 'bg-[#474e62] text-white' : 'text-[#909090] hover:text-white'
+              className={`flex items-center justify-center min-w-6 min-h-6 px-1 py-0.5 rounded transition-colors cursor-pointer ${TOUCH_TARGET} ${
+                wireStyle === style ? 'bg-[#474e62] text-white' : 'text-[#b0b0b0] hover:text-white'
               }`}
             >
               <svg viewBox="0 0 14 14" className="w-3.5 h-3.5" aria-hidden="true">
@@ -160,10 +165,10 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
           aria-pressed={miniMapVisible}
           // The overview is never shown in narrow viewers, so the button is hidden there too
           className={`hidden @md:flex items-center justify-center gap-1 px-2 py-1 rounded text-xs transition-colors cursor-pointer ${TOUCH_TARGET} ${
-            miniMapVisible ? 'bg-[#474e62] text-white' : 'text-[#909090] hover:bg-[#323232] hover:text-white'
+            miniMapVisible ? 'bg-[#474e62] text-white' : 'text-[#b0b0b0] hover:bg-[#323232] hover:text-white'
           }`}
         >
-          <MapIcon className="w-3.5 h-3.5" />
+          <MapIcon className="w-3.5 h-3.5" aria-hidden="true" />
         </button>
 
         {showDebugActions && (
@@ -171,16 +176,28 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
             <button
               type="button"
               onClick={handleCopyJson}
-              title="Copy Network JSON to Clipboard"
+              title={
+                copyState === 'blocked'
+                  ? 'Copying is blocked on this page: use the download button'
+                  : 'Copy Network JSON to Clipboard'
+              }
               aria-label="Copy network JSON to clipboard"
               className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-xs text-[#d4d4d4] hover:bg-[#323232] hover:text-white transition-colors cursor-pointer ${TOUCH_TARGET}`}
             >
-              {copied ? (
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
+              {copyState === 'copied' ? (
+                <Check className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+              ) : copyState === 'blocked' ? (
+                <Ban className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
               ) : (
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-3.5 h-3.5" aria-hidden="true" />
               )}
-              <span className="hidden md:inline">{copied ? 'Copied' : 'Copy JSON'}</span>
+              <span className="hidden @md:inline">
+                {copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked' : 'Copy JSON'}
+              </span>
+              {/* Announced to screen readers, and shown in narrow viewers where the text above is hidden */}
+              <span role="status" className="sr-only">
+                {copyState === 'copied' ? 'Copied' : copyState === 'blocked' ? 'Copy blocked: use the download button' : ''}
+              </span>
             </button>
 
             <button
@@ -190,8 +207,8 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
               aria-label="Download network JSON file"
               className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-xs text-[#d4d4d4] hover:bg-[#323232] hover:text-white transition-colors cursor-pointer ${TOUCH_TARGET}`}
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">JSON</span>
+              <Download className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden @md:inline">JSON</span>
             </button>
           </>
         )}
@@ -204,9 +221,9 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
           className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-xs text-[#d4d4d4] hover:bg-[#323232] hover:text-white transition-colors cursor-pointer ${TOUCH_TARGET}`}
         >
           {isFullscreen ? (
-            <Minimize2 className="w-3.5 h-3.5 text-amber-400" />
+            <Minimize2 className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
           ) : (
-            <Maximize2 className="w-3.5 h-3.5" />
+            <Maximize2 className="w-3.5 h-3.5" aria-hidden="true" />
           )}
         </button>
       </div>

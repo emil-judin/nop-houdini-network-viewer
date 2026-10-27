@@ -6,35 +6,33 @@ WOP (Web OPerator) is an interactive, strictly view-only viewer for **SideFX Hou
 
 ---
 
-## Core Pillars
+## What It Does
 
-1. **Usability:** Go from Houdini to an interactive web embed in seconds using the 1-click Houdini Python Shelf Exporter and a single HTML or React component tag.
-2. **Authenticity:** 1:1 visual fidelity with Houdini's native Network Editor (SOP flags, operator shapes, multi-input connectors, wire dots, network boxes, and sticky notes).
-3. **Strictly View-Only:** Designed purely for portfolio visualization and inspection. Visitors can pan, zoom, toggle fullscreen, dive into subnetworks, and inspect parameters and VEX snippets without altering the graph layout.
-4. **Modularity:** Lightweight, strongly typed TypeScript and React architecture built on `@xyflow/react`.
-5. **Documentation:** Built as an agentic-first repository with comprehensive schema and architectural documentation in [`PLAN.md`](./PLAN.md), [`AGENTS.md`](./AGENTS.md), and [`docs/`](./docs/).
-6. **Compatibility:** Works on Android and iOS as well as desktop, across current versions of all major modern browsers, without relying on experimental or non-standard web features.
+One click in Houdini exports a network; one tag shows it on your site, looking like Houdini's Network Editor. Visitors can pan, zoom, go fullscreen, dive into subnetworks and read parameters and VEX code, on desktop and on phones, but never edit anything. The six design pillars behind this are defined in [`AGENTS.md`](./AGENTS.md).
 
 ---
 
 ## Quick Start (Development)
 
+Needs Node.js 20 or newer (CI uses Node 22, see `.nvmrc`).
+
 ```bash
 # Install dependencies
 npm install
 
-# Run strict TypeScript verification
-npm run check
-
 # Start the interactive development playground
 npm run dev
+
+# Checks: strict TypeScript and lint
+npm run check
+npm run lint
 
 # Build the playground with the exporter download (dist-playground/) and the npm package + web component (dist/)
 npm run build
 npm run build:lib
 ```
 
-On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked.
+On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked. [`CONTRIBUTING.md`](./CONTRIBUTING.md) has the rules for changes.
 
 ---
 
@@ -47,6 +45,8 @@ Click **Exporter** in the playground to download `wop-exporter.zip`, a Houdini p
 ## Embedding on Your Website
 
 The playground's **Embed** button generates all three snippets below for the network on screen.
+
+> **Not on npm yet (tester release).** Snippets 1 and 2 need the npm package (or its CDN copy) and start working with the public release. Until then, use the iframe embed (3).
 
 ### 1. Plain HTML / WordPress / Cargo (Web Component)
 
@@ -62,7 +62,7 @@ The viewer runs inside a Shadow DOM, so your site's CSS cannot break it and its 
 
 ```html
 <houdini-network style="height: 600px">
-  <script type="application/json">{ "schemaVersion": "1.3.0", "root": { ... } }</script>
+  <script type="application/json">{ "schemaVersion": "1.4.0", "root": { ... } }</script>
 </houdini-network>
 ```
 
@@ -76,8 +76,9 @@ The viewer runs inside a Shadow DOM, so your site's CSS cannot break it and its 
 | `inspector` | `false` to never open the Parameter Inspector | enabled |
 | `debug-actions` | `true` to show the Copy / Download JSON buttons | hidden |
 | `fit-view` | `false` to skip fitting the network on load | fit |
+| `hotkeys` | `focus`: Houdini hotkeys only while the viewer has focus; `hover`: also while the pointer is over it; `off` | `focus` |
 
-The element is 480px tall unless you give it a height. From JavaScript you can also set `element.data = json`.
+The element is 480px tall unless you give it a height. From JavaScript you can also set `element.data = json`. The script loads the Parameter Inspector, the SideFX Labs icons and the fonts from files next to it when they are needed, so host the whole `dist/` folder together (the CDN does this for you).
 
 ### 2. React / Next.js / Astro (`npm`)
 
@@ -93,13 +94,13 @@ import myGraph from './circuit-gen-network.json';
 export function PortfolioBreakdown() {
   return (
     <div style={{ width: '100%', height: '600px' }}>
-      <HoudiniNetwork data={myGraph} showDebugActions={false} />
+      <HoudiniNetwork data={myGraph} />
     </div>
   );
 }
 ```
 
-`react` and `react-dom` (18.2 or newer) are peer dependencies. To load the file from a URL instead of importing it, use `<RemoteHoudiniNetwork src="/my-network.json" />`. The stylesheet does not reset your page; its classes only style the viewer.
+`react` and `react-dom` 18.2+ are peer dependencies (React 19 is not tested yet). To load the file from a URL instead of importing it, use `<RemoteHoudiniNetwork src="/my-network.json" />`. The stylesheet does not reset your page; its classes only style the viewer.
 
 ### 3. iframe (ArtStation, Notion, site builders without script tags)
 
@@ -131,7 +132,7 @@ The iframe page accepts the same options as URL parameters (`label-size=large`, 
 | Toggle wire style | `Shift+S` | Wire style switch |
 | Fullscreen | Maximize button (`Esc` to leave) | Maximize button |
 
-Hotkeys only react while the pointer is over the viewer, so they never interfere with the rest of the page.
+Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters, `Esc` closes them again. The single-key hotkeys only react while the viewer has focus (click into it first), so they never interfere with typing elsewhere on the page. The playground also lets them react while the pointer is over the viewer, like Houdini (`hotkeys="hover"`).
 
 ---
 
@@ -140,7 +141,19 @@ Hotkeys only react while the pointer is over the viewer, so they never interfere
 **Alpha.** The JSON schema and the component API can still change between `0.x` releases (see [`CHANGELOG.md`](./CHANGELOG.md)).
 
 - **Houdini:** the exporter is tested with Houdini 22.0.466. Houdini 20.5 and 21 are not tested yet.
-- **Browsers:** tested in Chrome (desktop, plus phone and tablet emulation). Firefox, Safari (macOS and iOS) and Chrome on Android are targeted but not tested on real devices yet.
+- **Browsers:** current Chrome, Edge, Firefox and Safari are targeted. Safari and Chrome on real phones are not tested on real devices yet.
+
+---
+
+## Privacy
+
+- **The playground keeps your files in your browser.** Opened, dropped and pasted networks are never uploaded.
+- **The feedback form** (only on the hosted playground) sends your message, an optional contact, the WOP version, your browser, the page address without its query and the name of the network on screen, by email through [Web3Forms](https://web3forms.com). Your network file is never sent.
+- **The exporter** scrubs paths (see [`docs/SCHEMA.md`](./docs/SCHEMA.md) rule 7) and leaves the insides of locked third-party assets out unless you confirm. Network box comments are exported exactly as written and sticky notes apart from their paths, so check them before sharing.
+
+## Security
+
+Please report vulnerabilities and privacy leaks in exports privately, as described in [`SECURITY.md`](./SECURITY.md).
 
 ---
 

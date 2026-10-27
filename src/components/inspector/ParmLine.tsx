@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check, ChevronsUpDown, Menu } from 'lucide-react';
 import { CodeBlock } from './CodeBlock';
 import { isToggleOn, type ParmDisplayRow } from './parmModel';
@@ -36,6 +36,9 @@ function fieldColors(row: ParmDisplayRow, index: number): string {
 
 /**
  * Read-only value field (looks like a Houdini parameter input but cannot be edited).
+ *
+ * Long values are cut off like in Houdini. A click or tap shows the whole value in place (and hides
+ * it again), because touch screens have no hover tooltip.
  */
 const ValueField: React.FC<{
   text: string;
@@ -47,23 +50,37 @@ const ValueField: React.FC<{
   bold?: boolean;
   /** Axis color of a vector component (small diamond in the bottom-right corner, like Houdini). */
   axisColor?: string;
-}> = ({ text, colors, className = '', title, mono, bold, axisColor }) => (
-  <div
-    title={title}
-    className={`relative min-w-0 ${FIELD_HEIGHT} px-1.5 flex items-center rounded-[3px] text-[13px] select-text ${
-      mono ? 'font-mono text-[12px]' : ''
-    } ${bold ? 'font-bold' : ''} ${colors} ${className}`}
-  >
-    <span className="truncate">{text}</span>
-    {axisColor && (
-      <span
-        aria-hidden="true"
-        className="absolute right-[3px] bottom-[3px] w-[3px] h-[3px] rotate-45"
-        style={{ backgroundColor: axisColor }}
-      />
-    )}
-  </div>
-);
+}> = ({ text, colors, className = '', title, mono, bold, axisColor }) => {
+  const [expanded, setExpanded] = useState(false);
+  // Greyed out by a disable-when rule: announced as dimmed (inactive text is exempt from contrast rules)
+  const disabled = colors === PANE.fieldDisabled;
+  return (
+    // A pointer convenience only: screen readers already read the whole value, and making every field
+    // a tab stop would bury the panel in hundreds of stops
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+    <div
+      title={title}
+      aria-disabled={disabled || undefined}
+      onClick={() => {
+        // Selecting text with the mouse also ends with a click: keep the field as it is then
+        if (window.getSelection()?.toString()) return;
+        setExpanded((value) => !value);
+      }}
+      className={`relative min-w-0 ${expanded ? 'min-h-6 h-auto py-0.5' : FIELD_HEIGHT} px-1.5 flex items-center rounded-[3px] text-[13px] select-text cursor-text ${
+        mono ? 'font-mono text-[12px]' : ''
+      } ${bold ? 'font-bold' : ''} ${colors} ${className}`}
+    >
+      <span className={expanded ? 'whitespace-pre-wrap break-all' : 'truncate'}>{text}</span>
+      {axisColor && (
+        <span
+          aria-hidden="true"
+          className="absolute right-[3px] bottom-[3px] w-[3px] h-[3px] rotate-45"
+          style={{ backgroundColor: axisColor }}
+        />
+      )}
+    </div>
+  );
+};
 
 /** Houdini's x / y / z component colors (sampled from a Houdini 22 Transform SOP). */
 const AXIS_COLORS = ['#db6c5a', '#58be65', '#6994c1'];
@@ -104,7 +121,7 @@ export const ToggleBox: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
         disabled ? 'opacity-50' : ''
       }`}
     >
-      {on && <Check className="w-3.5 h-3.5 text-[#7082b9]" strokeWidth={3.5} />}
+      {on && <Check className="w-3.5 h-3.5 text-[#7082b9]" strokeWidth={3.5} aria-hidden="true" />}
     </span>
   );
 };
@@ -206,17 +223,6 @@ const ParmWidget: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
         </div>
       );
     }
-    case 'button':
-      return (
-        <span
-          className={`inline-flex items-center ${FIELD_HEIGHT} px-3 rounded-[3px] text-[13px] max-w-full truncate ${
-            disabled ? PANE.fieldDisabled : 'bg-[#4c4c4c] text-[#dddddd]'
-          }`}
-          title={`${parm.name} (button, not available in the web viewer)`}
-        >
-          {row.label}
-        </span>
-      );
     case 'label':
       return (
         <span className={`flex items-center ${FIELD_HEIGHT} text-[13px] ${PANE.text}`}>
@@ -243,7 +249,7 @@ const ParmWidget: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
               }`}
               aria-hidden="true"
             >
-              <Menu className="w-3.5 h-3.5" />
+              <Menu className="w-3.5 h-3.5" aria-hidden="true" />
             </span>
           )}
         </div>
@@ -251,9 +257,9 @@ const ParmWidget: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
   }
 };
 
-/** `true` when a row draws its own label (toggles, buttons) or has none in the label column. */
+/** `true` when a row draws its own label (toggles) or has none in the label column. */
 function hasOwnLabel(row: ParmDisplayRow): boolean {
-  return row.kind === 'toggle' || row.kind === 'button' || Boolean(row.parm.labelHidden);
+  return row.kind === 'toggle' || Boolean(row.parm.labelHidden);
 }
 
 /**
@@ -270,6 +276,7 @@ function hasNoInlineLabel(row: ParmDisplayRow): boolean {
 const ParmLabel: React.FC<{ row: ParmDisplayRow; className?: string }> = ({ row, className = '' }) => (
   <span
     title={row.parm.name}
+    aria-disabled={row.parm.disabled || undefined}
     className={`text-[13px] leading-6 truncate ${row.parm.disabled ? PANE.labelDisabled : PANE.label} ${className}`}
   >
     {row.label}
@@ -322,7 +329,7 @@ export const ParmLine: React.FC<{ rows: ParmDisplayRow[] }> = ({ rows }) => {
 
   if (first.kind === 'code') {
     return (
-      <div className="px-2 py-1">
+      <div role="group" aria-label={first.label} className="px-2 py-1">
         <ParmLabel row={first} className="block mb-0.5" />
         <CodeBlock code={formatValue(first.parm.val[0])} language={first.language} />
       </div>
@@ -336,7 +343,14 @@ export const ParmLine: React.FC<{ rows: ParmDisplayRow[] }> = ({ rows }) => {
   const hasExpression = main.some((row) => row.parm.expr.some(Boolean));
 
   return (
-    <div className={`${LINE_GRID} px-2 py-[3px]`}>
+    // A named group, so screen readers announce each value together with its parameter label
+    <div
+      role="group"
+      aria-label={lead.label}
+      // Greyed out by a disable-when rule in Houdini: announced as dimmed (and exempt from text contrast)
+      aria-disabled={main.every((row) => row.parm.disabled) || undefined}
+      className={`${LINE_GRID} px-2 py-[3px]`}
+    >
       {hasExpression && !gutterToggle ? (
         // Houdini highlights the label of an expression-driven parameter and adds an f(x) icon
         <div className="col-span-2 min-w-0 flex items-center justify-end gap-1 pr-1 rounded-[3px] bg-[#424242]">

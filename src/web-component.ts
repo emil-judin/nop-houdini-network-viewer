@@ -13,6 +13,15 @@ export const HOUDINI_NETWORK_TAG = 'houdini-network';
 const HOST_CSS = ':host { display: block; position: relative; height: 480px; } :host([hidden]) { display: none; }';
 
 /**
+ * Font URLs in the built `fonts.css` are relative to this script (`./fonts/...`, see
+ * `vite.lib.config.ts`), but a `<style>` element in the page resolves them against the page.
+ * This makes them absolute, so the fonts load from wherever the script is served (a CDN, a folder).
+ */
+function resolveFontUrls(css: string): string {
+  return css.replace(/url\((["']?)\.\/fonts\//g, (_match, quote: string) => `url(${quote}${new URL(/* @vite-ignore */ './fonts/', import.meta.url).href}`);
+}
+
+/**
  * Registers the viewer fonts on the page once. Browsers ignore `@font-face` inside a Shadow DOM,
  * so the rules go into the document head (they only add font families, never style the page).
  */
@@ -20,9 +29,11 @@ function registerFonts(): void {
   if (document.head.querySelector('style[data-houdini-network-fonts]')) return;
   const style = document.createElement('style');
   style.setAttribute('data-houdini-network-fonts', '');
-  style.textContent = fontsCss;
+  style.textContent = resolveFontUrls(fontsCss);
   document.head.append(style);
 }
+
+type InlineJson = { data: unknown } | { error: string };
 
 /**
  * Tailwind declares its internal variables (`--tw-border-style`, `--tw-shadow`, ...) with
@@ -54,9 +65,9 @@ const SHADOW_CSS = [HOST_CSS, buildShadowPropertyDefaults(viewerCss), viewerCss]
  * 3. the `src` attribute (URL of the exported `.json` file).
  *
  * Optional attributes: `label-size` (`small` | `medium` | `large`), `wire-style`
- * (`default` | `rounded`), and `minimap`, `toolbar`, `inspector`, `debug-actions`, `fit-view`
- * (`"false"` to switch off). The viewer lives in a Shadow DOM, so page styles cannot break it
- * and its styles never leak into the page.
+ * (`default` | `rounded`), `hotkeys` (`focus` | `hover` | `off`), and `minimap`, `toolbar`,
+ * `inspector`, `debug-actions`, `fit-view` (`"false"` to switch off). The viewer lives in a Shadow
+ * DOM, so page styles cannot break it and its styles never leak into the page.
  */
 export class HoudiniNetworkElement extends HTMLElement {
   static observedAttributes = ['src', ...EMBED_OPTION_NAMES];
@@ -64,6 +75,13 @@ export class HoudiniNetworkElement extends HTMLElement {
   private reactRoot: Root | null = null;
   private readonly mountPoint: HTMLDivElement;
   private propertyData: unknown = null;
+  /**
+   * Last parsed inline JSON and its text. Re-rendering with the same text passes the same object,
+   * so changing an attribute does not reset the visitor's navigation, selection and view.
+   */
+  private inlineCache: { text: string; result: InlineJson } | null = null;
+  /** Re-reads the inline JSON when page scripts add or change the `<script>` child later. */
+  private readonly childObserver = new MutationObserver(() => this.render());
 
   constructor() {
     super();
@@ -88,10 +106,12 @@ export class HoudiniNetworkElement extends HTMLElement {
   connectedCallback(): void {
     registerFonts();
     this.reactRoot ??= createRoot(this.mountPoint);
+    this.childObserver.observe(this, { childList: true, subtree: true, characterData: true });
     this.render();
   }
 
   disconnectedCallback(): void {
+    this.childObserver.disconnect();
     // Moving the element in the page disconnects and reconnects it: only unmount when it is really gone
     queueMicrotask(() => {
       if (!this.isConnected && this.reactRoot) {
@@ -105,15 +125,25 @@ export class HoudiniNetworkElement extends HTMLElement {
     this.render();
   }
 
-  /** Reads the optional inline `<script type="application/json">` child. */
-  private readInlineJson(): { data: unknown } | { error: string } | null {
-    const script = this.querySelector(':scope > script[type="application/json"]');
-    if (!script?.textContent?.trim()) return null;
-    try {
-      return { data: JSON.parse(script.textContent) };
-    } catch (err) {
-      return { error: `The inline <script type="application/json"> is not valid JSON: ${err instanceof Error ? err.message : err}` };
+  /** Reads the optional inline `<script type="application/json">` child (parsed once per text). */
+  private readInlineJson(): InlineJson | null {
+    const text = this.querySelector(':scope > script[type="application/json"]')?.textContent?.trim();
+    if (!text) {
+      this.inlineCache = null;
+      return null;
     }
+    if (this.inlineCache?.text !== text) {
+      let result: InlineJson;
+      try {
+        result = { data: JSON.parse(text) };
+      } catch (err) {
+        result = {
+          error: `The inline <script type="application/json"> is not valid JSON: ${err instanceof Error ? err.message : err}`,
+        };
+      }
+      this.inlineCache = { text, result };
+    }
+    return this.inlineCache.result;
   }
 
   private render(): void {
@@ -128,7 +158,6 @@ export class HoudiniNetworkElement extends HTMLElement {
       React.createElement(RemoteHoudiniNetwork, {
         src: this.getAttribute('src'),
         data,
-        showDebugActions: false,
         ...parseEmbedOptions((name) => this.getAttribute(name)),
         className: 'h-full',
       }),

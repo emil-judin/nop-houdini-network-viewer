@@ -44,6 +44,9 @@ export interface CodeBlockProps {
   language: CodeLanguage;
 }
 
+/** Copy button in the top-right corner of a code field. */
+const COPY_BUTTON_CLASS = `absolute top-1 right-3 z-10 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-[3px] bg-[#474e62] text-[11px] text-[#ecedef] hover:bg-[#535b72] transition-colors cursor-pointer ${TOUCH_TARGET}`;
+
 /**
  * Read-only, syntax-highlighted code field for VEX snippets and Python code, with a
  * one-click Copy button. Long lines scroll sideways instead of wrapping, like Houdini's editor.
@@ -65,36 +68,42 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
 
   return (
     // Houdini's code editor: near-black field, line numbers in a gutter, Copy button at the top right
-    <div className="relative rounded-[2px] border border-[#3a3a3a] bg-[#141414]" aria-label={`${LANGUAGE_NAMES[language]} code`}>
+    <div className="relative rounded-[2px] border border-[#3a3a3a] bg-[#141414]">
       {showCopy && (
         <button
           type="button"
           onClick={handleCopy}
           aria-label={copied ? 'Code copied' : 'Copy code'}
-          className={`absolute top-1 right-3 z-10 flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-[3px] bg-[#474e62] text-[11px] text-[#ecedef] hover:bg-[#535b72] transition-colors cursor-pointer ${TOUCH_TARGET}`}
+          className={COPY_BUTTON_CLASS}
         >
-          {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+          {copied ? <Check className="w-3 h-3" aria-hidden="true" /> : <Copy className="w-3 h-3" aria-hidden="true" />}
           <span>{copied ? 'Copied' : 'Copy'}</span>
         </button>
       )}
-      <div className="flex max-h-80 overflow-auto [scrollbar-color:#555555_#141414] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]">
-        <pre aria-hidden="true" className="sticky left-0 m-0 py-1.5 pl-2 pr-2 text-right text-[#6a6a6a] bg-[#1c1c1c] select-none">
+      {/* A focusable, named region: keyboard users can scroll long code with the arrow keys */}
+      <div
+        role="region"
+        aria-label={`${LANGUAGE_NAMES[language]} code`}
+        tabIndex={0}
+        className="flex max-h-80 overflow-auto [scrollbar-color:#555555_#141414] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]"
+      >
+        <pre aria-hidden="true" className="sticky left-0 m-0 py-1.5 pl-2 pr-2 text-right text-[#8c8c8c] bg-[#1c1c1c] select-none">
           {code.split('\n').map((_, i) => `${i + 1}\n`).join('')}
         </pre>
-      <pre className="m-0 flex-1 px-2 py-1.5 text-[#d6d6d6] select-text whitespace-pre">
-        <code>
-          {tokens.map((token, i) => {
-            const color = TOKEN_COLORS[token.kind];
-            return color ? (
-              <span key={i} style={{ color }}>
-                {token.text}
-              </span>
-            ) : (
-              <React.Fragment key={i}>{token.text}</React.Fragment>
-            );
-          })}
-        </code>
-      </pre>
+        <pre className="m-0 flex-1 px-2 py-1.5 text-[#d6d6d6] select-text whitespace-pre">
+          <code>
+            {tokens.map((token, i) => {
+              const color = TOKEN_COLORS[token.kind];
+              return color ? (
+                <span key={i} style={{ color }}>
+                  {token.text}
+                </span>
+              ) : (
+                <React.Fragment key={i}>{token.text}</React.Fragment>
+              );
+            })}
+          </code>
+        </pre>
       </div>
     </div>
   );

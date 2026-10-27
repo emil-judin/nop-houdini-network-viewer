@@ -109,6 +109,10 @@ export function highlightCode(code: string, language: CodeLanguage): CodeToken[]
     }
   };
 
+  // Finds the next non-space character after a word without copying the rest of the code (a slice
+  // per word made highlighting quadratic and froze the tab on long generated snippets)
+  const nextNonSpace = /\s*(.)/sy;
+
   let index = 0;
   while (index < code.length) {
     let matched = false;
@@ -118,7 +122,8 @@ export function highlightCode(code: string, language: CodeLanguage): CodeToken[]
       if (!match || match[0].length === 0) continue;
       const text = match[0];
       if (rule.kind === 'word') {
-        const nextChar = code.slice(index + text.length).match(/^\s*(.)/)?.[1] ?? '';
+        nextNonSpace.lastIndex = index + text.length;
+        const nextChar = nextNonSpace.exec(code)?.[1] ?? '';
         push(text, classifyWord(text, language, nextChar));
       } else {
         push(text, rule.kind);

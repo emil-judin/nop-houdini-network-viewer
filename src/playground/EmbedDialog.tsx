@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
-import packageJson from '../../package.json';
 import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import {
   DEFAULT_EMBED_OPTIONS,
@@ -12,27 +11,47 @@ import {
 import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** jsDelivr serves every npm release, so the snippet works as soon as the package is published. */
-const WEB_COMPONENT_URL = `https://cdn.jsdelivr.net/npm/${packageJson.name}@${packageJson.version}/dist/web-component.js`;
+const WEB_COMPONENT_URL = `https://cdn.jsdelivr.net/npm/${__WOP_PACKAGE_NAME__}@${__WOP_VERSION__}/dist/web-component.js`;
+
+/**
+ * `false` until the package is on npm (Milestone 4). The HTML and React snippets need the npm
+ * package or its CDN copy, so until then the dialog says so and points to the iframe tab.
+ */
+const PUBLISHED_ON_NPM = false;
 
 type SnippetTab = 'html' | 'react' | 'iframe';
 
-const TABS: Array<{ id: SnippetTab; label: string; help: string }> = [
+const TABS: Array<{ id: SnippetTab; label: string; help: string; needsNpm: boolean }> = [
   {
     id: 'html',
     label: 'HTML',
     help: 'For any website where you can add HTML (static sites, WordPress, Cargo). Upload the exported .json file next to the page.',
+    needsNpm: true,
   },
   {
     id: 'react',
     label: 'React',
     help: 'For React, Next.js or Astro sites. Install with: npm install wop-houdini-network-viewer',
+    needsNpm: true,
   },
   {
     id: 'iframe',
     label: 'iframe',
     help: 'For platforms that only accept iframes (ArtStation, Notion). The .json file needs a full https:// address that allows cross-origin requests (CORS), for example a GitHub Gist raw link.',
+    needsNpm: false,
   },
 ];
+
+/** Smallest and largest embed height the dialog offers, in pixels. */
+const MIN_HEIGHT_PX = 240;
+const MAX_HEIGHT_PX = 4000;
+
+/** Height for the snippet from what is typed in the field: a whole number between the limits. */
+function clampHeight(text: string): number {
+  const value = Number(text);
+  if (!Number.isFinite(value) || value <= 0) return DEFAULT_EMBED_OPTIONS.heightPx;
+  return Math.min(MAX_HEIGHT_PX, Math.max(MIN_HEIGHT_PX, Math.round(value)));
+}
 
 /**
  * Props for the playground's Embed code dialog (`EmbedDialog`).
@@ -54,6 +73,8 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
   const [tab, setTab] = useState<SnippetTab>('html');
   const [options, setOptions] = useState<EmbedSnippetOptions>({ ...DEFAULT_EMBED_OPTIONS, jsonUrl: suggestedFileName });
   const [copied, setCopied] = useState(false);
+  // The height field keeps what is typed (clearing it to type "800" works); the snippet uses the clamped number
+  const [heightText, setHeightText] = useState(String(DEFAULT_EMBED_OPTIONS.heightPx));
 
   useEffect(() => {
     setOptions((o) => ({ ...o, jsonUrl: suggestedFileName }));
@@ -100,10 +121,15 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
             <span className="text-[#d2dcfb]">Height (px)</span>
             <input
               type="number"
-              min={240}
+              min={MIN_HEIGHT_PX}
+              max={MAX_HEIGHT_PX}
               step={20}
-              value={options.heightPx}
-              onChange={(e) => update('heightPx', Math.max(240, Number(e.target.value) || DEFAULT_EMBED_OPTIONS.heightPx))}
+              value={heightText}
+              onChange={(e) => {
+                setHeightText(e.target.value);
+                update('heightPx', clampHeight(e.target.value));
+              }}
+              onBlur={() => setHeightText(String(clampHeight(heightText)))}
               className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]"
             />
           </label>
@@ -173,6 +199,12 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
             ))}
           </div>
           <p className="mt-2 text-[#d2dcfb]">{activeTab.help}</p>
+          {activeTab.needsNpm && !PUBLISHED_ON_NPM && (
+            <p className="mt-1 text-[#e0b070]">
+              Not on npm yet (tester release): this snippet starts working with the public release. For now, use the
+              iframe tab.
+            </p>
+          )}
           {needsAbsoluteUrl && (
             <p className="mt-1 text-[#e0b070]">
               The file URL above is relative. An iframe loads it from this playground, so use a full https:// address.
@@ -187,7 +219,7 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
               onClick={handleCopy}
               className={`absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-white text-[12px] cursor-pointer ${TOUCH_TARGET}`}
             >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5" aria-hidden="true" /> : <Copy className="w-3.5 h-3.5" aria-hidden="true" />}
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>

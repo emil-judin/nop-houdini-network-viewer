@@ -54,7 +54,7 @@ const HistoryButton: React.FC<{
         enabled ? 'text-[#8c96b2] hover:bg-[#454545] hover:text-[#b4bdd6] cursor-pointer' : 'text-[#555862] cursor-default'
       }`}
     >
-      <Icon className="w-4 h-4" strokeWidth={2.25} />
+      <Icon className="w-4 h-4" strokeWidth={2.25} aria-hidden="true" />
     </button>
   );
 };
@@ -78,7 +78,8 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
 }) => (
   <nav
     aria-label="Network path"
-    className="pointer-events-auto min-w-0 max-w-full flex items-center h-[25px] rounded-[3px] bg-[#383838] border border-[#2a2a2a] pl-0.5 pr-2 text-[14px] text-[#d6d6d6] shadow-md"
+    // Touch screens: the bar grows with its 44px tap targets instead of letting them overflow
+    className="pointer-events-auto min-w-0 max-w-full flex items-center h-[25px] [@media(pointer:coarse)]:h-auto [@media(pointer:coarse)]:min-h-11 rounded-[3px] bg-[#383838] border border-[#2a2a2a] pl-0.5 pr-2 text-[14px] text-[#d6d6d6] shadow-md"
   >
     <HistoryButton direction="back" enabled={canGoBack} onClick={onBack} />
     <HistoryButton direction="forward" enabled={canGoForward} onClick={onForward} />
@@ -97,7 +98,8 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
             <span className="truncate">{segment.name}</span>
           </>
         );
-        const tone = segment.dimmed ? 'text-[#686868]' : 'text-[#d6d6d6]';
+        // Dimmed trail levels stay readable (4.9:1 on the bar); the icon carries the strong dimming
+        const tone = segment.dimmed ? 'text-[#a8a8a8]' : 'text-[#d6d6d6]';
         return (
           <li key={segment.path} className="min-w-0 flex items-center">
             {index > 0 && (
@@ -126,6 +128,6 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
       })}
     </ol>
 
-    <span className="shrink-0 ml-2 text-[11px] text-[#8a8a8a] whitespace-nowrap">{nodeCount} nodes</span>
+    <span className="shrink-0 ml-2 text-[11px] text-[#b0b0b0] whitespace-nowrap">{nodeCount} nodes</span>
   </nav>
 );

@@ -16,7 +16,9 @@ export interface OperatorTypeParts {
  */
 export function parseOperatorType(type: string): OperatorTypeParts {
   const parts = type.toLowerCase().split('::');
-  const isNamespaced = parts.length >= 2 && !/^\d/.test(parts[1]);
+  // The second part is a version (`2.0`) unless it is a name; names may start with a digit
+  // (`labs::2d_wavefunctioncollapse::1.1`)
+  const isNamespaced = parts.length >= 2 && !/^\d+(?:\.\d+)*$/.test(parts[1]);
   return {
     namespace: isNamespaced ? parts[0] : '',
     baseType: isNamespaced ? parts[1] : parts[0],

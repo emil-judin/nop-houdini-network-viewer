@@ -8,6 +8,7 @@
  * Runs before `npm.cmd run dev` and `npm.cmd run build`. Plain Node, no dependencies: the zip is
  * written by hand (deflate from `node:zlib`).
  */
+import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -39,11 +40,26 @@ function crc32(buffer) {
   return (crc ^ 0xffffffff) >>> 0;
 }
 
+/**
+ * Time stamp for every zip entry, so the same sources always give the same zip (reproducible builds):
+ * `SOURCE_DATE_EPOCH` if set, else the time of the last git commit, else a fixed date.
+ */
+function buildTime() {
+  const fromEnv = Number(process.env.SOURCE_DATE_EPOCH);
+  if (Number.isFinite(fromEnv) && fromEnv > 0) return new Date(fromEnv * 1000);
+  try {
+    const seconds = Number(execFileSync('git', ['log', '-1', '--format=%ct'], { cwd: ROOT, encoding: 'utf8' }).trim());
+    if (Number.isFinite(seconds) && seconds > 0) return new Date(seconds * 1000);
+  } catch {
+    // Not a git checkout (for example a source download): use the fixed date below
+  }
+  return new Date(Date.UTC(2026, 0, 1));
+}
+
 /** Writes a zip archive (deflate) from `[path, Buffer]` entries. */
-function buildZip(entries) {
-  const now = new Date();
-  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
-  const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+function buildZip(entries, time) {
+  const dosTime = (time.getUTCHours() << 11) | (time.getUTCMinutes() << 5) | Math.floor(time.getUTCSeconds() / 2);
+  const dosDate = ((time.getUTCFullYear() - 1980) << 9) | ((time.getUTCMonth() + 1) << 5) | time.getUTCDate();
   const localParts = [];
   const centralParts = [];
   let offset = 0;
@@ -95,7 +111,8 @@ function buildZip(entries) {
 }
 
 const exporterScript = readFileSync(EXPORTER_SCRIPT);
-const entries = listFiles(PACKAGE_DIR).map((path) => {
+// Sorted, so the entry order does not depend on the file system
+const entries = listFiles(PACKAGE_DIR).sort().map((path) => {
   let data = readFileSync(join(PACKAGE_DIR, path));
   if (path.endsWith('README.txt')) data = Buffer.from(data.toString('utf8').replaceAll('{{VERSION}}', version));
   return [path, data];
@@ -103,6 +120,6 @@ const entries = listFiles(PACKAGE_DIR).map((path) => {
 entries.push(['wop/scripts/python/wop_exporter.py', exporterScript]);
 
 mkdirSync(OUT_DIR, { recursive: true });
-writeFileSync(join(OUT_DIR, 'wop-exporter.zip'), buildZip(entries));
+writeFileSync(join(OUT_DIR, 'wop-exporter.zip'), buildZip(entries, buildTime()));
 writeFileSync(join(OUT_DIR, 'wop_exporter.py'), exporterScript);
 console.log(`WOP exporter ${version}: ${entries.length} files -> public/downloads/wop-exporter.zip`);

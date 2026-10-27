@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { TOUCH_TARGET } from '../hud/touchTarget';
 import { ParmLine } from './ParmLine';
@@ -49,22 +49,57 @@ const FolderSection: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'folder' }
 
 /**
  * Tab bar of `tabs` / `radio` folders. Switching tabs only changes what is shown (view-only).
+ * Follows the WAI-ARIA tabs pattern: one tab in the Tab order, Left / Right / Home / End move
+ * between tabs.
  */
 const FolderTabs: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'tabs' }> }> = ({ item }) => {
   const [active, setActive] = useState(0);
-  const current = item.tabs[Math.min(active, item.tabs.length - 1)];
+  const activeIndex = Math.min(active, item.tabs.length - 1);
+  const current = item.tabs[activeIndex];
+  const baseId = useId();
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const selectTab = (index: number) => {
+    const count = item.tabs.length;
+    const next = (index + count) % count;
+    setActive(next);
+    tabRefs.current[next]?.focus();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    const keys: Record<string, number> = {
+      ArrowRight: activeIndex + 1,
+      ArrowLeft: activeIndex - 1,
+      Home: 0,
+      End: item.tabs.length - 1,
+    };
+    if (!Object.hasOwn(keys, event.key)) return;
+    event.preventDefault();
+    selectTab(keys[event.key]);
+  };
+
   return (
     <div className="mt-1.5">
-      <div role="tablist" className="flex flex-wrap items-center gap-0.5 px-1 pb-1 border-b-2 border-[#282828]">
+      <div
+        role="tablist"
+        className="flex flex-wrap items-center gap-0.5 px-1 pb-1 border-b-2 border-[#282828]"
+      >
         {item.tabs.map((tab, index) => {
-          const selected = tab === current;
+          const selected = index === activeIndex;
           return (
             <button
               key={`${index}-${tab.label}`}
+              ref={(element) => {
+                tabRefs.current[index] = element;
+              }}
+              id={`${baseId}-tab-${index}`}
               type="button"
               role="tab"
               aria-selected={selected}
+              aria-controls={`${baseId}-panel`}
+              tabIndex={selected ? 0 : -1}
               onClick={() => setActive(index)}
+              onKeyDown={handleKeyDown}
               // Houdini 22: the active tab is a blue-grey pill with bold white text, others are plain grey text
               className={`h-[24px] px-2 rounded-[3px] text-[13px] cursor-pointer ${TOUCH_TARGET} ${
                 selected ? 'bg-[#474e62] text-white font-bold' : 'text-[#a6a6a6] hover:text-[#d0d0d0]'
@@ -75,7 +110,7 @@ const FolderTabs: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'tabs' }> }> 
           );
         })}
       </div>
-      <div role="tabpanel" className="py-1">
+      <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-tab-${activeIndex}`} className="py-1">
         <ParmLayoutView items={current.children} />
       </div>
     </div>

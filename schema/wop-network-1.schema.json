@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WOP network document (schema 1.x)",
+  "description": "A Houdini node network exported by the WOP exporter (exporter/wop_exporter.py). Human documentation: docs/SCHEMA.md. Every 1.x version only adds optional fields, so this file describes all of them. Unknown extra fields are allowed.",
+  "type": "object",
+  "required": ["houdiniVersion", "root"],
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "houdiniVersion": { "type": "string" },
+    "exportedAt": { "type": "string" },
+    "exportMode": { "enum": ["compact", "full"] },
+    "icons": {
+      "description": "Custom SVG icons of the user's assets, keyed by the node's `icon` id. Never SideFX icons.",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "customShapes": { "type": "object", "additionalProperties": { "type": "object" } },
+    "exportWarnings": { "description": "Parameters the exporter could not read (schema 1.4.0).", "type": "integer", "minimum": 0 },
+    "root": { "$ref": "#/$defs/graph" }
+  },
+  "$defs": {
+    "vec2": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2 },
+    "rgb": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }],
+      "minItems": 3
+    },
+    "graph": {
+      "type": "object",
+      "required": ["path", "type", "nodes", "dots", "boxes", "stickies", "wires"],
+      "properties": {
+        "path": { "type": "string" },
+        "type": { "type": "string" },
+        "context": { "type": "string" },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+        "dots": { "type": "array", "items": { "$ref": "#/$defs/dot" } },
+        "boxes": { "type": "array", "items": { "$ref": "#/$defs/box" } },
+        "stickies": { "type": "array", "items": { "$ref": "#/$defs/sticky" } },
+        "wires": { "type": "array", "items": { "$ref": "#/$defs/wire" } },
+        "subnetInputs": { "type": "array", "items": { "$ref": "#/$defs/subnetInput" } },
+        "wireStyle": { "enum": ["default", "rounded"] },
+        "pathNodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": { "name": { "type": "string" }, "type": { "type": "string" }, "icon": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "properties": {
+        "bypass": { "type": "boolean" },
+        "display": { "type": "boolean" },
+        "render": { "type": "boolean" },
+        "template": { "type": "boolean" },
+        "selectableTemplate": { "type": "boolean" },
+        "lock": { "type": "boolean" },
+        "softLock": { "type": "boolean" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": ["name", "type", "pos"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "type": "string" },
+        "label": { "type": "string" },
+        "icon": { "type": "string" },
+        "pos": { "$ref": "#/$defs/vec2" },
+        "size": { "$ref": "#/$defs/vec2" },
+        "color": { "$ref": "#/$defs/rgb" },
+        "shape": { "type": "string" },
+        "flags": { "$ref": "#/$defs/flags" },
+        "maxInputs": { "type": "integer", "minimum": 0 },
+        "inputLabels": { "type": "array", "items": { "type": "string" } },
+        "maxOutputs": { "type": "integer", "minimum": 0 },
+        "outputLabels": { "type": "array", "items": { "type": "string" } },
+        "comment": { "type": "string" },
+        "showComment": { "type": "boolean" },
+        "isSubnetwork": { "type": "boolean" },
+        "hdaState": { "enum": ["locked", "unlocked", null] },
+        "parms": { "type": "array", "items": { "$ref": "#/$defs/parm" } },
+        "children": { "$ref": "#/$defs/graph" }
+      }
+    },
+    "parm": {
+      "type": "object",
+      "required": ["name", "val"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "type": { "type": "string" },
+        "val": { "type": "array", "items": { "type": ["string", "number", "boolean"] } },
+        "expr": { "type": "array", "items": { "type": ["string", "null"] } },
+        "folders": { "type": "array", "items": { "type": "string" } },
+        "folderTypes": {
+          "type": "array",
+          "items": { "enum": ["tabs", "radio", "simple", "collapsible", "multiparm", "import"] }
+        },
+        "menuLabel": { "type": "string" },
+        "keyframed": { "type": "array", "items": { "type": "boolean" } },
+        "changed": { "type": "array", "items": { "type": "boolean" } },
+        "disabled": { "type": "boolean" },
+        "joinNext": { "type": "string" },
+        "labelHidden": { "type": "boolean" },
+        "range": { "$ref": "#/$defs/vec2" },
+        "hasMenu": { "type": "boolean" },
+        "ramp": {
+          "type": "object",
+          "required": ["color", "keys", "values"],
+          "properties": {
+            "color": { "type": "boolean" },
+            "keys": { "type": "array", "items": { "type": "number" } },
+            "values": { "type": "array", "items": { "anyOf": [{ "type": "number" }, { "$ref": "#/$defs/rgb" }] } },
+            "basis": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "dot": {
+      "type": "object",
+      "required": ["name", "pos"],
+      "properties": { "name": { "type": "string", "minLength": 1 }, "pos": { "$ref": "#/$defs/vec2" }, "pinned": { "type": "boolean" } }
+    },
+    "box": {
+      "type": "object",
+      "required": ["name", "pos", "size"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "comment": { "type": "string" },
+        "pos": { "$ref": "#/$defs/vec2" },
+        "size": { "$ref": "#/$defs/vec2" },
+        "color": { "$ref": "#/$defs/rgb" },
+        "minimized": { "type": "boolean" },
+        "items": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "sticky": {
+      "type": "object",
+      "required": ["name", "pos", "size"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "text": { "type": "string" },
+        "pos": { "$ref": "#/$defs/vec2" },
+        "size": { "$ref": "#/$defs/vec2" },
+        "color": { "$ref": "#/$defs/rgb" },
+        "minimized": { "type": "boolean" },
+        "textColor": { "$ref": "#/$defs/rgb" },
+        "drawBackground": { "type": "boolean" }
+      }
+    },
+    "subnetInput": {
+      "type": "object",
+      "required": ["name", "num", "pos"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "num": { "type": "integer", "minimum": 0 },
+        "pos": { "$ref": "#/$defs/vec2" },
+        "inputName": { "type": "string" }
+      }
+    },
+    "wire": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "fromOutput": { "type": "integer", "minimum": 0 },
+        "to": { "type": "string", "minLength": 1 },
+        "toInput": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shelfDocument>
-  <!-- WOP shelf, loaded by the WOP Houdini package (packages/wop.json adds this folder to HOUDINI_PATH). -->
+  <!-- WOP shelf, loaded by the WOP Houdini package (packages/wop.json sets $WOP_EXPORTER_ROOT to this folder and adds it to HOUDINI_PATH). -->
 
   <toolshelf name="wop" label="WOP">
     <memberTool name="wop_export"/>
@@ -12,12 +12,12 @@
     <addMemberToolshelf name="wop"/>
   </shelfSetEdit>
 
-  <tool name="wop_export" label="Export for WOP" icon="$WOP/icons/wop.svg">
+  <tool name="wop_export" label="Export for WOP" icon="$WOP_EXPORTER_ROOT/icons/wop.svg">
     <helpText><![CDATA[Export the current network (or the selected nodes) for the WOP web viewer: copy to the clipboard or save a .json file.]]></helpText>
     <script scriptType="python"><![CDATA[import sys
 
 # The package puts scripts/python on the Python path; this keeps the tool working if it does not
-_wop_python = hou.expandString("$WOP/scripts/python")
+_wop_python = hou.expandString("$WOP_EXPORTER_ROOT/scripts/python")
 if _wop_python not in sys.path:
     sys.path.append(_wop_python)
 
@@ -26,11 +26,11 @@ wop_exporter.run_interactive_export(kwargs.get("pane"))
 ]]></script>
   </tool>
 
-  <tool name="wop_copy" label="Copy for WOP" icon="$WOP/icons/wop.svg">
+  <tool name="wop_copy" label="Copy for WOP" icon="$WOP_EXPORTER_ROOT/icons/wop.svg">
     <helpText><![CDATA[Copy the selected nodes of the Network Editor under the mouse (or the whole network) as compact JSON, without a dialog. Paste it into the WOP playground with Ctrl+V. Bind it to a hotkey such as Ctrl+Shift+Alt+C.]]></helpText>
     <script scriptType="python"><![CDATA[import sys
 
-_wop_python = hou.expandString("$WOP/scripts/python")
+_wop_python = hou.expandString("$WOP_EXPORTER_ROOT/scripts/python")
 if _wop_python not in sys.path:
     sys.path.append(_wop_python)
 

@@ -89,8 +89,9 @@ export const FeedbackDialog: React.FC<FeedbackDialogProps> = ({ open, onClose, n
             className="hidden"
           />
           <p className="text-[12px] text-[#9a9a9a]">
-            Sent along: the WOP version, your browser and the network on screen ({networkName}). Your network file
-            itself is not sent.
+            Sent along: the WOP version, your browser, the page address (without its query) and the network on
+            screen ({networkName}). Your network file itself is not sent. The message is delivered by email through
+            Web3Forms.
           </p>
           {state.kind === 'error' && (
             <p role="alert" className="text-[#f0c8c8]">
