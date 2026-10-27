@@ -4,16 +4,16 @@
 
 ## Current State (2026-10-27)
 
-- **Version:** `0.1.0-alpha.1` (tester release), code done. The fixes from the repository review are in the working tree, **not committed yet** (owner's call).
+- **Version:** `0.1.0-alpha.1` (tester release), code done. The fixes from the repository review are committed and pushed ("Repository review fixes", 2026-10-27). Automated tests stay out of the repository for now (owner decision).
 - **Review:** every finding of the 2026-10-27 repository review is resolved (decisions and finding IDs in [HISTORY.md](./HISTORY.md)). Verdict after fixes: ship the tester release after the owner's Houdini check below; no blocking findings for the npm launch.
 - **Schema:** `1.4.0` (adds optional `exportWarnings`). Both demo fixtures were re-exported with schema `1.4.0` from Houdini 22.0.466 (2026-10-27). That export showed a path scrubber bug (commented-out VEX such as `//@Cd = ...` became `<path>`), fixed the same day, so `fixtures/circuit_gen-network.json` still holds 12 damaged code lines until it is exported once more.
 - **Checks:** `check`, `lint`, `build` and `build:lib` pass. CI runs them on every push and pull request (`.github/workflows/ci.yml`).
 
 ## Owner Steps
 
-1. **Commit** the review fixes (suggestion: one commit for the fixes, then a separate one for `npm run format`, the one-time Prettier reformat of about 47 files; afterwards add `npm run format:check` to CI).
+1. **Prettier reformat:** run `npm run format` (one-time reformat of about 47 files) as its own commit, then add `npm run format:check` to CI.
 2. **Houdini check of the exporter changes** (not run in Houdini yet): install the zip from `npm run build:exporter`, run both shelf tools, export a network that contains a locked third-party asset (the "Export Closed / Include Insides" dialog), and read one export for paths and names. Also confirm that the package works from a `HOUDINI_PACKAGE_DIR` folder (`$HOUDINI_PACKAGE_PATH`).
-3. **GitHub repository settings:** push `main`; Settings > Pages > Source: GitHub Actions; Settings > Code security > enable private vulnerability reporting (`SECURITY.md` points there); Settings > Branches > require the CI checks `verify` and `browser` on `main`.
+3. **GitHub repository settings:** Settings > Pages > Source: GitHub Actions; Settings > Code security > enable private vulnerability reporting (`SECURITY.md` points there); Settings > Branches > require the CI checks `verify` and `browser` on `main`.
 4. **Feedback form:** Web3Forms access key as the repository variable `WEB3FORMS_KEY`, then re-run the deploy workflow.
 5. **Fixtures:** re-install the exporter (`npm run build:exporter`, or copy `exporter/wop_exporter.py`) and export `circuit_gen` once more into `fixtures/circuit_gen-network.json` (`circuit_board` is fine). Then `grep "<path>" fixtures/*.json` should find nothing.
 6. **Real devices:** smoke-test the hosted playground on Safari (macOS, iOS) and a real Android phone.
