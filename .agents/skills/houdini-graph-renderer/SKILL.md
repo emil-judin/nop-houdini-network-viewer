@@ -34,9 +34,20 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
 - **Multi-input nodes:** nodes with `maxInputs > 4` (`merge`, `switch` report 9999) get one wide bar with 16
   hidden handles `in-multi-0..15`; never render one handle per input in a loop. Wires fan out across the bar in
   input order (`toInput`), computed in the converter.
-- **IDs:** operator nodes use their Houdini name; boxes, stickies, dots and subnet inputs use the prefixes
-  `box:`, `sticky:`, `dot:`, `input:` (Houdini never allows a colon in names). Wire ends resolve node first,
+- **IDs:** operator nodes use their Houdini name; boxes, stickies, dots, subnet inputs and block underlays use
+  the prefixes `box:`, `sticky:`, `dot:`, `input:`, `block:` (Houdini never allows a colon in names). Wire ends resolve node first,
   then dot, then subnet input. Wires to items that are not in the export are skipped.
+- **Drawing order (`zIndex`):** network boxes -20, sticky notes -10, block underlays -5, wires 4, subnet
+  inputs 5, operator nodes 10, dots 12.
+- **Block underlays** (`src/schema/blockUnderlays.ts`, `HoudiniBlockUnderlay`): For-Each and Compile blocks get a
+  rounded convex outline in the Block End color. Members are the end node, every begin node whose `blockpath`
+  points to it (metadata begins too) and the nodes wired between them (downstream of a begin, upstream of the
+  end). Padding and corner radius come from a Houdini 22 screenshot.
+- **Block method labels** (`src/schema/blockLabels.ts`): For-Each Block Begin and End nodes show their method in
+  blue under the name (`Point` / `Piece`, `Metadata`, `Feedback`, `Input`, `Merge`), read from the `method`
+  parameter (and the end's `class` for piece begins). Compile blocks have none.
+- **Dotted wires:** the wire into the second input (target points) of Copy to Points is dotted, `1.5 2.5` px
+  (`isDottedWire` in `convertGraph.ts`).
 - **View-only:** `nodesDraggable={false}`, `nodesConnectable={false}`, `edgesReconnectable={false}`. Flags are
   pictures, never buttons. Nodes are focusable for keyboard access (Tab, Enter opens the inspector), which does
   not allow editing: arrow keys only move draggable nodes.

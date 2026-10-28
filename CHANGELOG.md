@@ -15,6 +15,9 @@ Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs
 - Houdini package: `wop.json` uses `$HOUDINI_PACKAGE_PATH`, so the package works in any package folder; the variable is now `$WOP_EXPORTER_ROOT`. The download zip is reproducible.
 
 ### Viewer
+- **For-Each and Compile blocks:** the tinted underlay Houdini draws behind a block, a rounded outline in the Block End color around the begin, metadata, in-between and end nodes. Works with existing exports (read from `blockpath`).
+- **Block method labels:** For-Each Block Begin and End nodes show their method in blue under the name (`Point`, `Metadata`, `Merge`, ...), like Houdini. Works with existing exports.
+- **Dotted wires:** the wire into the second input (target points) of Copy to Points is dotted, like Houdini. Works with existing exports.
 - **Keyboard:** Tab reaches every node, Enter opens its parameters (focus moves to the panel), Escape closes them and returns to the node. Tabs in the parameter panel work with the arrow keys. Visible focus rings.
 - **Hotkeys** (H, F, I, U, O, Shift+S) now only act while the viewer has focus; new `hotkeys` prop and attribute (`focus`, `hover`, `off`).
 - **Screen readers:** parameter rows are named groups, disabled parameters are announced as dimmed, label size buttons have names and pressed states.

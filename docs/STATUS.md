@@ -8,6 +8,7 @@
 - **Review:** every finding of the 2026-10-27 repository review is resolved (decisions and finding IDs in [HISTORY.md](./HISTORY.md)). Verdict after fixes: ship the tester release after the owner's Houdini check below; no blocking findings for the npm launch.
 - **Schema:** `1.4.0` (adds optional `exportWarnings`). Both demo fixtures were re-exported with schema `1.4.0` from Houdini 22.0.466 (2026-10-27). That export showed a path scrubber bug (commented-out VEX such as `//@Cd = ...` became `<path>`), fixed the same day, so `fixtures/circuit_gen-network.json` still holds 12 damaged code lines until it is exported once more.
 - **Checks:** `check`, `lint`, `build` and `build:lib` pass. CI runs them on every push and pull request (`.github/workflows/ci.yml`).
+- **Viewer additions (2026-10-28):** For-Each / Compile block underlays (`src/schema/blockUnderlays.ts`, `HoudiniBlockUnderlay.tsx`), checked against a Houdini 22 screenshot of `foreach_end4`. Blue block method labels (`src/schema/blockLabels.ts`; the `Point` / `Piece` and `Feedback` / `Input` texts and the defaults for compact exports are not checked in Houdini yet). Dotted wire into the second input of Copy to Points (owner decision 2026-10-28: only this case, no cook-state export).
 
 ## Owner Steps
 

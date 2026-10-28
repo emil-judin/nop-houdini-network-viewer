@@ -110,6 +110,7 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
     widthPx,
     heightPx,
     labelSize = 'medium',
+    descriptiveText,
   } = data as unknown as HoudiniSopFlowNodeData;
 
   const sizeClasses = LABEL_SIZE_STYLES[labelSize] ?? LABEL_SIZE_STYLES.medium;
@@ -428,6 +429,11 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
           {hdaState === 'unlocked' && <HdaUnlockedBadge />}
           {node.isSubnetwork && node.children && <SubnetBadge />}
         </div>
+        {descriptiveText && (
+          <span className={`${sizeClasses.typeText} text-[#74a6e0] font-normal tracking-normal mt-0.5`}>
+            {descriptiveText}
+          </span>
+        )}
         {node.comment && node.showComment && (
           <span
             className={`${sizeClasses.commentText} text-[#7ec4cf] mt-0.5 max-w-[240px] truncate`}

@@ -40,7 +40,7 @@ The constants live in `src/schema/convertGraph.ts`.
 | **Minimized Sticky** | | Header only, `22px` high (`MINIMIZED_STICKY_HEIGHT_PX`) | `y = -pos[1] * 100 - 22` |
 | **Network Dot** | Center point `(pos[0], pos[1])` | `19px` disc, radius `9.5px` (`HOUDINI_DOT_RADIUS_PX`) | `x = pos[0] * 100 - 9.5`, `y = -pos[1] * 100 - 9.5` |
 
-React Flow IDs: operator nodes use their Houdini name; boxes, stickies, dots and subnet inputs get the prefixes `box:`, `sticky:`, `dot:` and `input:` (Houdini never allows a colon in names), so items of different kinds never collide.
+React Flow IDs: operator nodes use their Houdini name; boxes, stickies, dots, subnet inputs and For-Each / Compile block underlays get the prefixes `box:`, `sticky:`, `dot:`, `input:` and `block:` (Houdini never allows a colon in names), so items of different kinds never collide.
 
 ---
 

@@ -37,6 +37,7 @@ import { ViewerToolbar } from './hud/ViewerToolbar';
 import { ResizableInspectorPanel, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
 import { useElementSize } from './useElementSize';
 import { NetworkErrorBoundary } from './NetworkErrorBoundary';
+import { HoudiniBlockUnderlay } from './nodes/HoudiniBlockUnderlay';
 import { HoudiniDotNode } from './nodes/HoudiniDotNode';
 import { HoudiniNetBox } from './nodes/HoudiniNetBox';
 import { HoudiniSopNode } from './nodes/HoudiniSopNode';
@@ -100,6 +101,7 @@ const NODE_TYPES: NodeTypes = {
   houdiniSubnetInput: memo(HoudiniSubnetInput),
   houdiniNetBox: memo(HoudiniNetBox),
   houdiniSticky: memo(HoudiniStickyNote),
+  houdiniBlock: memo(HoudiniBlockUnderlay),
 };
 
 const EDGE_TYPES: EdgeTypes = {
@@ -141,6 +143,10 @@ function resolveMiniMapNodeColor(node: Node): string {
   if (node.type === 'houdiniSticky') {
     const data = node.data as unknown as HoudiniStickyFlowNodeData;
     return houdiniRgbToCss(data?.sticky?.color, '#d9c25b');
+  }
+  if (node.type === 'houdiniBlock') {
+    // The overview shows the nodes themselves; a block's bounding box would hide them
+    return 'transparent';
   }
   return '#777777';
 }

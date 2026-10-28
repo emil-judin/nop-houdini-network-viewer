@@ -1,9 +1,13 @@
 import type { Edge, Node } from '@xyflow/react';
+import { blockMethodLabel } from './blockLabels';
+import { blockOutline, findBlocks } from './blockUnderlays';
+import { parseOperatorType } from './operatorType';
 import type {
   HoudiniDotData,
   HoudiniNetworkBoxData,
   HoudiniNetworkGraph,
   HoudiniNodeData,
+  HoudiniRgbColor,
   HoudiniStickyNoteData,
   HoudiniSubnetInputData,
   HoudiniWireStyle,
@@ -43,6 +47,8 @@ export const DOT_ID_PREFIX = 'dot:';
 export const BOX_ID_PREFIX = 'box:';
 /** ID prefix of sticky notes (see `SUBNET_INPUT_ID_PREFIX`). */
 export const STICKY_ID_PREFIX = 'sticky:';
+/** ID prefix of For-Each and Compile block underlays, followed by the end node's name. */
+export const BLOCK_ID_PREFIX = 'block:';
 
 /**
  * Configurable label size preset for node names and descriptive labels.
@@ -62,6 +68,8 @@ export interface HoudiniSopFlowNodeData extends Record<string, unknown> {
   widthPx: number;
   heightPx: number;
   labelSize?: HoudiniLabelSize;
+  /** Blue descriptive text under the node name (the method of a For-Each Block Begin or End). */
+  descriptiveText?: string;
 }
 
 /**
@@ -93,6 +101,8 @@ export interface HoudiniWireFlowEdgeData extends Record<string, unknown> {
   targetIsDot?: boolean;
   /** Houdini wire style used to draw this wire (defaults to `default`). */
   wireStyle?: HoudiniWireStyle;
+  /** Drawn dotted like Houdini (the target points input of Copy to Points). */
+  dotted?: boolean;
 }
 
 /**
@@ -111,6 +121,26 @@ export interface HoudiniStickyFlowNodeData extends Record<string, unknown> {
   sticky: HoudiniStickyNoteData;
   widthPx: number;
   heightPx: number;
+}
+
+/**
+ * Custom React Flow node data payload for a For-Each or Compile block underlay (`HoudiniBlockUnderlay`).
+ */
+export interface HoudiniBlockFlowNodeData extends Record<string, unknown> {
+  /** Rounded outline path, relative to the node's top-left corner. */
+  outlinePath: string;
+  widthPx: number;
+  heightPx: number;
+  /** Color of the Block End node, used for the outline and the tinted fill. */
+  color: HoudiniRgbColor;
+}
+
+/**
+ * Whether Houdini draws the wire into input `toInput` of `target` dotted: the second input (target
+ * points) of Copy to Points.
+ */
+export function isDottedWire(target: HoudiniNodeData | undefined, toInput: number | undefined): boolean {
+  return target !== undefined && toInput === 1 && parseOperatorType(target.type).baseType === 'copytopoints';
 }
 
 /**
@@ -207,6 +237,41 @@ export function convertGraphToReactFlow(
     });
   }
 
+  // 2b. For-Each and Compile block underlays (zIndex: -5): a tinted outline in the Block End color
+  // around the block's nodes, above boxes and sticky notes, below wires
+  const visibleNodeNames = new Set(
+    (graph.nodes ?? []).filter((node) => !hiddenItemNames.has(node.name)).map((node) => node.name),
+  );
+  for (const block of findBlocks(graph, visibleNodeNames)) {
+    const outline = blockOutline(
+      block.members.map((node) => ({
+        x: (node.pos?.[0] ?? 0) * HOUDINI_UNIT_TO_PX,
+        y: -((node.pos?.[1] ?? 0) + 0.3) * HOUDINI_UNIT_TO_PX,
+        width: HOUDINI_UNIT_TO_PX,
+        height: 0.3 * HOUDINI_UNIT_TO_PX,
+      })),
+    );
+    if (!outline) continue;
+    rfNodes.push({
+      id: `${BLOCK_ID_PREFIX}${block.end.name}`,
+      type: 'houdiniBlock',
+      position: { x: outline.x, y: outline.y },
+      initialWidth: outline.width,
+      initialHeight: outline.height,
+      zIndex: -5,
+      selectable: false,
+      draggable: false,
+      // Only operator nodes are in the keyboard Tab order
+      focusable: false,
+      data: {
+        outlinePath: outline.d,
+        widthPx: outline.width,
+        heightPx: outline.height,
+        color: block.end.color,
+      } satisfies HoudiniBlockFlowNodeData,
+    });
+  }
+
   // 3. Subnetwork Indirect Inputs (top of subnetwork graphs)
   // Rendered with the same isotropic 10:3 proportions (100px x 30px) as operator nodes.
   const subnetInputIds = new Set<string>();
@@ -243,6 +308,7 @@ export function convertGraphToReactFlow(
   // ratio (100px x 30px) so node shapes match Houdini's native rendering 1:1.
   const nodeLookup = new Map<string, HoudiniNodeData>();
   const operatorNodes: Node[] = [];
+  const nodesByName = new Map((graph.nodes ?? []).map((node) => [node.name, node]));
   for (const node of graph.nodes ?? []) {
     if (hiddenItemNames.has(node.name)) {
       continue;
@@ -277,6 +343,7 @@ export function convertGraphToReactFlow(
         widthPx,
         heightPx,
         labelSize,
+        descriptiveText: blockMethodLabel(node, (name) => nodesByName.get(name), graph.path) ?? undefined,
       } satisfies HoudiniSopFlowNodeData,
     });
   }
@@ -391,6 +458,7 @@ export function convertGraphToReactFlow(
         sourceIsDot: isFromDot,
         targetIsDot: isToDot,
         wireStyle,
+        dotted: isDottedWire(targetNode, wire.toInput),
       } satisfies HoudiniWireFlowEdgeData,
     });
   }
