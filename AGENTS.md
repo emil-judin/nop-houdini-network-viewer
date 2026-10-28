@@ -1,12 +1,12 @@
 # AGENTS.md - Agentic Engineering Guidelines
 
-This file provides essential context, architectural invariants, and coding conventions for AI coding agents working in WOP (npm package `wop-houdini-network-viewer`). It is the canonical copy of the project pillars: other docs link here instead of repeating them.
+This file provides essential context, architectural invariants, and coding conventions for AI coding agents working in NOP (npm package `nop-houdini-network-viewer`). It is the canonical copy of the project pillars: other docs link here instead of repeating them.
 
 ## 1. Project Overview & Core Pillars
 
-WOP (`wop-houdini-network-viewer`) is a lightweight, embeddable interactive web viewer for SideFX Houdini node networks, inspired by Klee for Unreal Engine. Tagline: "View and share Houdini node networks on the web."
+NOP (`nop-houdini-network-viewer`) is a lightweight, embeddable interactive web viewer for SideFX Houdini node networks, inspired by Klee for Unreal Engine. Tagline: "View and share Houdini node networks on the web."
 
-**Naming:** the product name is **WOP**, always in capitals in visible text (UI, docs, exporter dialogs), never lowercase on its own. Lowercase `wop` only appears inside technical names: the npm package `wop-houdini-network-viewer`, the CSS prefix `.wop-`, the exporter file `wop_exporter.py`. Never start a package or product name with `houdini-` (it would look official). The HTML tag `<houdini-network>` and the React components `HoudiniNetwork` / `RemoteHoudiniNetwork` keep their names (owner decision).
+**Naming:** the product name is **NOP**, always in capitals in visible text (UI, docs, exporter dialogs), never lowercase on its own. Lowercase `nop` only appears inside technical names: the npm package `nop-houdini-network-viewer`, the CSS prefix `.nop-`, the exporter file `nop_exporter.py`. Never start a package or product name with `houdini-` (it would look official). The HTML tag `<houdini-network>` and the React components `HoudiniNetwork` / `RemoteHoudiniNetwork` keep their names (owner decision). The product was called WOP until 2026-10-28 (see [docs/HISTORY.md](./docs/HISTORY.md)); do not bring the old name back.
 
 Every change must strictly follow our **6 Core Pillars**:
 1. **Usability (Frictionless Workflow):** Exporting from Houdini and embedding on a website must require minimal steps (1-click Shelf export, 1-line `<houdini-network>` Web Component, `<HoudiniNetwork />` React component, or `<iframe>` embed).
@@ -35,7 +35,7 @@ Every change must strictly follow our **6 Core Pillars**:
 
 ### Definition of Done
 
-A task is finished only when `check`, `lint`, `build` and `build:lib` pass, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `wop-verify` skill has the full list. Report failures with their output instead of skipping a step.
+A task is finished only when `check`, `lint`, `build` and `build:lib` pass, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
 
 ## 3. Critical Architectural Rules
 
@@ -48,8 +48,8 @@ A task is finished only when `check`, `lint`, `build` and `build:lib` pass, no n
 - **Subnetwork Recursion Guard (`exporter/`):**
   - Built-in Houdini SOPs like `attribwrangle` or SideFX Labs nodes return `isSubNetwork() == True`. Only recurse into user-authored `subnet` nodes or unlocked/custom HDAs to prevent multi-megabyte JSON bloat.
 - **Library Styles (`src/styles/`):**
-  - The npm and web component builds have no Tailwind preflight (it would reset the host page). Viewer components must look right with only the scoped `.wop-root` reset in `src/styles/reset.css`.
-  - The npm `style.css` is scoped to `.wop-root` at build time (`vite.lib.config.ts`), so every viewer element must render inside a `.wop-root` element: no portals to `document.body`.
+  - The npm and web component builds have no Tailwind preflight (it would reset the host page). Viewer components must look right with only the scoped `.nop-root` reset in `src/styles/reset.css`.
+  - The npm `style.css` is scoped to `.nop-root` at build time (`vite.lib.config.ts`), so every viewer element must render inside a `.nop-root` element: no portals to `document.body`.
   - Use `px` for sizes in viewer components (arbitrary values like `text-[11px]`, or the px-pinned theme tokens), never raw `rem`: `rem` follows the host page's root font size, even inside a Shadow DOM.
   - Size viewer layouts with container queries (`@container`, `@2xl:`) on the viewer, not viewport breakpoints, because embeds are often narrower than the page.
 - **Operator Icons (`src/components/nodes/icons/`):**
@@ -80,6 +80,6 @@ The viewer renders untrusted JSON, and the exporter writes files people publish.
 - **Specialized Skills** (in `.agents/skills/`, with pointers in `.claude/skills/` so Claude Code finds them):
   - `houdini-graph-renderer`: drawing the network, coordinates, viewer components.
   - `houdini-python-exporter`: the Houdini exporter, privacy rules, schema versioning.
-  - `wop-icon-drawing`: operator icon drawings and their legal rules.
-  - `wop-verify`: the definition of done.
-  - `wop-release`: release checklist.
+  - `nop-icon-drawing`: operator icon drawings and their legal rules.
+  - `nop-verify`: the definition of done.
+  - `nop-release`: release checklist.

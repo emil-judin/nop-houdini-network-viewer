@@ -1,9 +1,9 @@
 /**
- * Builds the downloadable WOP exporter for the playground (`public/downloads/`, gitignored):
+ * Builds the downloadable NOP exporter for the playground (`public/downloads/`, gitignored):
  *
- * - `wop-exporter.zip`: the Houdini package. Unzipped into the Houdini `packages` folder, it gives
- *   `packages/wop.json` and `packages/wop/` (shelf, icon, `scripts/python/wop_exporter.py`).
- * - `wop_exporter.py`: the plain script, for the manual shelf tool setup in `exporter/README.md`.
+ * - `nop-exporter.zip`: the Houdini package. Unzipped into the Houdini `packages` folder, it gives
+ *   `packages/nop.json` and `packages/nop/` (shelf, icon, `scripts/python/nop_exporter.py`).
+ * - `nop_exporter.py`: the plain script, for the manual shelf tool setup in `exporter/README.md`.
  *
  * Runs before `npm.cmd run dev` and `npm.cmd run build`. Plain Node, no dependencies: the zip is
  * written by hand (deflate from `node:zlib`).
@@ -16,7 +16,7 @@ import { deflateRawSync } from 'node:zlib';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const PACKAGE_DIR = join(ROOT, 'exporter', 'package');
-const EXPORTER_SCRIPT = join(ROOT, 'exporter', 'wop_exporter.py');
+const EXPORTER_SCRIPT = join(ROOT, 'exporter', 'nop_exporter.py');
 const OUT_DIR = join(ROOT, 'public', 'downloads');
 const { version } = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 
@@ -117,9 +117,9 @@ const entries = listFiles(PACKAGE_DIR).sort().map((path) => {
   if (path.endsWith('README.txt')) data = Buffer.from(data.toString('utf8').replaceAll('{{VERSION}}', version));
   return [path, data];
 });
-entries.push(['wop/scripts/python/wop_exporter.py', exporterScript]);
+entries.push(['nop/scripts/python/nop_exporter.py', exporterScript]);
 
 mkdirSync(OUT_DIR, { recursive: true });
-writeFileSync(join(OUT_DIR, 'wop-exporter.zip'), buildZip(entries, buildTime()));
-writeFileSync(join(OUT_DIR, 'wop_exporter.py'), exporterScript);
-console.log(`WOP exporter ${version}: ${entries.length} files -> public/downloads/wop-exporter.zip`);
+writeFileSync(join(OUT_DIR, 'nop-exporter.zip'), buildZip(entries, buildTime()));
+writeFileSync(join(OUT_DIR, 'nop_exporter.py'), exporterScript);
+console.log(`NOP exporter ${version}: ${entries.length} files -> public/downloads/nop-exporter.zip`);

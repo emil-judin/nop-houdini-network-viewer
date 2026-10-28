@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "WOP network document (schema 1.x)",
-  "description": "A Houdini node network exported by the WOP exporter (exporter/wop_exporter.py). Human documentation: docs/SCHEMA.md. Every 1.x version only adds optional fields, so this file describes all of them. Unknown extra fields are allowed.",
+  "title": "NOP network document (schema 1.x)",
+  "description": "A Houdini node network exported by the NOP exporter (exporter/nop_exporter.py). Human documentation: docs/SCHEMA.md. Every 1.x version only adds optional fields, so this file describes all of them. Unknown extra fields are allowed.",
   "type": "object",
   "required": ["houdiniVersion", "root"],
   "properties": {

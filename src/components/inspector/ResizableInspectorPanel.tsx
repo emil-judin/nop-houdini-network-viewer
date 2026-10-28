@@ -9,7 +9,7 @@ const MIN_HEIGHT = 120;
 const MIN_CANVAS_WIDTH = 200;
 const MIN_CANVAS_HEIGHT = 100;
 const KEYBOARD_STEP = 16;
-const STORAGE_KEYS = { width: 'wop-inspector-width', height: 'wop-inspector-height' } as const;
+const STORAGE_KEYS = { width: 'nop-inspector-width', height: 'nop-inspector-height' } as const;
 
 /** Reads a remembered panel size. Storage can be unavailable (private mode, blocked site data). */
 function readStoredSize(key: string): number | null {

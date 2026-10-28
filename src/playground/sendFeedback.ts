@@ -20,7 +20,7 @@ export interface FeedbackMessage {
 }
 
 /**
- * Sends a feedback message by email through Web3Forms, with the WOP version, page address and
+ * Sends a feedback message by email through Web3Forms, with the NOP version, page address and
  * browser attached. Rejects with a readable `Error` when sending fails.
  */
 export async function sendFeedback(feedback: FeedbackMessage): Promise<void> {
@@ -35,14 +35,14 @@ export async function sendFeedback(feedback: FeedbackMessage): Promise<void> {
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         access_key: FEEDBACK_ACCESS_KEY,
-        subject: `WOP feedback (${__WOP_VERSION__})`,
-        from_name: 'WOP playground',
+        subject: `NOP feedback (${__NOP_VERSION__})`,
+        from_name: 'NOP playground',
         // An email address becomes the reply-to address
         ...(isEmail ? { email: contact } : {}),
         message: feedback.message.trim(),
         contact: contact || '(not given)',
         network: feedback.network,
-        version: __WOP_VERSION__,
+        version: __NOP_VERSION__,
         // Without the query: `?embed=true&src=...` can hold a private file address
         page: window.location.origin + window.location.pathname,
         browser: navigator.userAgent,

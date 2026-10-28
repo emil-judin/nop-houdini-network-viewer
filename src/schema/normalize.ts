@@ -316,8 +316,8 @@ export function normalizeNetworkDocument(raw: unknown): HoudiniNetworkDocument {
   const schemaMajor = typeof raw.schemaVersion === 'string' ? Number.parseInt(raw.schemaVersion, 10) : NaN;
   if (schemaMajor > SUPPORTED_SCHEMA_MAJOR) {
     throw new Error(
-      `This file uses schema ${raw.schemaVersion as string}, made by a newer WOP exporter. ` +
-        `Update the WOP viewer to show it (this viewer reads schema ${SUPPORTED_SCHEMA_MAJOR}.x).`,
+      `This file uses schema ${raw.schemaVersion as string}, made by a newer NOP exporter. ` +
+        `Update the NOP viewer to show it (this viewer reads schema ${SUPPORTED_SCHEMA_MAJOR}.x).`,
     );
   }
 

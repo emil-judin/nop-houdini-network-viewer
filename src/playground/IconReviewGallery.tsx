@@ -20,7 +20,7 @@ type DecisionFilter = 'all' | 'keep' | 'redo' | 'unreviewed';
 
 const FAMILY_LABELS: Record<FamilyFilter, string> = { all: 'All', sop: 'SOP', labs: 'Labs', path: 'Path bar' };
 
-// Pre-WOP key kept on purpose: renaming it would drop the review progress saved in browsers
+// Pre-NOP key kept on purpose: renaming it would drop the review progress saved in browsers
 const STORAGE_KEY = 'houdini-visualizer-icon-review-v2';
 const ALL_ICONS: OperatorIconDef[] = [...OPERATOR_ICONS, ...PATH_ICONS, DEFAULT_OPERATOR_ICON];
 

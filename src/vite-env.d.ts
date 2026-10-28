@@ -16,6 +16,6 @@ interface ImportMeta {
 }
 
 /** Package version from `package.json`, replaced at build time (`define` in `vite.config.ts`). */
-declare const __WOP_VERSION__: string;
+declare const __NOP_VERSION__: string;
 /** Package name from `package.json`, replaced at build time (`define` in `vite.config.ts`). */
-declare const __WOP_PACKAGE_NAME__: string;
+declare const __NOP_PACKAGE_NAME__: string;

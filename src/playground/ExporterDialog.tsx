@@ -5,8 +5,8 @@ import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** Built into `public/downloads/` by `scripts/build_exporter_package.mjs`, relative to the page (works from a sub-path). */
-const PACKAGE_URL = `${import.meta.env.BASE_URL}downloads/wop-exporter.zip`;
-const SCRIPT_URL = `${import.meta.env.BASE_URL}downloads/wop_exporter.py`;
+const PACKAGE_URL = `${import.meta.env.BASE_URL}downloads/nop-exporter.zip`;
+const SCRIPT_URL = `${import.meta.env.BASE_URL}downloads/nop_exporter.py`;
 
 /** Houdini preferences folders per operating system (Houdini 22). */
 const PREFERENCE_FOLDERS: Array<[string, string]> = [
@@ -26,14 +26,14 @@ export interface ExporterDialogProps {
 }
 
 /**
- * Download and install steps for the WOP Houdini exporter (a Houdini package with a WOP shelf).
+ * Download and install steps for the NOP Houdini exporter (a Houdini package with a NOP shelf).
  */
 export const ExporterDialog: React.FC<ExporterDialogProps> = ({ open, onClose }) => (
   <PlaygroundDialog open={open} onClose={onClose} title="Get the Houdini exporter" maxWidthPx={600}>
     <div className="overflow-y-auto px-4 py-3 space-y-4 text-[13px] leading-normal">
       <p>
-        The exporter is a Houdini package. It adds a <b>WOP</b> shelf with two tools: <b>Export for WOP</b> (copy to
-        the clipboard or save a .json file) and <b>Copy for WOP</b> (copy the selection without a dialog).
+        The exporter is a Houdini package. It adds a <b>NOP</b> shelf with two tools: <b>Export for NOP</b> (copy to
+        the clipboard or save a .json file) and <b>Copy for NOP</b> (copy the selection without a dialog).
       </p>
 
       <a
@@ -42,7 +42,7 @@ export const ExporterDialog: React.FC<ExporterDialogProps> = ({ open, onClose })
         className={`inline-flex items-center gap-2 h-9 px-3 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-white font-bold ${TOUCH_TARGET}`}
       >
         <Download className="w-4 h-4" />
-        Download wop-exporter.zip
+        Download nop-exporter.zip
         <span className="font-normal text-[#c4c9d8]">({packageJson.version})</span>
       </a>
 
@@ -70,12 +70,12 @@ export const ExporterDialog: React.FC<ExporterDialogProps> = ({ open, onClose })
             </ul>
           </li>
           <li>
-            Copy <code className="font-mono text-[12px]">wop.json</code> and the{' '}
-            <code className="font-mono text-[12px]">wop</code> folder from the zip into it.
+            Copy <code className="font-mono text-[12px]">nop.json</code> and the{' '}
+            <code className="font-mono text-[12px]">nop</code> folder from the zip into it.
           </li>
           <li>
-            Restart Houdini. The <b>WOP</b> shelf tab appears at the top. If it does not, click the <b>+</b> next to the
-            shelf tabs and choose Shelves, then WOP.
+            Restart Houdini. The <b>NOP</b> shelf tab appears at the top. If it does not, click the <b>+</b> next to the
+            shelf tabs and choose Shelves, then NOP.
           </li>
         </ol>
       </section>
@@ -85,22 +85,22 @@ export const ExporterDialog: React.FC<ExporterDialogProps> = ({ open, onClose })
         <ol className="list-decimal pl-5 space-y-1.5">
           <li>Open a network in Houdini. Select nodes to export only those, or nothing for the whole network.</li>
           <li>
-            Click <b>Export for WOP</b> and choose <i>Copy to Clipboard</i>, then press <b>Ctrl+V</b> on this page.
+            Click <b>Export for NOP</b> and choose <i>Copy to Clipboard</i>, then press <b>Ctrl+V</b> on this page.
             Or save a .json file and use <b>Open .json</b>.
           </li>
         </ol>
         <p className="mt-2 text-[#9a9a9a]">
-          Optional hotkey: hold Ctrl+Alt+Shift and click <b>Copy for WOP</b>, then add a key such as Ctrl+Shift+Alt+C.
+          Optional hotkey: hold Ctrl+Alt+Shift and click <b>Copy for NOP</b>, then add a key such as Ctrl+Shift+Alt+C.
         </p>
       </section>
 
       <p className="text-[#9a9a9a] border-t border-[#1f1f1f] pt-3">
         Tested with Houdini 22.0.466. Prefer a manual shelf tool? Download the plain{' '}
         <a href={SCRIPT_URL} download className="text-[#8c96b2] underline hover:text-[#d2dcfb]">
-          wop_exporter.py
+          nop_exporter.py
         </a>{' '}
-        and paste it into a new shelf tool. Update by replacing the wop folder; uninstall by deleting wop.json and the
-        wop folder.
+        and paste it into a new shelf tool. Update by replacing the nop folder; uninstall by deleting nop.json and the
+        nop folder.
       </p>
     </div>
   </PlaygroundDialog>

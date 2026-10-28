@@ -1,10 +1,10 @@
-"""Generate WOP (web operator) icon prototypes: a white spider web on Houdini orange.
+"""Generate NOP (web operator) icon prototypes: a white spider web on Houdini orange.
 
-Writes one SVG per variant and stroke weight into ``design/wop-icon/`` plus an
+Writes one SVG per variant and stroke weight into ``design/nop-icon/`` plus an
 ``index.html`` preview that shows every SVG at several sizes on light and dark
 backgrounds. All geometry is computed here, nothing is traced from other art.
 
-Usage: ``python scripts/build_wop_icon_prototypes.py``
+Usage: ``python scripts/build_nop_icon_prototypes.py``
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 SIZE = 512
 ORANGE = "#FE4703"  # sampled from the Houdini app icon background
 WHITE = "#FFFFFF"
-OUT_DIR = Path(__file__).resolve().parent.parent / "design" / "wop-icon"
+OUT_DIR = Path(__file__).resolve().parent.parent / "design" / "nop-icon"
 
 Point = tuple[float, float]
 
@@ -215,7 +215,7 @@ VARIANTS: list[tuple[str, str, Web, list[tuple[str, float, float, float | None]]
 PREVIEW_HEAD = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WOP Icon Prototypes</title>
+<title>NOP Icon Prototypes</title>
 <style>
   body { margin: 0; padding: 24px 16px; background: #1e1e1e; color: #ddd; font: 14px/1.4 system-ui, sans-serif; }
   h1 { font-size: 20px; margin: 0 0 4px; }
@@ -228,7 +228,7 @@ PREVIEW_HEAD = """<!doctype html>
   .big { width: 192px; height: 192px; display: block; }
   .light { background: #f2f2f2; padding: 6px; border-radius: 4px; display: flex; gap: 6px; align-items: flex-end; }
 </style></head><body>
-<h1>WOP icon prototypes</h1>
+<h1>NOP icon prototypes</h1>
 <p>Each card: 192 px, then 64, 32, 24 and 16 px on dark, and 32 / 16 px on light.</p>
 """
 
@@ -239,7 +239,7 @@ def main() -> None:
     for name, blurb, web, weights in VARIANTS:
         html.append(f"<h2>{name}</h2><p>{blurb}</p><div class='row'>")
         for weight, spoke_w, ring_w, frame_w in weights:
-            file = f"wop-{name}-{weight}.svg"
+            file = f"nop-{name}-{weight}.svg"
             (OUT_DIR / file).write_text(svg(web, spoke_w, ring_w, frame_w), encoding="utf-8")
             small = "".join(f"<img src='{file}' width='{s}' height='{s}' alt=''>" for s in (64, 32, 24, 16))
             light = "".join(f"<img src='{file}' width='{s}' height='{s}' alt=''>" for s in (32, 16))

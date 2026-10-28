@@ -84,8 +84,8 @@ export function buildReactSnippet(options: EmbedSnippetOptions): string {
   if (!options.showInspector) props.push('showInspector={false}');
   const fileName = options.jsonUrl.split('/').pop() || 'my-network.json';
   return [
-    `import { HoudiniNetwork } from 'wop-houdini-network-viewer';`,
-    `import 'wop-houdini-network-viewer/style.css';`,
+    `import { HoudiniNetwork } from 'nop-houdini-network-viewer';`,
+    `import 'nop-houdini-network-viewer/style.css';`,
     `import network from './${fileName}';`,
     '',
     'export function MyHoudiniNetwork() {',
@@ -101,7 +101,7 @@ export function buildReactSnippet(options: EmbedSnippetOptions): string {
 /**
  * Builds the URL of the playground's `?embed=true` page for an iframe.
  *
- * @param pageUrl URL of the hosted playground (for example `https://user.github.io/wop-houdini-network-viewer/`).
+ * @param pageUrl URL of the hosted playground (for example `https://user.github.io/nop-houdini-network-viewer/`).
  */
 export function buildEmbedPageUrl(options: EmbedSnippetOptions, pageUrl: string): string {
   const url = new URL(pageUrl);

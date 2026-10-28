@@ -1,6 +1,6 @@
-# Contributing to WOP
+# Contributing to NOP
 
-Thank you for helping. WOP is a small project with a few firm rules; reading them first saves review rounds.
+Thank you for helping. NOP is a small project with a few firm rules; reading them first saves review rounds.
 
 ## Before you start
 

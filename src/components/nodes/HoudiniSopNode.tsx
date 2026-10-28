@@ -121,7 +121,7 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
   );
 
   const mainOutlinePath = useMemo(() => pointsToSvgPath(shapeDef.outline, true), [shapeDef]);
-  const bodyClipId = `wop-node-body-${React.useId().replace(/:/g, '')}`;
+  const bodyClipId = `nop-node-body-${React.useId().replace(/:/g, '')}`;
 
   const flagRegions = useMemo(() => {
     const flags = shapeDef.flags ?? {};

@@ -1,4 +1,4 @@
-# In-Depth Architecture & Implementation Plan: WOP (`wop-houdini-network-viewer`)
+# In-Depth Architecture & Implementation Plan: NOP (`nop-houdini-network-viewer`)
 
 > **Project Goal:** A lightweight, embeddable interactive Houdini node network viewer for portfolio websites, documentation, and technical blogs, inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
 > **Repository Philosophy:** Agentic-first repository architecture enabling seamless development and handoffs across AI coding agents and human developers.
@@ -16,7 +16,7 @@ Every architectural decision, code module and documentation file follows the six
 ### 2.1 Target Use Cases
 1. **Portfolio Website Integration:** Technical Artists and Houdini TDs can replace static screenshots of node networks with interactive, zoomable, inspectable Houdini node graphs on their personal websites.
 2. **Standalone Web Playground:** A hosted web application (GitHub Pages) where users can paste exported Houdini JSON directly from their clipboard (`Ctrl+V`), inspect networks, and generate embed snippets.
-3. **Developer Package (`npm` & Web Component):** Easily installable via `npm install wop-houdini-network-viewer` for React/Next.js/Astro sites, via a single `<script>` tag (`<houdini-network>`) for plain HTML/WordPress/Cargo sites, or via `<iframe>` for ArtStation/Notion.
+3. **Developer Package (`npm` & Web Component):** Easily installable via `npm install nop-houdini-network-viewer` for React/Next.js/Astro sites, via a single `<script>` tag (`<houdini-network>`) for plain HTML/WordPress/Cargo sites, or via `<iframe>` for ArtStation/Notion.
 
 ### 2.2 Locked-In Design Decisions (From Discovery & Live Houdini 22 Testing)
 - **Interaction Mode:** **Strictly View-Only Layout** (`nodesDraggable={false}`, `nodesConnectable={false}`, `elementsSelectable={true}`). Visitors can pan, zoom, fit-to-view, use the minimap, toggle full-screen, click nodes to inspect parameters/VEX, and double-click subnetworks to dive inside, without mutating the artist's graph or node state.
@@ -40,7 +40,7 @@ To ensure any AI coding agent (Antigravity, Claude Code, Cursor, Codex, Copilot)
 
 ```mermaid
 flowchart TD
-    Root["Repository Root (wop-houdini-network-viewer)"]
+    Root["Repository Root (nop-houdini-network-viewer)"]
     Root --> AgentsMD["AGENTS.md (Core Rules, 6 Pillars & Commands)"]
     Root --> PlanMD["PLAN.md (This Master Blueprint)"]
     Root --> AgentSkills[".agents/skills/ (On-Demand Domain Knowledge)"]
@@ -49,7 +49,7 @@ flowchart TD
     
     AgentSkills --> S1["houdini-graph-renderer/SKILL.md (Shapes, Flags, Coords)"]
     AgentSkills --> S2["houdini-python-exporter/SKILL.md (HOM API, Privacy, Schema)"]
-    AgentSkills --> S3["wop-icon-drawing, wop-verify, wop-release"]
+    AgentSkills --> S3["nop-icon-drawing, nop-verify, nop-release"]
     
     Docs --> Status["STATUS.md (Session Handoff & Milestone Checklist)"]
     Docs --> Arch["ARCHITECTURE.md (Coordinate Math & Component Tree)"]
@@ -59,7 +59,7 @@ flowchart TD
 ### 3.1 File-by-File Repository Layout
 
 ```text
-wop-houdini-network-viewer/
+nop-houdini-network-viewer/
 ├── AGENTS.md                          # Always-on concise agent rules, 6 pillars, commands, definition of done
 ├── CLAUDE.md                          # One line: @AGENTS.md (for agents that look for their own file name)
 ├── SECURITY.md / CONTRIBUTING.md      # Vulnerability reports; rules for contributors
@@ -67,7 +67,7 @@ wop-houdini-network-viewer/
 ├── README.md                          # Human-facing documentation, quickstart, embed guide
 ├── CHANGELOG.md                       # Release notes per version
 ├── LICENSE                            # MIT License
-├── package.json                       # npm package 'wop-houdini-network-viewer' and scripts
+├── package.json                       # npm package 'nop-houdini-network-viewer' and scripts
 ├── vite.config.ts                     # Playground build (dist-playground/), og:image URLs, dev-only reference icons
 ├── vite.lib.config.ts                 # npm + web component builds (dist/), stylesheet scoping, font files
 ├── eslint.config.js
@@ -80,9 +80,9 @@ wop-houdini-network-viewer/
 ├── .agents/skills/                    # On-demand agent knowledge (pointers in .claude/skills/)
 │   ├── houdini-graph-renderer/SKILL.md
 │   ├── houdini-python-exporter/SKILL.md
-│   ├── wop-icon-drawing/SKILL.md
-│   ├── wop-verify/SKILL.md            # Definition of done
-│   └── wop-release/SKILL.md
+│   ├── nop-icon-drawing/SKILL.md
+│   ├── nop-verify/SKILL.md            # Definition of done
+│   └── nop-release/SKILL.md
 │
 ├── docs/
 │   ├── STATUS.md                      # Current state, owner steps, next tasks (short)
@@ -93,20 +93,20 @@ wop-houdini-network-viewer/
 │   └── TESTERS.md                     # Guide for the tester release
 │
 ├── exporter/                          # Houdini side (Python 3 / HOM)
-│   ├── wop_exporter.py                # Export dialog, copy-for-web hotkey function, schema writer
-│   ├── package/                       # Houdini package: wop.json + wop/ (shelf, icon, README.txt)
+│   ├── nop_exporter.py                # Export dialog, copy-for-web hotkey function, schema writer
+│   ├── package/                       # Houdini package: nop.json + nop/ (shelf, icon, README.txt)
 │   └── README.md                      # Install (package or manual shelf tool) and usage
 │
 ├── fixtures/                          # Real Houdini 22 exports used as demos
 │   ├── circuit_board-network.json     # Small /obj/circuit_board network
 │   ├── circuit_gen-network.json       # Production network, full parameters
-├── schema/wop-network-1.schema.json   # JSON Schema of the export format (all 1.x fields)
+├── schema/nop-network-1.schema.json   # JSON Schema of the export format (all 1.x fields)
 │
-├── design/wop-icon/                   # Master WOP icon SVG, web.html preview and pack/ (website icon pack)
+├── design/nop-icon/                   # Master NOP icon SVG, web.html preview and pack/ (website icon pack)
 ├── public/                            # Playground static files (favicons, manifest, og-image);
 │                                      #   downloads/ is generated (exporter zip and script)
 ├── scripts/                           # build_exporter_package.mjs (exporter zip), print_sri.mjs (release hash),
-│                                      #   build_wop_icon_pack.py (website icons), build_local_reference_icons.py
+│                                      #   build_nop_icon_pack.py (website icons), build_local_reference_icons.py
 │                                      #   (dev-only SideFX reference icons, Labs catalog), icon prototype builders
 ├── local-refs/                        # Gitignored SideFX reference icons, served by the dev server only
 │
@@ -203,7 +203,7 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
   - In Houdini, wires coming from a parent network's input connectors have `"from": "1"`, `"from": "2"`, etc., matching `subnetInputs[i].name`.
   - Our converter normalizes these IDs to `input:1`, etc. (boxes, stickies and dots get `box:`, `sticky:`, `dot:`), so they never collide with node names and wire seamlessly from the top indirect input triangles.
 
-### 4.4 Smart Subnetwork Recursion & Parameter Extraction (`exporter/wop_exporter.py`)
+### 4.4 Smart Subnetwork Recursion & Parameter Extraction (`exporter/nop_exporter.py`)
 1. **Avoiding the 3MB Built-In HDA Trap:**
    - Many standard Houdini SOPs (`attribwrangle`, `color`, `split`, `convertline`, `labs::*`) return `True` for `node.isSubNetwork()`.
    - Our exporter checks a helper `should_recurse_subnet(node)`:
@@ -225,10 +225,10 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
 ## 5. Phased Implementation Roadmap
 
 ### Milestone 1: Repository Scaffolding, Agentic Docs & Fixtures
-- Initialize `package.json` (`wop-houdini-network-viewer`), TypeScript, Vite, Tailwind CSS, `@xyflow/react`, and Lucide icons.
+- Initialize `package.json` (`nop-houdini-network-viewer`), TypeScript, Vite, Tailwind CSS, `@xyflow/react`, and Lucide icons.
 - Create `AGENTS.md`, `PLAN.md`, `docs/STATUS.md`, `docs/ARCHITECTURE.md`, and `docs/SCHEMA.md` enforcing the Core Pillars (5 at the time, now 6) and neutral international documentation styling.
 - Create `.agents/skills/houdini-graph-renderer/SKILL.md` and `.agents/skills/houdini-python-exporter/SKILL.md`.
-- Write the production-ready `exporter/wop_exporter.py` shelf tool (with the UI dialog for Clipboard vs. File Save and Compact vs. Full parameters) and `exporter/README.md`.
+- Write the production-ready `exporter/nop_exporter.py` shelf tool (with the UI dialog for Clipboard vs. File Save and Compact vs. Full parameters) and `exporter/README.md`.
 - Process `complex-network.json` into clean, fast-loading test fixtures (now `fixtures/circuit_gen-network.json` and `fixtures/circuit_board-network.json`, re-exported from Houdini 22).
 - Implement the canonical TypeScript schema (`src/schema/types.ts`) and verify `npm run check` passes.
 
@@ -264,7 +264,7 @@ Goal: a hosted playground that a small group of selected Houdini users can open,
 
 - Version control (git repository, private or public GitHub repository).
 - Host the playground on GitHub Pages (`.github/workflows/deploy-playground.yml`), kept out of search engines (`noindex`) during testing.
-- Exporter download in the playground, installed as a Houdini package (`exporter/package/`, built into `wop-exporter.zip`).
+- Exporter download in the playground, installed as a Houdini package (`exporter/package/`, built into `nop-exporter.zip`).
 - Hide the internal Icon Review tab from the hosted playground.
 - Version `0.1.0-alpha.1`, CHANGELOG entry, matching README snippet.
 - Feedback form that sends testers' messages to the owner's email (Web3Forms), plus the tester guide `docs/TESTERS.md`.
@@ -284,7 +284,7 @@ Goal: a hosted playground that a small group of selected Houdini users can open,
 - [ ] Measure `preact/compat` for the web component build (smaller bundle).
 
 **Public release**
-- Publish `wop-houdini-network-viewer` on npm (and so on jsDelivr for the web component), after the tester feedback.
+- Publish `nop-houdini-network-viewer` on npm (and so on jsDelivr for the web component), after the tester feedback.
 - [x] `repository`, `homepage` and `bugs` fields in `package.json`.
 - Set `PUBLISHED_ON_NPM` in the Embed dialog and drop the README's "not on npm yet" note; publish the SRI hash (`npm run sri`).
 - Embedding guide: CORS, file size, where to host the JSON.

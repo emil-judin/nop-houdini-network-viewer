@@ -76,7 +76,7 @@ function suggestFileName(doc: HoudiniNetworkDocument, loaded: LoadedNetwork | nu
 }
 
 /**
- * Interactive Playground application for testing and showcasing WOP:
+ * Interactive Playground application for testing and showcasing NOP:
  * demo networks, loading your own export (open, drop, paste), embed code, and the icon gallery.
  */
 export const App: React.FC = () => {
@@ -140,9 +140,9 @@ export const App: React.FC = () => {
       {/* Top bar in the Houdini pane style: pane grey with a dark separator line underneath */}
       <header className="min-h-11 shrink-0 bg-[#2d2d2d] border-b-2 border-[#1f1f1f] px-3 py-1.5 flex flex-wrap items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
-          {/* WOP icon (orange square, web cut out) from public/, relative to the page so it also works from a sub-path */}
+          {/* NOP icon (orange square, web cut out) from public/, relative to the page so it also works from a sub-path */}
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={24} height={24} className="w-6 h-6" />
-          <h1 className="font-bold text-[14px] text-[#dddddd]">WOP</h1>
+          <h1 className="font-bold text-[14px] text-[#dddddd]">NOP</h1>
           <span className="hidden xl:inline text-[12px] text-[#a6a6a6]">View and share Houdini node networks on the web</span>
           {activeDocument && (
             <span className="hidden sm:inline h-5 px-1.5 leading-5 rounded-[3px] bg-[#434343] text-[12px] text-[#dddddd] font-mono">
@@ -192,7 +192,7 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => setExporterOpen(true)}
-            title="Download the WOP exporter for Houdini"
+            title="Download the NOP exporter for Houdini"
             className={HEADER_BUTTON}
           >
             <Download className="w-3.5 h-3.5" aria-hidden="true" />
@@ -214,7 +214,7 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="Open a network .json file exported with the WOP shelf tool (or drop it on the page)"
+            title="Open a network .json file exported with the NOP shelf tool (or drop it on the page)"
             className={HEADER_BUTTON}
           >
             <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
@@ -223,7 +223,7 @@ export const App: React.FC = () => {
           <button
             type="button"
             onClick={loader.pasteFromClipboard}
-            title="Paste JSON copied with the WOP shelf tool (or press Ctrl+V)"
+            title="Paste JSON copied with the NOP shelf tool (or press Ctrl+V)"
             className={HEADER_BUTTON}
           >
             <ClipboardPaste className="w-3.5 h-3.5" aria-hidden="true" />

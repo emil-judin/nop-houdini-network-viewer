@@ -1,17 +1,17 @@
 {
-  "name": "wop-houdini-network-viewer",
+  "name": "nop-houdini-network-viewer",
   "version": "0.1.0-alpha.1",
-  "description": "WOP: View and share Houdini node networks on the web. Interactive, view-only viewer for SideFX Houdini node networks on portfolio websites and technical documentation. Not affiliated with SideFX.",
+  "description": "NOP: View and share Houdini node networks on the web. Interactive, view-only viewer for SideFX Houdini node networks on portfolio websites and technical documentation. Not affiliated with SideFX.",
   "author": "Emil Judin",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emil-judin/wop-houdini-network-viewer.git"
+    "url": "git+https://github.com/emil-judin/nop-houdini-network-viewer.git"
   },
   "bugs": {
-    "url": "https://github.com/emil-judin/wop-houdini-network-viewer/issues"
+    "url": "https://github.com/emil-judin/nop-houdini-network-viewer/issues"
   },
-  "homepage": "https://github.com/emil-judin/wop-houdini-network-viewer#readme",
+  "homepage": "https://github.com/emil-judin/nop-houdini-network-viewer#readme",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -34,7 +34,7 @@
   ],
   "files": [
     "dist",
-    "exporter/wop_exporter.py",
+    "exporter/nop_exporter.py",
     "exporter/README.md",
     "schema",
     "README.md",
@@ -60,7 +60,7 @@
     "houdini",
     "sidefx",
     "node-graph",
-    "wop",
+    "nop",
     "viewer",
     "network-viewer",
     "sop",

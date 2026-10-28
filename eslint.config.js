@@ -1,4 +1,4 @@
-// ESLint flat config for WOP: TypeScript, React hooks rules (a missing hook dependency shipped once)
+// ESLint flat config for NOP: TypeScript, React hooks rules (a missing hook dependency shipped once)
 // and accessibility checks for JSX. Run with `npm.cmd run lint`.
 import js from '@eslint/js';
 import jsxA11y from 'eslint-plugin-jsx-a11y';

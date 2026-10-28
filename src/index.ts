@@ -1,8 +1,8 @@
 /**
- * Public library entry point for `wop-houdini-network-viewer`.
+ * Public library entry point for `nop-houdini-network-viewer`.
  *
- * Import the stylesheet once next to the component: `import 'wop-houdini-network-viewer/style.css';`
- * For plain HTML pages use the `<houdini-network>` web component (`wop-houdini-network-viewer/web-component`).
+ * Import the stylesheet once next to the component: `import 'nop-houdini-network-viewer/style.css';`
+ * For plain HTML pages use the `<houdini-network>` web component (`nop-houdini-network-viewer/web-component`).
  */
 
 import './styles/library.css';

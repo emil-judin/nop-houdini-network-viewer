@@ -1,21 +1,21 @@
 /*
- * Minimal reset for the library builds, scoped to the viewer (`.wop-root`), in place of
+ * Minimal reset for the library builds, scoped to the viewer (`.nop-root`), in place of
  * Tailwind's global preflight: the viewer must look the same on any host page without
  * resetting the host page itself. The class selector also outranks host element rules
  * such as `button { ... }`. Every rule has the specificity of one class (element parts are
  * wrapped in `:where()`), so the utility classes, which come later in the bundle, override it.
  */
-.wop-root,
-.wop-root :where(*),
-.wop-root ::before,
-.wop-root ::after {
+.nop-root,
+.nop-root :where(*),
+.nop-root ::before,
+.nop-root ::after {
   box-sizing: border-box;
   border: 0 solid;
   margin: 0;
   padding: 0;
 }
 
-.wop-root {
+.nop-root {
   font-size: 16px;
   color: #dcdcdc;
   line-height: 1.5;
@@ -26,16 +26,16 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.wop-root :where(h1, h2, h3, h4, p) {
+.nop-root :where(h1, h2, h3, h4, p) {
   font-size: inherit;
   font-weight: inherit;
 }
 
-.wop-root :where(ol, ul) {
+.nop-root :where(ol, ul) {
   list-style: none;
 }
 
-.wop-root :where(button, input, select) {
+.nop-root :where(button, input, select) {
   font: inherit;
   letter-spacing: inherit;
   color: inherit;
@@ -44,25 +44,25 @@
   text-transform: none;
 }
 
-.wop-root :where(button) {
+.nop-root :where(button) {
   cursor: pointer;
 }
 
-.wop-root :where(button:disabled) {
+.nop-root :where(button:disabled) {
   cursor: default;
 }
 
-.wop-root :where(svg, img) {
+.nop-root :where(svg, img) {
   display: block;
   vertical-align: middle;
 }
 
-.wop-root :where(pre, code) {
+.nop-root :where(pre, code) {
   font-family: var(--font-mono);
   font-size: inherit;
 }
 
-.wop-root :where(pre code) {
+.nop-root :where(pre code) {
   font-size: inherit;
   background: none;
   padding: 0;

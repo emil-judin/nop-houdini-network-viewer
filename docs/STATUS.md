@@ -12,12 +12,13 @@
 
 ## Owner Steps
 
-1. **Prettier reformat:** run `npm run format` (one-time reformat of about 47 files) as its own commit, then add `npm run format:check` to CI.
-2. **Houdini check of the exporter changes** (not run in Houdini yet): install the zip from `npm run build:exporter`, run both shelf tools, export a network that contains a locked third-party asset (the "Export Closed / Include Insides" dialog), and read one export for paths and names. Also confirm that the package works from a `HOUDINI_PACKAGE_DIR` folder (`$HOUDINI_PACKAGE_PATH`).
-3. **GitHub repository settings:** Settings > Pages > Source: GitHub Actions; Settings > Code security > enable private vulnerability reporting (`SECURITY.md` points there); Settings > Branches > require the CI checks `verify` and `browser` on `main`.
-4. **Feedback form:** Web3Forms access key as the repository variable `WEB3FORMS_KEY`, then re-run the deploy workflow.
-5. **Fixtures:** re-install the exporter (`npm run build:exporter`, or copy `exporter/wop_exporter.py`) and export `circuit_gen` once more into `fixtures/circuit_gen-network.json` (`circuit_board` is fine). Then `grep "<path>" fixtures/*.json` should find nothing.
-6. **Real devices:** smoke-test the hosted playground on Safari (macOS, iOS) and a real Android phone.
+1. **Finish the rename to NOP:** on GitHub, rename the repository to `nop-houdini-network-viewer` (Settings > General > Repository name) before pushing the rename commit, then run `git remote set-url origin https://github.com/emil-judin/nop-houdini-network-viewer.git`. GitHub redirects the old repository URL, but the Pages address changes, so old playground links break. Tell the alpha.1 testers to delete `wop.json` and the `wop` folder from their Houdini `packages` folder and install `nop-exporter.zip`.
+2. **Prettier reformat:** run `npm run format` (one-time reformat of about 47 files) as its own commit, then add `npm run format:check` to CI.
+3. **Houdini check of the exporter changes** (not run in Houdini yet): install the zip from `npm run build:exporter`, run both shelf tools, export a network that contains a locked third-party asset (the "Export Closed / Include Insides" dialog), and read one export for paths and names. Also confirm that the package works from a `HOUDINI_PACKAGE_DIR` folder (`$HOUDINI_PACKAGE_PATH`).
+4. **GitHub repository settings:** Settings > Pages > Source: GitHub Actions; Settings > Code security > enable private vulnerability reporting (`SECURITY.md` points there); Settings > Branches > require the CI checks `verify` and `browser` on `main`.
+5. **Feedback form:** Web3Forms access key as the repository variable `WEB3FORMS_KEY`, then re-run the deploy workflow.
+6. **Fixtures:** re-install the exporter (`npm run build:exporter`, or copy `exporter/nop_exporter.py`) and export `circuit_gen` once more into `fixtures/circuit_gen-network.json` (`circuit_board` is fine). Then `grep "<path>" fixtures/*.json` should find nothing.
+7. **Real devices:** smoke-test the hosted playground on Safari (macOS, iOS) and a real Android phone.
 
 ## Next Tasks (agents)
 
@@ -30,5 +31,5 @@
 ## Where Things Are
 
 - Rules for agents: [AGENTS.md](../AGENTS.md) (pillars, definition of done, security rules) and the skills in `.agents/skills/`.
-- Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md); JSON contract: [SCHEMA.md](./SCHEMA.md) and `schema/wop-network-1.schema.json`.
+- Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md); JSON contract: [SCHEMA.md](./SCHEMA.md) and `schema/nop-network-1.schema.json`.
 - Testers: [TESTERS.md](./TESTERS.md). Icons: [ICON_ART_BIBLE.md](./ICON_ART_BIBLE.md).

@@ -11,7 +11,7 @@ import {
 import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** jsDelivr serves every npm release, so the snippet works as soon as the package is published. */
-const WEB_COMPONENT_URL = `https://cdn.jsdelivr.net/npm/${__WOP_PACKAGE_NAME__}@${__WOP_VERSION__}/dist/web-component.js`;
+const WEB_COMPONENT_URL = `https://cdn.jsdelivr.net/npm/${__NOP_PACKAGE_NAME__}@${__NOP_VERSION__}/dist/web-component.js`;
 
 /**
  * `false` until the package is on npm (Milestone 4). The HTML and React snippets need the npm
@@ -31,7 +31,7 @@ const TABS: Array<{ id: SnippetTab; label: string; help: string; needsNpm: boole
   {
     id: 'react',
     label: 'React',
-    help: 'For React, Next.js or Astro sites. Install with: npm install wop-houdini-network-viewer',
+    help: 'For React, Next.js or Astro sites. Install with: npm install nop-houdini-network-viewer',
     needsNpm: true,
   },
   {

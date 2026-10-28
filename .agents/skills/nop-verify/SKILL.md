@@ -1,11 +1,11 @@
 ---
-name: wop-verify
+name: nop-verify
 description: >-
-  The WOP definition of done: the commands and checks that must pass before a change counts as finished.
+  The NOP definition of done: the commands and checks that must pass before a change counts as finished.
   Use before reporting any code, build, exporter or docs change as done.
 ---
 
-# Verify a WOP change
+# Verify a NOP change
 
 Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands with `;`).
 

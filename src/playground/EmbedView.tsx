@@ -15,7 +15,7 @@ const DEMO_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
 /**
  * Host name of `src` when the file comes from another site than this page, else `null`.
  * Shown under the viewer, so a link to this page cannot pass off someone else's network (and its
- * sticky note text) as content of the WOP site.
+ * sticky note text) as content of the NOP site.
  */
 function foreignHost(src: string | null): string | null {
   if (!src) return null;
@@ -77,8 +77,8 @@ export const EmbedView: React.FC = () => {
     <div className="w-full h-dvh flex flex-col bg-[#242424]">
       <div className="flex-1 min-h-0">{content}</div>
       {sourceHost && (
-        <p className="wop-root shrink-0 px-2 py-0.5 bg-[#1b1b1b] text-[11px] text-[#b0b0b0] truncate">
-          Network from {sourceHost}, shown with the WOP viewer
+        <p className="nop-root shrink-0 px-2 py-0.5 bg-[#1b1b1b] text-[11px] text-[#b0b0b0] truncate">
+          Network from {sourceHost}, shown with the NOP viewer
         </p>
       )}
     </div>

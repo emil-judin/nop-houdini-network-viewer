@@ -88,7 +88,7 @@ function contentSecurityPolicy(): Plugin {
 }
 
 /**
- * Vite configuration for the WOP playground and development server.
+ * Vite configuration for the NOP playground and development server.
  */
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -99,8 +99,8 @@ export default defineConfig(({ mode }) => ({
     contentSecurityPolicy(),
   ],
   define: {
-    __WOP_VERSION__: JSON.stringify(PACKAGE.version),
-    __WOP_PACKAGE_NAME__: JSON.stringify(PACKAGE.name),
+    __NOP_VERSION__: JSON.stringify(PACKAGE.version),
+    __NOP_PACKAGE_NAME__: JSON.stringify(PACKAGE.name),
   },
   // Relative asset URLs, so the playground also works from a sub-path such as GitHub Pages (`/<repo>/`)
   base: './',

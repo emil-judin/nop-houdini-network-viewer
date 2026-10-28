@@ -529,7 +529,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
 };
 
 /**
- * Embeddable, strictly view-only viewer component for SideFX Houdini networks (WOP).
+ * Embeddable, strictly view-only viewer component for SideFX Houdini networks (NOP).
  *
  * Visitors can pan, zoom, select nodes to read their parameters, and dive into exported
  * subnetworks (double-click or double-tap, `I` to enter and `U` to go up), but never edit the network.
@@ -553,11 +553,11 @@ export const HoudiniNetwork: React.FC<HoudiniNetworkProps> = (props) => {
     <div
       ref={containerRef}
       className={
-        // `wop-root` scopes the library stylesheet's reset (see `src/styles/reset.css`). The CSS
+        // `nop-root` scopes the library stylesheet's reset (see `src/styles/reset.css`). The CSS
         // fullscreen fallback sits above host page headers, which often use z-index 1000 or more.
         fullscreen.isFullscreen
-          ? `wop-root fixed inset-0 z-[2147483000] ${CANVAS_BG_CLASS} pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]`
-          : `wop-root w-full h-full min-h-80 relative ${props.className ?? ''}`
+          ? `nop-root fixed inset-0 z-[2147483000] ${CANVAS_BG_CLASS} pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]`
+          : `nop-root w-full h-full min-h-80 relative ${props.className ?? ''}`
       }
     >
       {parsed.doc && !iconsReady ? (

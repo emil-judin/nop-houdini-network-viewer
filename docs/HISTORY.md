@@ -12,6 +12,10 @@
 
 ---
 
+### Rename to NOP (2026-10-28, owner decision)
+
+The product was renamed from **WOP** to **NOP** a day after the rename to WOP, because "wop" is an ethnic slur in American English. NOP is spelled out once as "Net OPerator" in the README text, not in titles or the tagline (tagline unchanged: "View and share Houdini node networks on the web."). The spider web icon stays; only its file names changed (`design/nop-icon/`). Renamed: npm package `nop-houdini-network-viewer` (never published as `wop-...`), CSS prefix `.nop-`, `exporter/nop_exporter.py`, the Houdini package (`nop.json`, `nop/`, `$NOP_EXPORTER_ROOT`, shelf tools `nop_export` / `nop_copy`), the skills `nop-verify`, `nop-release` and `nop-icon-drawing`, the schema file and the build scripts. The local storage keys for the inspector size changed (`nop-inspector-width` / `-height`), so a saved size resets once. Exported network files contain no product name and need no re-export. Entries below this one keep the old name and paths.
+
 ### Repository Review (2026-10-27)
 
 A full review of the code, docs and agent files at `c19d6f5` found 98 issues (plus three more found while fixing); all were fixed on the same day except the testing findings (T), which are planned for later (the web component shrank from 272 KB to 176 KB gzip). The full report and fix log were removed after the fixes; this section keeps the decisions and the finding IDs.

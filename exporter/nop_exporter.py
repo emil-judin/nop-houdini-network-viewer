@@ -1,8 +1,8 @@
 """
-WOP - Houdini Python Shelf Exporter
+NOP - Houdini Python Shelf Exporter
 ===================================
 Exports the active or selected Houdini node network into a self-contained JSON
-format for the `wop-houdini-network-viewer` web package.
+format for the `nop-houdini-network-viewer` web package.
 
 Features:
 - Supports exporting to the OS Clipboard (for instant browser pasting) or saving to a .json file.
@@ -887,7 +887,7 @@ def ask_about_locked_assets(closed_assets):
         buttons=("Export Closed (Recommended)", "Include Insides", "Cancel"),
         default_choice=0,
         close_choice=2,
-        title="WOP Exporter",
+        title="NOP Exporter",
     )
     if choice == 2:
         return None
@@ -905,7 +905,7 @@ def copy_selection_for_web(pane=None):
     parent = editor.pwd() if editor else None
     if parent is None:
         hou.ui.setStatusMessage(
-            "WOP: no Network Editor found to copy from.",
+            "NOP: no Network Editor found to copy from.",
             severity=hou.severityType.Warning,
         )
         return
@@ -933,7 +933,7 @@ def run_interactive_export(pane=None):
         return
 
     choice = hou.ui.displayMessage(
-        f"Export network '{parent.path()}' for WOP:\n\n"
+        f"Export network '{parent.path()}' for NOP:\n\n"
         "Paths inside $HIP and $JOB keep their folders. Every other path keeps only its file name. "
         "Network box comments are exported exactly as written, and sticky notes apart from their paths: "
         "check both before sharing.",
@@ -945,7 +945,7 @@ def run_interactive_export(pane=None):
         ),
         default_choice=0,
         close_choice=3,
-        title="WOP Exporter",
+        title="NOP Exporter",
     )
 
     if choice == 3:
@@ -989,7 +989,7 @@ def run_interactive_export(pane=None):
                         buttons=("Overwrite", "Cancel"),
                         default_choice=1,
                         close_choice=1,
-                        title="WOP Exporter",
+                        title="NOP Exporter",
                     )
                     if overwrite != 0:
                         return
@@ -1002,6 +1002,6 @@ def run_interactive_export(pane=None):
 
 
 # Run only when executed as a shelf tool (Houdini passes a `kwargs` dict to shelf scripts) or as a
-# script, never when imported as a module (`import wop_exporter`).
+# script, never when imported as a module (`import nop_exporter`).
 if __name__ == "__main__" or "kwargs" in globals():
     run_interactive_export(globals().get("kwargs", {}).get("pane"))

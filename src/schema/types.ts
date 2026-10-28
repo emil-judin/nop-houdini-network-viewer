@@ -1,7 +1,7 @@
 /**
- * Canonical TypeScript schema definitions for WOP.
+ * Canonical TypeScript schema definitions for NOP.
  *
- * These interfaces define the JSON contract produced by `exporter/wop_exporter.py`
+ * These interfaces define the JSON contract produced by `exporter/nop_exporter.py`
  * and consumed by the React Flow converter and visual components.
  */
 
@@ -340,7 +340,7 @@ export interface HoudiniPathNode {
 }
 
 /**
- * Top-level JSON document produced by the WOP exporter.
+ * Top-level JSON document produced by the NOP exporter.
  */
 export interface HoudiniNetworkDocument {
   /** Schema semantic version (e.g. `"1.0.0"`). */

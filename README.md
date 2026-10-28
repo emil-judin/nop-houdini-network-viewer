@@ -1,8 +1,8 @@
-# WOP
+# NOP
 
 **View and share Houdini node networks on the web.**
 
-WOP (Web OPerator) is an interactive, strictly view-only viewer for **SideFX Houdini** node networks on portfolio websites, technical blogs, and documentation, inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
+NOP (Net OPerator) is an interactive, strictly view-only viewer for **SideFX Houdini** node networks on portfolio websites, technical blogs, and documentation, inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
 
 ---
 
@@ -38,7 +38,7 @@ On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blo
 
 ## Exporting a Network from Houdini
 
-Click **Exporter** in the playground to download `wop-exporter.zip`, a Houdini package: copy its contents into the `packages` folder of your Houdini preferences and restart Houdini to get a **WOP** shelf. See [`exporter/README.md`](./exporter/README.md) for the details, a manual shelf tool setup, and binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
+Click **Exporter** in the playground to download `nop-exporter.zip`, a Houdini package: copy its contents into the `packages` folder of your Houdini preferences and restart Houdini to get a **NOP** shelf. See [`exporter/README.md`](./exporter/README.md) for the details, a manual shelf tool setup, and binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
 
 ---
 
@@ -53,7 +53,7 @@ The playground's **Embed** button generates all three snippets below for the net
 Upload the exported `.json` file next to your page, then:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/wop-houdini-network-viewer@0.1.0-alpha.1/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.1/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
@@ -83,12 +83,12 @@ The element is 480px tall unless you give it a height. From JavaScript you can a
 ### 2. React / Next.js / Astro (`npm`)
 
 ```bash
-npm install wop-houdini-network-viewer
+npm install nop-houdini-network-viewer
 ```
 
 ```tsx
-import { HoudiniNetwork } from 'wop-houdini-network-viewer';
-import 'wop-houdini-network-viewer/style.css';
+import { HoudiniNetwork } from 'nop-houdini-network-viewer';
+import 'nop-houdini-network-viewer/style.css';
 import myGraph from './circuit-gen-network.json';
 
 export function PortfolioBreakdown() {
@@ -148,7 +148,7 @@ Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters
 ## Privacy
 
 - **The playground keeps your files in your browser.** Opened, dropped and pasted networks are never uploaded.
-- **The feedback form** (only on the hosted playground) sends your message, an optional contact, the WOP version, your browser, the page address without its query and the name of the network on screen, by email through [Web3Forms](https://web3forms.com). Your network file is never sent.
+- **The feedback form** (only on the hosted playground) sends your message, an optional contact, the NOP version, your browser, the page address without its query and the name of the network on screen, by email through [Web3Forms](https://web3forms.com). Your network file is never sent.
 - **The exporter** scrubs paths (see [`docs/SCHEMA.md`](./docs/SCHEMA.md) rule 7) and leaves the insides of locked third-party assets out unless you confirm. Network box comments are exported exactly as written and sticky notes apart from their paths, so check them before sharing.
 
 ## Security

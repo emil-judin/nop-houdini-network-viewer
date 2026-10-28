@@ -40,7 +40,7 @@ function emitFontFiles(): Plugin {
     let fileName = fileNames.get(dataUri);
     if (!fileName) {
       const bytes = Buffer.from(dataUri.slice(FONT_DATA_PREFIX.length), 'base64');
-      fileName = `fonts/wop-${createHash('sha256').update(bytes).digest('hex').slice(0, 12)}.woff2`;
+      fileName = `fonts/nop-${createHash('sha256').update(bytes).digest('hex').slice(0, 12)}.woff2`;
       context.emitFile({ type: 'asset', fileName, source: bytes });
       fileNames.set(dataUri, fileName);
     }
@@ -71,7 +71,7 @@ function emitFontFiles(): Plugin {
 }
 
 /** Class on the outermost element of every viewer (see `src/styles/reset.css`). */
-const VIEWER_ROOT = '.wop-root';
+const VIEWER_ROOT = '.nop-root';
 
 /** Matches the viewer root element itself and everything inside it, with the specificity of one class. */
 const VIEWER_SCOPE = `:is(${VIEWER_ROOT}, ${VIEWER_ROOT} *)`;
@@ -94,7 +94,7 @@ export function scopeSelector(selector: string): string {
 
 /**
  * Scopes the npm stylesheet (`dist/style.css`) to the viewer: Tailwind utilities, React Flow overrides,
- * theme variables and the `--tw-*` fallbacks then only apply inside `.wop-root`, so they cannot restyle
+ * theme variables and the `--tw-*` fallbacks then only apply inside `.nop-root`, so they cannot restyle
  * the host page (or another React Flow diagram on it), and a host's own Tailwind classes cannot
  * restyle the viewer. The web component needs none of this: its Shadow DOM isolates its styles.
  */

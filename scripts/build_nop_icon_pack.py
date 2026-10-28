@@ -1,24 +1,24 @@
-"""Generate the production WOP website icon pack.
+"""Generate the production NOP website icon pack.
 
-Final chosen design: ``wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg``
-(the master SVG in ``design/wop-icon/``). The earlier prototypes are in the git history.
+Final chosen design: ``nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg``
+(the master SVG in ``design/nop-icon/``). The earlier prototypes are in the git history.
 
-1. Writes the master SVG to ``design/wop-icon/``.
-2. Writes vector SVG variants to ``design/wop-icon/pack/``:
-   - ``wop-icon.svg`` (and ``favicon.svg``): 512x512 square icon (Houdini orange #FE4703 + white web)
-   - ``wop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
-   - ``wop-icon-circle.svg``: 512x512 circular badge (white web on orange)
-   - ``wop-icon-transparent.svg``: 512x512 Houdini orange (#FE4703) square with the spiderweb cut out (transparent web)
-   - ``wop-icon-rounded-transparent.svg``: 512x512 Houdini orange (#FE4703) rounded square with the spiderweb cut out
-   - ``wop-icon-circle-transparent.svg``: 512x512 Houdini orange (#FE4703) circle with the spiderweb cut out
-   - ``wop-icon-transparent-white.svg``: 512x512 white (#FFFFFF) square with the spiderweb cut out
-   - ``wop-icon-transparent-dark.svg``: 512x512 dark (#1E1E1E) square with the spiderweb cut out
+1. Writes the master SVG to ``design/nop-icon/``.
+2. Writes vector SVG variants to ``design/nop-icon/pack/``:
+   - ``nop-icon.svg`` (and ``favicon.svg``): 512x512 square icon (Houdini orange #FE4703 + white web)
+   - ``nop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
+   - ``nop-icon-circle.svg``: 512x512 circular badge (white web on orange)
+   - ``nop-icon-transparent.svg``: 512x512 Houdini orange (#FE4703) square with the spiderweb cut out (transparent web)
+   - ``nop-icon-rounded-transparent.svg``: 512x512 Houdini orange (#FE4703) rounded square with the spiderweb cut out
+   - ``nop-icon-circle-transparent.svg``: 512x512 Houdini orange (#FE4703) circle with the spiderweb cut out
+   - ``nop-icon-transparent-white.svg``: 512x512 white (#FFFFFF) square with the spiderweb cut out
+   - ``nop-icon-transparent-dark.svg``: 512x512 dark (#1E1E1E) square with the spiderweb cut out
    - ``safari-pinned-tab.svg``: 512x512 black (#000000) square with the spiderweb cut out
 3. Writes raster PNGs, multi-size ``favicon.ico``, ``og-image.png`` (1200x630), and
-   ``site.webmanifest`` into ``design/wop-icon/pack/``.
-4. Writes the icon pack showcase page to ``design/wop-icon/web.html``.
+   ``site.webmanifest`` into ``design/nop-icon/pack/``.
+4. Writes the icon pack showcase page to ``design/nop-icon/web.html``.
 
-Usage: ``python scripts/build_wop_icon_pack.py``
+Usage: ``python scripts/build_nop_icon_pack.py``
 """
 
 from __future__ import annotations
@@ -31,14 +31,14 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-from build_wop_icon_prototypes import ORANGE, SIZE, WHITE, fmt, polar
-from build_wop_web_prototypes import SAG_RATIO, SPOKE_LEN, SpiralSpiderWeb
+from build_nop_icon_prototypes import ORANGE, SIZE, WHITE, fmt, polar
+from build_nop_web_prototypes import SAG_RATIO, SPOKE_LEN, SpiralSpiderWeb
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-ICON_DIR = ROOT_DIR / "design" / "wop-icon"
+ICON_DIR = ROOT_DIR / "design" / "nop-icon"
 PACK_DIR = ICON_DIR / "pack"
 
-FINAL_SOURCE_NAME = "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg"
+FINAL_SOURCE_NAME = "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg"
 DARK = "#1E1E1E"
 
 FINAL_WEB = SpiralSpiderWeb(
@@ -71,7 +71,7 @@ def build_svg_variant(
     shape: str = "square",         # "square" | "rounded" | "circle"
     corner_rx: int = 96,
 ) -> str:
-    """Render an SVG variant of the final WOP spiderweb icon.
+    """Render an SVG variant of the final NOP spiderweb icon.
 
     When ``fg_color`` is ``None``, the spiderweb is punched out of ``bg_color`` using an
     SVG ``<mask>`` so everything is ``bg_color`` except the transparent web.
@@ -272,7 +272,7 @@ def compose_rgba(
 
 
 def build_og_image(rounded_icon_1024: Image.Image) -> Image.Image:
-    """Create a 1200x630 Open Graph social preview card with the rounded WOP icon centered."""
+    """Create a 1200x630 Open Graph social preview card with the rounded NOP icon centered."""
     w, h = 1200, 630
     card = Image.new("RGBA", (w, h), (30, 30, 30, 255))
     icon_size = 360
@@ -288,7 +288,7 @@ def main() -> None:
     PACK_DIR.mkdir(parents=True, exist_ok=True)
 
     # Clean up old transparent files from pack/ if present
-    for stale in ("wop-icon-transparent-orange.svg", "wop-icon-transparent-orange-512.png"):
+    for stale in ("nop-icon-transparent-orange.svg", "nop-icon-transparent-orange-512.png"):
         for folder in (ICON_DIR, PACK_DIR):
             p = folder / stale
             if p.exists():
@@ -299,45 +299,45 @@ def main() -> None:
     (ICON_DIR / FINAL_SOURCE_NAME).write_text(final_svg, encoding="utf-8")
 
     svg_variants = [
-        ("wop-icon.svg", "Standard 512x512 square icon (Houdini orange #FE4703 + white web)", final_svg),
+        ("nop-icon.svg", "Standard 512x512 square icon (Houdini orange #FE4703 + white web)", final_svg),
         ("favicon.svg", "Scalable SVG favicon (512x512 orange square with transparent web cutout)", cutout_svg),
         (
-            "wop-icon-rounded.svg",
+            "nop-icon-rounded.svg",
             "Rounded square app/navbar badge (rx=96, white web on orange)",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="rounded"),
         ),
         (
-            "wop-icon-circle.svg",
+            "nop-icon-circle.svg",
             "Circular avatar / social badge (white web on orange)",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="circle"),
         ),
         (
-            "wop-icon-transparent.svg",
+            "nop-icon-transparent.svg",
             "Transparent cutout square: Houdini orange (#FE4703) square with the spiderweb cut out",
             cutout_svg,
         ),
         (
-            "wop-icon-cutout.svg",
+            "nop-icon-cutout.svg",
             "Transparent cutout square alias: Houdini orange (#FE4703) square with the spiderweb cut out",
             cutout_svg,
         ),
         (
-            "wop-icon-rounded-transparent.svg",
+            "nop-icon-rounded-transparent.svg",
             "Transparent cutout rounded square (rx=96): Houdini orange (#FE4703) with the spiderweb cut out",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="rounded"),
         ),
         (
-            "wop-icon-circle-transparent.svg",
+            "nop-icon-circle-transparent.svg",
             "Transparent cutout circle: Houdini orange (#FE4703) circle with the spiderweb cut out",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="circle"),
         ),
         (
-            "wop-icon-transparent-white.svg",
+            "nop-icon-transparent-white.svg",
             "Monochrome white (#FFFFFF) square with the spiderweb cut out (for dark backgrounds)",
             build_svg_variant(FINAL_WEB, bg_color=WHITE, fg_color=None, shape="square"),
         ),
         (
-            "wop-icon-transparent-dark.svg",
+            "nop-icon-transparent-dark.svg",
             "Monochrome dark (#1E1E1E) square with the spiderweb cut out (for light backgrounds)",
             build_svg_variant(FINAL_WEB, bg_color=DARK, fg_color=None, shape="square"),
         ),
@@ -365,23 +365,23 @@ def main() -> None:
         ("favicon-16x16.png", master_cutout_square, 16, "16x16 browser tab favicon (orange square with transparent web cutout)"),
         ("favicon-32x32.png", master_cutout_square, 32, "32x32 browser tab favicon (orange square with transparent web cutout)"),
         ("favicon-48x48.png", master_cutout_square, 48, "48x48 desktop shortcut icon (orange square with transparent web cutout)"),
-        ("wop-icon-64.png", master_square, 64, "64x64 UI / toolbar icon"),
-        ("wop-icon-128.png", master_square, 128, "128x128 store / badge icon"),
+        ("nop-icon-64.png", master_square, 64, "64x64 UI / toolbar icon"),
+        ("nop-icon-128.png", master_square, 128, "128x128 store / badge icon"),
         ("apple-touch-icon.png", master_square, 180, "180x180 iOS / iPadOS home screen icon (solid orange + white web)"),
         ("android-chrome-192x192.png", master_square, 192, "192x192 Android / PWA home screen icon (solid orange + white web)"),
-        ("wop-icon-256.png", master_square, 256, "256x256 desktop / documentation icon"),
+        ("nop-icon-256.png", master_square, 256, "256x256 desktop / documentation icon"),
         ("android-chrome-512x512.png", master_square, 512, "512x512 Android / PWA splash & store icon (solid orange + white web)"),
-        ("wop-icon-512.png", master_square, 512, "512x512 standard square PNG (white web on orange)"),
-        ("wop-icon-1024.png", master_square, 1024, "1024x1024 high-DPI master PNG (white web on orange)"),
-        ("wop-icon-rounded-512.png", master_rounded, 512, "512x512 rounded square PNG (white web on orange)"),
-        ("wop-icon-circle-512.png", master_circle, 512, "512x512 circular avatar PNG (white web on orange)"),
-        ("wop-icon-transparent-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout"),
-        ("wop-icon-cutout-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout (alias)"),
-        ("wop-icon-transparent-1024.png", master_cutout_square, 1024, "1024x1024 orange square with transparent spiderweb cutout"),
-        ("wop-icon-rounded-transparent-512.png", master_cutout_rounded, 512, "512x512 orange rounded square with transparent spiderweb cutout"),
-        ("wop-icon-circle-transparent-512.png", master_cutout_circle, 512, "512x512 orange circle with transparent spiderweb cutout"),
-        ("wop-icon-transparent-white-512.png", master_cutout_white, 512, "512x512 white square with transparent spiderweb cutout"),
-        ("wop-icon-transparent-dark-512.png", master_cutout_dark, 512, "512x512 dark square with transparent spiderweb cutout"),
+        ("nop-icon-512.png", master_square, 512, "512x512 standard square PNG (white web on orange)"),
+        ("nop-icon-1024.png", master_square, 1024, "1024x1024 high-DPI master PNG (white web on orange)"),
+        ("nop-icon-rounded-512.png", master_rounded, 512, "512x512 rounded square PNG (white web on orange)"),
+        ("nop-icon-circle-512.png", master_circle, 512, "512x512 circular avatar PNG (white web on orange)"),
+        ("nop-icon-transparent-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout"),
+        ("nop-icon-cutout-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout (alias)"),
+        ("nop-icon-transparent-1024.png", master_cutout_square, 1024, "1024x1024 orange square with transparent spiderweb cutout"),
+        ("nop-icon-rounded-transparent-512.png", master_cutout_rounded, 512, "512x512 orange rounded square with transparent spiderweb cutout"),
+        ("nop-icon-circle-transparent-512.png", master_cutout_circle, 512, "512x512 orange circle with transparent spiderweb cutout"),
+        ("nop-icon-transparent-white-512.png", master_cutout_white, 512, "512x512 white square with transparent spiderweb cutout"),
+        ("nop-icon-transparent-dark-512.png", master_cutout_dark, 512, "512x512 dark square with transparent spiderweb cutout"),
     ]
     for filename, source_img, px, _ in png_specs:
         resized = source_img if px == 1024 else source_img.resize((px, px), Image.Resampling.LANCZOS)
@@ -399,8 +399,8 @@ def main() -> None:
 
     # Web App Manifest (with relative icon paths so subpath hosting works)
     manifest = {
-        "name": "WOP",
-        "short_name": "WOP",
+        "name": "NOP",
+        "short_name": "NOP",
         "icons": [
             {"src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png"},
             {"src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png"},
@@ -457,7 +457,7 @@ def main() -> None:
     html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>WOP Final Icon Pack</title>
+<title>NOP Final Icon Pack</title>
 <style>
   body {{ margin: 0; padding: 24px 16px; background: #1e1e1e; color: #ddd; font: 14px/1.4 system-ui, sans-serif; }}
   h1 {{ font-size: 20px; margin: 0 0 4px; }}
@@ -473,16 +473,16 @@ def main() -> None:
   .light {{ background: #f2f2f2; padding: 6px; border-radius: 4px; display: flex; gap: 6px; align-items: flex-end; }}
   pre {{ background: #141414; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #ccc; overflow-x: auto; font-size: 13px; }}
 </style></head><body>
-<h1>WOP Final Icon Pack</h1>
-<p>Chosen final icon: <code>{FINAL_SOURCE_NAME}</code> (also saved as <code>wop-icon.svg</code> and <code>favicon.svg</code>).</p>
+<h1>NOP Final Icon Pack</h1>
+<p>Chosen final icon: <code>{FINAL_SOURCE_NAME}</code> (also saved as <code>nop-icon.svg</code> and <code>favicon.svg</code>).</p>
 
-<h2>1. Vector SVG Variants (<code>design/wop-icon/</code> &amp; <code>design/wop-icon/pack/</code>)</h2>
+<h2>1. Vector SVG Variants (<code>design/nop-icon/</code> &amp; <code>design/nop-icon/pack/</code>)</h2>
 <div class="row">{"".join(svg_cards)}</div>
 
 <h2>2. Website HTML <code>&lt;head&gt;</code> Snippet</h2>
 <pre><code>{head_snippet}</code></pre>
 
-<h2>3. Raster PNGs, <code>favicon.ico</code> &amp; Social Preview (<code>design/wop-icon/pack/</code>)</h2>
+<h2>3. Raster PNGs, <code>favicon.ico</code> &amp; Social Preview (<code>design/nop-icon/pack/</code>)</h2>
 <div class="row">
   <div class="card"><code>pack/favicon.ico</code><p>Multi-size ICO (16x16, 32x32, 48x48)</p><div class="sizes"><img src="pack/favicon.ico" width="48" height="48" alt="favicon.ico"><img src="pack/favicon.ico" width="32" height="32" alt=""><img src="pack/favicon.ico" width="16" height="16" alt=""></div></div>
   <div class="card"><code>pack/og-image.png</code><p>Open Graph social card (1200x630)</p><div class="sizes"><img src="pack/og-image.png" width="300" height="158" alt="og-image.png" style="border-radius:4px"></div></div>

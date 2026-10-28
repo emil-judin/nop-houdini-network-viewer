@@ -1,4 +1,4 @@
-# Builds the WOP playground and publishes it to GitHub Pages on every push to main.
+# Builds the NOP playground and publishes it to GitHub Pages on every push to main.
 # One-time setup in the repository: Settings > Pages > Source: GitHub Actions.
 # Optional: Settings > Secrets and variables > Actions > Variables > WEB3FORMS_KEY turns on the feedback form.
 # Actions are pinned to full commit SHAs (Dependabot keeps them current, see .github/dependabot.yml).

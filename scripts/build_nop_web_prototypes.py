@@ -1,17 +1,17 @@
-"""Generate ``design/wop-icon/wop-houdini-web*.svg`` and ``design/wop-icon/web-prototypes.html`` (``web.html`` is the icon pack page).
+"""Generate ``design/nop-icon/nop-houdini-web*.svg`` and ``design/nop-icon/web-prototypes.html`` (``web.html`` is the icon pack page).
 
 Draws the 8-spoke white spiderweb on the Houdini orange (`#FE4703`) 512x512 square,
 centered at the Houdini spiral hub ``(182, 316)`` with progressively wider spacing
 toward the outside, extending completely to the edges of the square.
 
-Usage: ``python scripts/build_wop_web_prototypes.py``
+Usage: ``python scripts/build_nop_web_prototypes.py``
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from build_wop_icon_prototypes import OUT_DIR, ORANGE, PREVIEW_HEAD, SIZE, WHITE, fmt, polar
+from build_nop_icon_prototypes import OUT_DIR, ORANGE, PREVIEW_HEAD, SIZE, WHITE, fmt, polar
 
 HUB = (182.0, 316.0)  # center of the Houdini spiral on the 512x512 canvas
 SPOKE_LEN = 600.0     # extends past every edge and corner of the 512x512 square
@@ -318,7 +318,7 @@ class ReferenceSpiderWeb:
 
 SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent.svg",
         "Final: 22.5 deg, 22 px stroke, inner turns (54, 140), outer turns (256, 405, 595), vertical web dent",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -330,7 +330,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick-to-thin.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick-to-thin.svg",
         "Thick-to-thin: thicker inside (28 px) tapering thinner toward the outside (13 px) on spiral & spokes",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -345,7 +345,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick35-to-thin11.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick35-to-thin11.svg",
         "Even thicker inside (35 px spiral, 32 px spokes) tapering thinner outside (11 px)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -360,7 +360,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick40-to-thin10.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick40-to-thin10.svg",
         "Heavy inside (40 px spiral, 36 px spokes) tapering thin outside (10 px)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -375,7 +375,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick35-to-thin11-spiral.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick35-to-thin11-spiral.svg",
         "Even thicker inside (35 -> 11 px) on spiral only, uniform 20 px spokes",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -388,7 +388,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick-to-thin-spiral.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-thick-to-thin-spiral.svg",
         "Thick-to-thin on spiral only (28 -> 13 px), uniform 20 px spokes",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -401,7 +401,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random1.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random1.svg",
         "Random thickness along the spline & spokes (no inside/outside correlation, seed 1)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -415,7 +415,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random2.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random2.svg",
         "Random thickness along the spline & spokes (no inside/outside correlation, seed 2)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -429,7 +429,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg",
         "Random thickness along the spiral spline only (uniform 22 px spokes)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -443,7 +443,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-tapered.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-tapered.svg",
         "Variable thickness: spiral & spokes widen outward (16 -> 32 px) with Houdini-style modulation",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -459,7 +459,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-tapered-spiral.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-tapered-spiral.svg",
         "Variable thickness on spiral only (16 -> 34 px with Houdini modulation), uniform 20 px spokes",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -473,7 +473,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5.svg",
         "Baseline without extra vertical dent: 22.5 deg, 22 px stroke",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -484,7 +484,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-strong.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-strong.svg",
         "Variant: slightly deeper inward dent on the vertical web lines",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -496,7 +496,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px-fill5-wider.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px-fill5-wider.svg",
         "22.5 deg: 22 px stroke, inner turns (54, 140), outer turns (265, 425, 635)",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -507,7 +507,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-subtle.svg",
+        "nop-houdini-web-spiral-center-rot22.5-subtle.svg",
         "22.5 deg: 20 px stroke, radii (60, 138, 236, 360, 512), inner pinhole filled with white",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -518,7 +518,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5-22px.svg",
+        "nop-houdini-web-spiral-center-rot22.5-22px.svg",
         "22.5 deg: 22 px stroke, radii (60, 140, 245, 380, 550), inner pinhole filled with white",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -529,7 +529,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center-rot22.5.svg",
+        "nop-houdini-web-spiral-center-rot22.5.svg",
         "22.5 deg: 20 px stroke, radii (60, 140, 245, 380, 550), inner pinhole filled with white",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -540,7 +540,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-center.svg",
+        "nop-houdini-web-spiral-center.svg",
         "0 deg: 20 px stroke, inner pinhole filled with white",
         SpiralSpiderWeb(
             rotate=0.0,
@@ -552,7 +552,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral.svg",
+        "nop-houdini-web-spiral.svg",
         "0 deg: open middle spiral web, 20 px stroke",
         SpiralSpiderWeb(
             rotate=0.0,
@@ -564,7 +564,7 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
         ),
     ),
     (
-        "wop-houdini-web-spiral-rot22.5.svg",
+        "nop-houdini-web-spiral-rot22.5.svg",
         "22.5 deg: open middle spiral web, 20 px stroke",
         SpiralSpiderWeb(
             rotate=22.5,
@@ -578,12 +578,12 @@ SPIRAL_VARIANTS: list[tuple[str, str, SpiralSpiderWeb]] = [
 ]
 
 ROTATION_VARIANTS: list[tuple[str, str, ReferenceSpiderWeb]] = [
-    ("wop-houdini-web.svg", "0 deg rotation (cardinal + diagonal spokes)", ReferenceSpiderWeb(rotate=0.0)),
-    ("wop-houdini-web-rot7.5.svg", "7.5 deg rotation", ReferenceSpiderWeb(rotate=7.5)),
-    ("wop-houdini-web-rot15.svg", "15 deg rotation", ReferenceSpiderWeb(rotate=15.0)),
-    ("wop-houdini-web-rotated.svg", "22.5 deg (45/2) rotation", ReferenceSpiderWeb(rotate=22.5)),
-    ("wop-houdini-web-rot30.svg", "30 deg rotation", ReferenceSpiderWeb(rotate=30.0)),
-    ("wop-houdini-web-rot37.5.svg", "37.5 deg rotation", ReferenceSpiderWeb(rotate=37.5)),
+    ("nop-houdini-web.svg", "0 deg rotation (cardinal + diagonal spokes)", ReferenceSpiderWeb(rotate=0.0)),
+    ("nop-houdini-web-rot7.5.svg", "7.5 deg rotation", ReferenceSpiderWeb(rotate=7.5)),
+    ("nop-houdini-web-rot15.svg", "15 deg rotation", ReferenceSpiderWeb(rotate=15.0)),
+    ("nop-houdini-web-rotated.svg", "22.5 deg (45/2) rotation", ReferenceSpiderWeb(rotate=22.5)),
+    ("nop-houdini-web-rot30.svg", "30 deg rotation", ReferenceSpiderWeb(rotate=30.0)),
+    ("nop-houdini-web-rot37.5.svg", "37.5 deg rotation", ReferenceSpiderWeb(rotate=37.5)),
 ]
 
 
@@ -599,7 +599,7 @@ def card_html(file: str, blurb: str) -> str:
 
 def main() -> None:
     html = [
-        PREVIEW_HEAD.replace("WOP icon prototypes</h1>", "WOP Houdini spiderweb</h1>"),
+        PREVIEW_HEAD.replace("NOP icon prototypes</h1>", "NOP Houdini spiderweb</h1>"),
         "<h2>SideFX-style spiral web from the middle</h2><div class='row'>",
     ]
     for file, blurb, sweb in SPIRAL_VARIANTS:

@@ -1,6 +1,6 @@
 # Canonical JSON Schema Specification (`SCHEMA.md`)
 
-This document defines the JSON contract produced by `exporter/wop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/wop-network-1.schema.json](../schema/wop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields).
+This document defines the JSON contract produced by `exporter/nop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/nop-network-1.schema.json](../schema/nop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields).
 
 ---
 
@@ -93,7 +93,7 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 
 ## 3. Versioning Policy
 
-`schemaVersion` follows semantic versioning (`MAJOR.MINOR.PATCH`). The exporter always writes the newest version (`SCHEMA_VERSION` in `exporter/wop_exporter.py`); the viewer declares the major version it reads (`SUPPORTED_SCHEMA_MAJOR` in `src/schema/normalize.ts`). Every new field also goes into `schema/wop-network-1.schema.json`.
+`schemaVersion` follows semantic versioning (`MAJOR.MINOR.PATCH`). The exporter always writes the newest version (`SCHEMA_VERSION` in `exporter/nop_exporter.py`); the viewer declares the major version it reads (`SUPPORTED_SCHEMA_MAJOR` in `src/schema/normalize.ts`). Every new field also goes into `schema/nop-network-1.schema.json`.
 
 - **PATCH** (`1.3.0` to `1.3.1`): the exporter fills existing fields more correctly. The shape and meaning of every field stay the same.
 - **MINOR** (`1.3.0` to `1.4.0`): adds optional fields. Old viewers ignore fields they do not know, and new viewers fall back to the old behavior when a field is missing. Every new field is marked with the version that added it ("schema 1.4.0") in this document.
@@ -102,8 +102,8 @@ This document defines the JSON contract produced by `exporter/wop_exporter.py` a
 Guarantees:
 
 1. **Every viewer reads every export of its major version.** A file exported years ago with schema `1.0.0` keeps working in the newest `1.x` viewer. Files people host on their own sites never need a re-export because of a viewer update.
-2. **A newer major is refused with a clear message**, never misread: the viewer shows "made by a newer WOP exporter, update the WOP viewer" instead of a broken network.
+2. **A newer major is refused with a clear message**, never misread: the viewer shows "made by a newer NOP exporter, update the NOP viewer" instead of a broken network.
 3. **A schema `2.0.0` ships with a viewer that still reads `1.x`** (by converting old files on load), so embeds keep working during the change. Dropping `1.x` support would itself be a major release of the package.
 4. Every schema change is listed in `CHANGELOG.md` and in this document.
 
-While WOP is in `0.x` alpha these rules already apply to the schema; the React component API may still change between alpha releases.
+While NOP is in `0.x` alpha these rules already apply to the schema; the React component API may still change between alpha releases.

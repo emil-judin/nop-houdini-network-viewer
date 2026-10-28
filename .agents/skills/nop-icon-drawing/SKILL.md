@@ -1,11 +1,11 @@
 ---
-name: wop-icon-drawing
+name: nop-icon-drawing
 description: >-
-  Rules for drawing or changing WOP operator icons (src/components/nodes/icons/). Use whenever an icon file is
+  Rules for drawing or changing NOP operator icons (src/components/nodes/icons/). Use whenever an icon file is
   created or edited, or an icon is requested for a Houdini or SideFX Labs node.
 ---
 
-# Draw a WOP operator icon
+# Draw a NOP operator icon
 
 1. Read [docs/ICON_ART_BIBLE.md](../../../docs/ICON_ART_BIBLE.md) first: style, palette, viewBox, legal rules and
    workflow are defined there.

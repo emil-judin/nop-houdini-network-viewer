@@ -1,22 +1,22 @@
 ---
 name: houdini-python-exporter
 description: >-
-  Rules for the WOP Houdini exporter (exporter/wop_exporter.py, the Houdini package in exporter/package/).
+  Rules for the NOP Houdini exporter (exporter/nop_exporter.py, the Houdini package in exporter/package/).
   Use when changing what or how the exporter serializes, path scrubbing, subnetwork
   recursion, icon extraction, the shelf tools or the export dialogs.
 ---
 
-# WOP Houdini Exporter
+# NOP Houdini Exporter
 
 The exporter runs inside the user's Houdini session (Python 3, `hou` module). It writes the JSON document
-described in [docs/SCHEMA.md](../../../docs/SCHEMA.md) and checked by `schema/wop-network-1.schema.json`.
+described in [docs/SCHEMA.md](../../../docs/SCHEMA.md) and checked by `schema/nop-network-1.schema.json`.
 The code is the source of truth: read the function named in each rule before changing it.
 
 ## 1. Entry points
 
-- `run_interactive_export(pane)`: the "Export for WOP" shelf tool. One dialog (clipboard or file, compact or
+- `run_interactive_export(pane)`: the "Export for NOP" shelf tool. One dialog (clipboard or file, compact or
   full parameters), then a second dialog only when locked third-party assets were found (see 3.2).
-- `copy_selection_for_web(pane)`: the dialog-free "Copy for WOP" tool for a hotkey. Always compact, minified,
+- `copy_selection_for_web(pane)`: the dialog-free "Copy for NOP" tool for a hotkey. Always compact, minified,
   never opens locked assets.
 - Both build the document with `build_document(parent, export_mode, include_locked_assets)`, which returns
   `(document, selected_only, state)`. `ExportState` carries the settings, the icon extractor, the warning count
@@ -75,12 +75,12 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 ## 4. Schema versioning
 
 - Bump `SCHEMA_VERSION` (minor) whenever a field is added, mark the field "schema 1.x.0" in `docs/SCHEMA.md`
-  and in `src/schema/types.ts`, and add it to `schema/wop-network-1.schema.json`.
+  and in `src/schema/types.ts`, and add it to `schema/nop-network-1.schema.json`.
 - Never remove or rename a field in 1.x: old exports must stay readable. A breaking change needs a new major
   version and a viewer that reads both.
 - Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0).
 
 ## 5. Package
 
-- `exporter/package/` is the Houdini package: `wop.json` sets `$WOP_EXPORTER_ROOT` from `$HOUDINI_PACKAGE_PATH`,
+- `exporter/package/` is the Houdini package: `nop.json` sets `$NOP_EXPORTER_ROOT` from `$HOUDINI_PACKAGE_PATH`,
   so it works in any package folder. `npm run build:exporter` builds the reproducible zip.

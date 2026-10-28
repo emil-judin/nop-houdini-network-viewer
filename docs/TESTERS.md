@@ -1,6 +1,6 @@
-# Testing WOP (`0.1.0-alpha.1`)
+# Testing NOP (`0.1.0-alpha.1`)
 
-Thank you for trying WOP. It shows Houdini node networks on a web page, so you can put an interactive network on your portfolio or in a tutorial instead of a screenshot. Visitors can pan, zoom, open subnetworks and read parameters and VEX, but cannot change anything.
+Thank you for trying NOP. It shows Houdini node networks on a web page, so you can put an interactive network on your portfolio or in a tutorial instead of a screenshot. Visitors can pan, zoom, open subnetworks and read parameters and VEX, but cannot change anything.
 
 This is an early test version. Some things will be missing or broken, and that is exactly what I would like to hear about.
 
@@ -12,19 +12,19 @@ Open the link from your invitation. It works in a desktop or phone browser. Two 
 
 You need Houdini 22 (other versions are not tested yet).
 
-1. In the playground, click **Exporter** and download `wop-exporter.zip`.
+1. In the playground, click **Exporter** and download `nop-exporter.zip`.
 2. Open the `packages` folder in your Houdini preferences (create it if it does not exist):
    - Windows: `Documents\houdini22.0\packages`
    - macOS: `~/Library/Preferences/houdini/22.0/packages`
    - Linux: `~/houdini22.0/packages`
-3. Copy `wop.json` and the `wop` folder from the zip into it.
-4. Restart Houdini. A **WOP** shelf tab appears at the top. If not: click the **+** next to the shelf tabs and choose **Shelves > WOP**.
+3. Copy `nop.json` and the `nop` folder from the zip into it.
+4. Restart Houdini. A **NOP** shelf tab appears at the top. If not: click the **+** next to the shelf tabs and choose **Shelves > NOP**.
 
-To remove it later, delete `wop.json` and the `wop` folder.
+To remove it later, delete `nop.json` and the `nop` folder. Upgrading from the WOP exporter (before 2026-10-28): delete the old `wop.json` and the `wop` folder first, otherwise Houdini shows both shelves.
 
 ## 3. Things to try
 
-- Export one of your own networks: select nodes (or nothing for the whole network), click **Export for WOP**, choose **Copy to Clipboard**, then press `Ctrl+V` in the playground.
+- Export one of your own networks: select nodes (or nothing for the whole network), click **Export for NOP**, choose **Copy to Clipboard**, then press `Ctrl+V` in the playground.
 - Save a `.json` file instead and open it with **Open .json**, or drop it on the page.
 - Compare with Houdini: node shapes, colors, flags, wires, network boxes, the parameter panel. Anything that looks different from Houdini is useful feedback.
 - Go into subnetworks and your own unlocked digital assets, and back out with the path bar.
@@ -49,4 +49,4 @@ To remove it later, delete `wop.json` and the `wop` folder.
 
 ## 6. Send feedback
 
-Click **Feedback** in the playground. Your message goes straight to me by email (through Web3Forms), with the WOP version, your browser and the name of the network on screen; your network file is never sent. Add your name or email if you would like an answer. Screenshots help: if something looks wrong, mention what you expected and I may ask you for one.
+Click **Feedback** in the playground. Your message goes straight to me by email (through Web3Forms), with the NOP version, your browser and the name of the network on screen; your network file is never sent. Add your name or email if you would like an answer. Screenshots help: if something looks wrong, mention what you expected and I may ask you for one.

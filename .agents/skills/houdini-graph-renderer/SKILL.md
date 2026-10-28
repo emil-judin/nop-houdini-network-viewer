@@ -1,12 +1,12 @@
 ---
 name: houdini-graph-renderer
 description: >-
-  Rules for drawing Houdini networks in the WOP viewer (src/components/, src/schema/convertGraph.ts): node
+  Rules for drawing Houdini networks in the NOP viewer (src/components/, src/schema/convertGraph.ts): node
   shapes, flags, wires, dots, network boxes, sticky notes, subnet inputs, the path bar, the inspector and
   coordinate conversion. Use when creating or changing any viewer component or the converter.
 ---
 
-# WOP Graph Renderer
+# NOP Graph Renderer
 
 The viewer must look like Houdini 22's Network Editor (pillar 2) and stay view-only (pillar 3). The code holds
 every measured value as a named constant: this skill points to them instead of repeating numbers that drift.
@@ -54,7 +54,7 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
 
 ## 3. Library rules (also in AGENTS.md)
 
-- Every viewer element renders inside `.wop-root` (no portals to `document.body`): the npm stylesheet is scoped
+- Every viewer element renders inside `.nop-root` (no portals to `document.body`): the npm stylesheet is scoped
   to it at build time.
 - Sizes in `px` (or the px-pinned theme tokens), never raw `rem`.
 - Layouts follow the viewer's own width with container queries (`@md:`, `@2xl:`), not viewport breakpoints.

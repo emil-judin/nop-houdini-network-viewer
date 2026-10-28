@@ -1,7 +1,0 @@
-{
-  "env": [
-    { "WOP_EXPORTER_ROOT": "$HOUDINI_PACKAGE_PATH/wop" }
-  ],
-  "path": "$WOP_EXPORTER_ROOT",
-  "load_package_once": true
-}

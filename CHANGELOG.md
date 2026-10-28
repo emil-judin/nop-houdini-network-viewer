@@ -12,7 +12,7 @@ Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs
 - New optional `exportWarnings`: parameters that could not be read are counted and reported in the status bar.
 - Asks before overwriting a file when it adds `.json` to the chosen name.
 - Hide-when / disable-when rules evaluate each parameter once per node (faster exports of heavy networks).
-- Houdini package: `wop.json` uses `$HOUDINI_PACKAGE_PATH`, so the package works in any package folder; the variable is now `$WOP_EXPORTER_ROOT`. The download zip is reproducible.
+- Houdini package: `nop.json` uses `$HOUDINI_PACKAGE_PATH`, so the package works in any package folder; the variable is now `$NOP_EXPORTER_ROOT`. The download zip is reproducible.
 
 ### Viewer
 - **For-Each and Compile blocks:** the tinted underlay Houdini draws behind a block, a rounded outline in the Block End color around the begin, metadata, in-between and end nodes. Works with existing exports (read from `blockpath`).
@@ -34,12 +34,13 @@ Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs
 - `web-component.js` is 176 KB gzip instead of 272 KB: the Parameter Inspector and the SideFX Labs icons load on demand from `web-component-chunks/`, fonts are separate files in `dist/fonts/` (also for `style.css`).
 - Changing an attribute no longer resets the visitor's place; a JSON child added later by page scripts is read.
 - Downloads have a 100 MB size limit and a 30 second time limit.
-- Correct source maps for the minified web component. Peer range narrowed to React 18 (the tested version). `engines.node` is `>=20`. The package ships `schema/wop-network-1.schema.json`.
+- Correct source maps for the minified web component. Peer range narrowed to React 18 (the tested version). `engines.node` is `>=20`. The package ships `schema/nop-network-1.schema.json`.
 
 ### Playground
 - Demos load on demand; the small Circuit Board demo opens first. Content-Security-Policy meta tag. Embed dialog: "Not on npm yet" note on the HTML and React tabs, a height field that keeps what you type. A network from another site is labelled with its host in embed mode. Feedback sends the page address without its query and names Web3Forms. Proper tabs and a page heading for screen readers.
 
 ### Project
+- **Renamed WOP to NOP** (2026-10-28): npm package `nop-houdini-network-viewer`, CSS prefix `.nop-` (`.nop-root`), exporter `nop_exporter.py`, Houdini package `nop.json` with `$NOP_EXPORTER_ROOT`, shelf **NOP**, schema file `schema/nop-network-1.schema.json`. Exported network files are unchanged and keep working. Upgrading from the WOP exporter (before 2026-10-28): delete the old `wop.json` and the `wop` folder first, otherwise Houdini shows both shelves.
 - ESLint, `.editorconfig`, `.nvmrc`. CI workflow on every push and pull request; SHA-pinned actions and Dependabot. `SECURITY.md`, `CONTRIBUTING.md`, JSON Schema file, agent skills rewritten and three new ones.
 
 ## 0.1.0-alpha.1 (tester release)
