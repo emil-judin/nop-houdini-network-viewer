@@ -7,7 +7,7 @@ description: >-
 
 # Release NOP
 
-1. Run the full definition of done (`.agents/skills/nop-verify/SKILL.md`).
+1. Run the full definition of done (`.agents/skills/nop-verify/SKILL.md`), including the browser tests.
 2. Version: bump `package.json` `version` (pre-releases: `0.x.y-alpha.n`). The exporter zip, the README of the
    Houdini package and the feedback form read it from there.
 3. Schema: if the export format changed, `SCHEMA_VERSION` in `exporter/nop_exporter.py` was bumped, and

@@ -70,10 +70,10 @@ nop-houdini-network-viewer/
 ├── package.json                       # npm package 'nop-houdini-network-viewer' and scripts
 ├── vite.config.ts                     # Playground build (dist-playground/), og:image URLs, dev-only reference icons
 ├── vite.lib.config.ts                 # npm + web component builds (dist/), stylesheet scoping, font files
-├── eslint.config.js
-├── tsconfig.json / tsconfig.lib.json  # Strict TypeScript for src and the npm types
+├── vitest.config.ts / playwright.config.ts / eslint.config.js
+├── tsconfig.json / tsconfig.lib.json / tsconfig.test.json  # Strict TypeScript for src, the npm types, the tests
 ├── .github/
-│   ├── workflows/ci.yml               # Check, lint and builds on every push and pull request
+│   ├── workflows/ci.yml               # Check, lint, tests and builds on every push and pull request
 │   ├── workflows/deploy-playground.yml # Builds the playground and publishes it to GitHub Pages
 │   └── dependabot.yml                 # Weekly npm and GitHub Actions updates
 │
@@ -87,6 +87,8 @@ nop-houdini-network-viewer/
 ├── docs/
 │   ├── STATUS.md                      # Current state, owner steps, next tasks (short)
 │   ├── HISTORY.md                     # Finished work and fidelity decisions
+│   ├── TESTING.md                     # Test strategy (unit, component, browser, exporter)
+│   ├── features/                      # Gherkin feature list; test names use its scenario IDs
 │   ├── ARCHITECTURE.md                # Coordinates, packaging, styles & isolation, navigation
 │   ├── SCHEMA.md                      # JSON contract and its versioning policy
 │   ├── ICON_ART_BIBLE.md              # Operator icon style, palette, legal rules
@@ -94,20 +96,23 @@ nop-houdini-network-viewer/
 │
 ├── exporter/                          # Houdini side (Python 3 / HOM)
 │   ├── nop_exporter.py                # Export dialog, copy-for-web hotkey function, schema writer
+│   ├── tests/                         # unittest suite with a fake `hou` module
 │   ├── package/                       # Houdini package: nop.json + nop/ (shelf, icon, README.txt)
 │   └── README.md                      # Install (package or manual shelf tool) and usage
 │
 ├── fixtures/                          # Real Houdini 22 exports used as demos
 │   ├── circuit_board-network.json     # Small /obj/circuit_board network
 │   ├── circuit_gen-network.json       # Production network, full parameters
+│   └── edge-cases/                    # Small hand-written files for tests (malformed, prototype keys, ...)
 ├── schema/nop-network-1.schema.json   # JSON Schema of the export format (all 1.x fields)
+├── tests/                             # unit/, component/ (Vitest), e2e/ (Playwright, test server, host pages)
 │
-├── design/nop-icon/                   # Master NOP icon SVG, web.html preview and pack/ (website icon pack)
+├── design/nop-icon/                   # Master NOP icon SVGs, web.html preview and pack/ (icon pack)
 ├── public/                            # Playground static files (favicons, manifest, og-image);
 │                                      #   downloads/ is generated (exporter zip and script)
 ├── scripts/                           # build_exporter_package.mjs (exporter zip), print_sri.mjs (release hash),
-│                                      #   build_nop_icon_pack.py (website icons), build_local_reference_icons.py
-│                                      #   (dev-only SideFX reference icons, Labs catalog), icon prototype builders
+│                                      #   build_nop_icon_pack.py (NOP icon pack, website and shelf icons),
+│                                      #   build_local_reference_icons.py (dev-only SideFX reference icons, Labs catalog)
 ├── local-refs/                        # Gitignored SideFX reference icons, served by the dev server only
 │
 └── src/
@@ -277,9 +282,10 @@ Goal: a hosted playground that a small group of selected Houdini users can open,
 ### Milestone 4: Quality, Public Release & Viewer Features
 
 **Quality** (done 2026-10-27 with the review fixes, see `docs/HISTORY.md`)
+- [x] Automated tests with Vitest (converter, layout, ramps, parameter layout model) and component tests.
 - [x] Lint setup with the React hooks and JSX accessibility rules.
-- [x] CI on GitHub Actions: check, lint and both builds on every push and pull request.
-- [ ] Automated tests (unit, component, exporter and browser tests): later.
+- [x] Repeatable browser checks with Playwright in Chromium, Firefox, WebKit and device profiles.
+- [x] CI on GitHub Actions: check, lint, tests and both builds on every push and pull request.
 - [ ] React 19 smoke test, then widen the peer range to `^18.2.0 || ^19.0.0`.
 - [ ] Measure `preact/compat` for the web component build (smaller bundle).
 
@@ -318,6 +324,6 @@ Goal: a hosted playground that a small group of selected Houdini users can open,
 ---
 
 ## 6. Verification & Acceptance Criteria
-- **Automated Checks:** the definition of done in AGENTS.md: `check`, `lint`, `build` and `build:lib`. CI runs them on every push.
+- **Automated Checks:** the definition of done in AGENTS.md: `check`, `lint`, `test`, `test:exporter`, `build`, `build:lib`, and `test:e2e` for visible changes. CI runs them on every push.
 - **Real Production Graph Verification:** the 169-node `circuit_gen` network renders in the browser with accurate spatial layout, wire dots, For-Each chevrons, wavy Wrangle shapes, cigar Merge shapes, expanded/minimized Network Boxes, and clickable VEX inspection.
 - **Library isolation:** on a host page with its own utility classes, the npm build styles only the viewer and the host's elements stay untouched.

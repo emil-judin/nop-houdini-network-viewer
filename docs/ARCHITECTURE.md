@@ -4,7 +4,7 @@
 
 NOP (`nop-houdini-network-viewer`) follows the six core pillars defined once in [AGENTS.md](../AGENTS.md) section 1 (usability, authenticity, strictly view-only, modularity, documentation style, compatibility). This file describes how the code implements them.
 
-The code is split by job: `src/schema/` is pure data logic (normalize, convert, colors), `src/components/` draws the viewer, `src/embed/` loads remote files and parses embed options, `src/playground/` is the demo site, and `exporter/` is the Houdini side.
+The code is split by job: `src/schema/` is pure data logic (normalize, convert, colors), `src/components/` draws the viewer, `src/embed/` loads remote files and parses embed options, `src/playground/` is the demo site, and `exporter/` is the Houdini side. The public API is `src/api.ts` (re-exported with the stylesheet by `src/index.ts`); the playground imports the package only through it, apart from a few listed exceptions (playground helpers and the dev-only icon gallery), which `no-restricted-imports` in `eslint.config.js` enforces.
 
 ---
 
@@ -27,7 +27,7 @@ flowchart LR
 
 Houdini and web browsers use opposite vertical axes and different unit scales:
 
-The constants live in `src/schema/convertGraph.ts`.
+The constants live in `src/schema/convertGraph.ts` and are pinned by `tests/unit/convertGraph.test.ts`.
 
 | Property | Houdini Network Space | Browser / React Flow Space | Conversion Formula (`HOUDINI_UNIT_TO_PX = 100`) |
 | :--- | :--- | :--- | :--- |
@@ -46,14 +46,14 @@ React Flow IDs: operator nodes use their Houdini name; boxes, stickies, dots, su
 
 ## 4. Packaging & Embedding Modes
 
-`npm.cmd run build:lib` builds both library outputs into `dist/` (`vite.lib.config.ts`, two modes) and the type declarations into `dist/types/` (`tsconfig.lib.json`). `npm.cmd run build` builds the Houdini exporter package (`npm.cmd run build:exporter`: `public/downloads/nop-exporter.zip` from `exporter/package/` and `exporter/nop_exporter.py`) and then the playground into `dist-playground/`, which `.github/workflows/deploy-playground.yml` publishes to GitHub Pages on every push to `main`.
+`npm.cmd run build:lib` builds both library outputs into `dist/` (`vite.lib.config.ts`, two modes) and the type declarations into `dist/types/` (`tsconfig.lib.json`). `npm.cmd run build` builds the Houdini exporter package (`npm.cmd run build:exporter`: `public/downloads/nop-exporter.zip` from `exporter/package/` and `exporter/nop_exporter.py`) and then the playground into `dist-playground/`, which `.github/workflows/deploy-playground.yml` publishes to GitHub Pages on every push to `main`. The playground build also publishes the example networks at `examples/<name>-network.json` and the web component from `dist/` at `lib/` (`exampleSiteFiles` in `vite.config.ts`), for the embed snippets and `public/example-site.html`, so `build:lib` runs before `build`. Examples are listed in `src/playground/examples.ts`; one whose file is missing is left out.
 
 1. **React Component (`src/index.ts`, `--mode npm`):**
    `dist/index.js` (ES) and `dist/index.cjs` export `<HoudiniNetwork data={...} />`, `<RemoteHoudiniNetwork src="..." />`, the schema types and the converter. `react` and `react-dom` are peer dependencies; `@xyflow/react` and `lucide-react` stay external. Styles ship separately as `dist/style.css` (`nop-houdini-network-viewer/style.css`).
 2. **Web Component (`src/web-component.ts`, `--mode web-component`):**
    `dist/web-component.js` is a minified ES module (React included, about 176 KB gzipped) that registers `<houdini-network>`. Optional parts load on demand from `dist/web-component-chunks/` next to it: the Parameter Inspector (about 9 KB, when a node is selected) and the SideFX Labs icon drawings (about 24 KB, only for networks with Labs tools). Fonts are separate files in `dist/fonts/`, registered in the page head with URLs made absolute from the script's own URL. The viewer renders inside an open **Shadow DOM**, so host page CSS never reaches the nodes and the viewer CSS never reaches the page. The network comes from the `data` property, an inline `<script type="application/json">` child (parsed once per text, and re-read when page scripts change it), or the `src` attribute (in that order). Viewer options are attributes (`label-size`, `wire-style`, `minimap`, `toolbar`, `inspector`, `debug-actions`, `fit-view`, `hotkeys`), parsed by `src/embed/embedAttributes.ts`.
 3. **Iframe Embed Mode (`?embed=true`):**
-   `src/playground/EmbedView.tsx` renders only the viewer, loading `src=<url>` (or `demo=circuit|board`) with the same option names as the web component. A file from another site gets a small "Network from <host>" caption, so a link cannot pass off foreign content as the NOP site's. `main.tsx` lazy-loads either the embed view or the playground, so an embed never downloads the demo networks or the icon gallery. Used on platforms like ArtStation and Notion where script tags are not allowed.
+   `src/playground/EmbedView.tsx` renders only the viewer, loading `src=<url>` (or `demo=<example key>`, see `examples.ts`) with the same option names as the web component. A file from another site gets a small "Network from <host>" caption, so a link cannot pass off foreign content as the NOP site's. `main.tsx` lazy-loads either the embed view or the playground, so an embed never downloads the demo networks or the icon gallery. Used on platforms like ArtStation and Notion where script tags are not allowed.
 
 Remote files go through `src/embed/fetchNetwork.ts`: no credentials to other sites, at most 100 MB and 30 seconds, and readable errors (wrong path, CORS, HTML page instead of JSON). The hosted playground also sends a Content-Security-Policy meta tag (`vite.config.ts`).
 
@@ -89,6 +89,7 @@ flowchart TD
     EB1 --> Inner["HoudiniNetworkInnerCanvas"]
     Inner --> Nav["useNavigationHistory (back / forward, trail, dive in)"]
     Inner --> Keys["useViewerHotkeys (focus, hover or off)"]
+    Inner --> TP["useTwoFingerPan (touch: one finger scrolls the page outside fullscreen)"]
     Inner --> Wires["useWireHighlight (wire index per level)"]
     Inner --> Toolbar["ViewerToolbar + BreadcrumbBar"]
     Inner --> EB2["NetworkErrorBoundary (per level, back to the top network)"]

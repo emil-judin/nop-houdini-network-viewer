@@ -8,13 +8,13 @@ NOP (Net OPerator) is an interactive, strictly view-only viewer for **SideFX Hou
 
 ## What It Does
 
-One click in Houdini exports a network; one tag shows it on your site, looking like Houdini's Network Editor. Visitors can pan, zoom, go fullscreen, dive into subnetworks and read parameters and VEX code, on desktop and on phones, but never edit anything. The six design pillars behind this are defined in [`AGENTS.md`](./AGENTS.md).
+One click in Houdini exports a network; one tag shows it on your site, looking like Houdini's Network Editor. Visitors can pan, zoom, dive into subnetworks and read parameters and VEX code, on desktop and on phones, but never edit anything. The six design pillars behind this are defined in [`AGENTS.md`](./AGENTS.md).
 
 ---
 
 ## Quick Start (Development)
 
-Needs Node.js 20 or newer (CI uses Node 22, see `.nvmrc`).
+Needs Node.js 20 or newer (CI uses Node 22, see `.nvmrc`) and Python 3.9+ for the exporter tests.
 
 ```bash
 # Install dependencies
@@ -23,28 +23,33 @@ npm install
 # Start the interactive development playground
 npm run dev
 
-# Checks: strict TypeScript and lint
+# Checks: strict TypeScript, lint, unit and component tests, exporter tests
 npm run check
 npm run lint
+npm test
+npm run test:exporter
+
+# Browser tests in Chromium, Firefox, WebKit and phone profiles (first run: npx playwright install)
+npm run test:e2e
 
 # Build the playground with the exporter download (dist-playground/) and the npm package + web component (dist/)
 npm run build
 npm run build:lib
 ```
 
-On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked. [`CONTRIBUTING.md`](./CONTRIBUTING.md) has the rules for changes.
+On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked. [`CONTRIBUTING.md`](./CONTRIBUTING.md) has the rules for changes, [`docs/TESTING.md`](./docs/TESTING.md) the test strategy.
 
 ---
 
 ## Exporting a Network from Houdini
 
-Click **Exporter** in the playground to download `nop-exporter.zip`, a Houdini package: copy its contents into the `packages` folder of your Houdini preferences and restart Houdini to get a **NOP** shelf. See [`exporter/README.md`](./exporter/README.md) for the details, a manual shelf tool setup, and binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
+Click **Get the exporter** at the bottom of the playground's Networks pane to download `nop-exporter.zip`, a Houdini package: copy its contents into the `packages` folder of your Houdini preferences and restart Houdini to get a **NOP** shelf. See [`exporter/README.md`](./exporter/README.md) for the details, a manual shelf tool setup, and binding the dialog-free "copy for web" export to a hotkey such as **Ctrl+Shift+Alt+C**.
 
 ---
 
 ## Embedding on Your Website
 
-The playground's **Embed** button generates all three snippets below for the network on screen.
+The playground's **Embed this network** button (at the bottom of the Networks pane) generates all three snippets below for the network on screen; for the examples, the file address is filled in and works as it is. The playground's [example website](./public/example-site.html) (`example-site.html` next to the hosted playground) is a plain page that embeds two networks with snippet 1: view its source to copy the pattern.
 
 > **Not on npm yet (tester release).** Snippets 1 and 2 need the npm package (or its CDN copy) and start working with the public release. Until then, use the iframe embed (3).
 
@@ -53,7 +58,7 @@ The playground's **Embed** button generates all three snippets below for the net
 Upload the exported `.json` file next to your page, then:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.1/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.2/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
@@ -70,11 +75,14 @@ The viewer runs inside a Shadow DOM, so your site's CSS cannot break it and its 
 | :--- | :--- | :--- |
 | `src` | URL of the exported `.json` (another site must allow CORS) | none |
 | `label-size` | `small`, `medium`, `large` | `medium` |
-| `wire-style` | `default`, `rounded` | as exported |
-| `minimap` | `false` to hide | shown (hidden automatically in narrow viewers) |
+| `wire-style` | `default` (straight, Houdini's default), `rounded` | as exported (Houdini's wire style setting of that network) |
+| `minimap` | `true` (or the bare attribute) opens the network overview at the start | closed (visitors open it with the map button or `O`; never shown in narrow viewers) |
+| `focus-node` | name of a node at the top network level to frame at the start, like Houdini's `F` | none: the whole network is fitted |
+| `touch-pan` | `two-fingers`: on touch screens one finger scrolls the page, two fingers move the network; `one-finger`: one finger moves the network (for pages the viewer fills). In fullscreen one finger always moves it | `two-fingers` |
 | `toolbar` | `false` to hide | shown |
+| `fullscreen` | `false` to hide the fullscreen button | shown |
 | `inspector` | `false` to never open the Parameter Inspector | enabled |
-| `debug-actions` | `true` to show the Copy / Download JSON buttons | hidden |
+| `debug-actions` | `true` to show the Download JSON button | hidden |
 | `fit-view` | `false` to skip fitting the network on load | fit |
 | `hotkeys` | `focus`: Houdini hotkeys only while the viewer has focus; `hover`: also while the pointer is over it; `off` | `focus` |
 
@@ -114,7 +122,7 @@ Host the playground (for example on GitHub Pages) and point an iframe at its emb
 ></iframe>
 ```
 
-The iframe page accepts the same options as URL parameters (`label-size=large`, `minimap=false`, ...).
+The iframe page accepts the same options as URL parameters (`label-size=large`, `minimap=true`, `focus-node=transform1`, ...).
 
 ---
 
@@ -122,15 +130,19 @@ The iframe page accepts the same options as URL parameters (`label-size=large`, 
 
 | Action | Mouse / keyboard | Touch |
 | :--- | :--- | :--- |
-| Pan / zoom | Drag / scroll wheel | Drag / pinch |
+| Pan / zoom | Drag with the left or middle mouse button (the middle button never auto-scrolls the page over the viewer) / scroll wheel | Two fingers (one finger scrolls the page); one finger in fullscreen |
 | Inspect parameters and VEX | Click a node | Tap a node |
 | Dive into a subnetwork | Double-click it, or select it and press `I` | Double-tap it, or tap **Open subnetwork** in the inspector |
 | Go up a level | `U`, the arrow button, or a path segment | Arrow button or path segment |
 | Resize the parameter panel | Drag its edge (arrow keys when focused, double-click resets) | Drag the grip above the panel |
-| Fit all / frame selected | `H` / `F` | **Fit** button |
+| Fit all / frame selected | `H` or double-click the empty canvas / `F` | Double-tap the empty canvas |
+| Fullscreen | Fullscreen button (`Esc` leaves it); the network is fitted to the new size | Fullscreen button (a full-screen overlay on iPhone) |
 | Network overview (minimap) | Click to jump, hold and drag to follow, wheel to zoom; `O` or the map button shows / hides it | Hidden on phone-sized viewers |
 | Toggle wire style | `Shift+S` | Wire style switch |
-| Fullscreen | Maximize button (`Esc` to leave) | Maximize button |
+
+The node label size is a setting of the page that embeds the viewer (`label-size` attribute or `labelSize` prop), not a visitor control. The fullscreen button can be hidden with `fullscreen="false"` or `showFullscreenButton={false}`.
+
+**On phones:** give the viewer the full screen width and most of its height (for example `height: 70svh`), as the [example website](./public/example-site.html) does. Narrow viewers get a one-row header without the node count, and frame nodes less closely so their names stay on screen.
 
 Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters, `Esc` closes them again. The single-key hotkeys only react while the viewer has focus (click into it first), so they never interfere with typing elsewhere on the page. The playground also lets them react while the pointer is over the viewer, like Houdini (`hotkeys="hover"`).
 
@@ -141,7 +153,7 @@ Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters
 **Alpha.** The JSON schema and the component API can still change between `0.x` releases (see [`CHANGELOG.md`](./CHANGELOG.md)).
 
 - **Houdini:** the exporter is tested with Houdini 22.0.466. Houdini 20.5 and 21 are not tested yet.
-- **Browsers:** current Chrome, Edge, Firefox and Safari are targeted. Safari and Chrome on real phones are not tested on real devices yet.
+- **Browsers:** automated tests run in Chromium, Firefox and WebKit, plus Pixel 7, iPhone 14 and iPad device profiles. Safari and Chrome on real phones are targeted but not tested on real devices yet.
 
 ---
 

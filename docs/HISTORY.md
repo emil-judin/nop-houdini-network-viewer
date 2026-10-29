@@ -7,10 +7,24 @@
 - The dialog-free copy hotkey is documented as **Ctrl+Shift+Alt+C** everywhere; the Milestone 3 entry that says Ctrl+Shift+C is outdated.
 - The Milestone 1 fixture names `simple-sop-network.json` and `circuit-gen-network.json` were replaced by `fixtures/circuit_gen-network.json` and `fixtures/circuit_board-network.json`.
 - The absolute `og:image` URL is done in code (`vite.config.ts`, from `VITE_SITE_URL`); it only needs the hosted playground.
-- The headless Chrome checks and the mock `hou` module mentioned below were one-off runs.
+- The headless Chrome checks and the mock `hou` module mentioned below were one-off runs. They are now replaced by committed tests: `tests/` (Vitest and Playwright) and `exporter/tests/` (fake `hou`).
 - Since the review fixes, the exporter package variable is `$WOP_EXPORTER_ROOT` (from `$HOUDINI_PACKAGE_PATH`), not `$WOP`.
 
 ---
+
+### Mobile embeds and fullscreen (2026-10-29, owner decisions)
+
+Checked on an emulated iPhone 14 with the example website: the 420px viewer lost about 100px to the two-row header, the bottom sheet left about 120px of network, the start frame (zoom 1.6) cut labels off, and one finger could not scroll the page past an embed. Owner decisions: the fullscreen button replaces Fit and is shown by default (Fit stays on `H` and a double-click or double-tap on the empty canvas; entering and leaving fullscreen fits); the header becomes one row on every screen size, with the node count only from 448px; on touch screens one finger scrolls the page and two fingers move the network outside fullscreen (like map embeds, `touchPan`, the playground keeps one finger); narrow viewers frame nodes with zoom at most 1; the example website gives its viewers the full width and 70% of the screen height on phones. The inspector reveal goes back to panning only (zoom kept): framing it like `F` was tried the same day and not wanted.
+
+### New NOP icon (2026-10-28, owner decision)
+
+The first web icon (22px strokes, three turns) turned to noise at small sizes. From a set of thicker test variants the owner chose a bolder one (test name "02a-2turns-34px-outer385", now simply the NOP icon): the same hub at the Houdini spiral center, eight spokes, two turns to the outer row (turn radii 76, 208, 385) and a 34px stroke. `scripts/build_nop_icon_pack.py` now holds that geometry itself and writes the masters (`design/nop-icon/nop-icon.svg` and `nop-icon-cutout.svg`), the pack, the playground's `public/` icons and the Houdini shelf icon. The shelf gets the see-through icon (owner decision) as a 256px PNG (`exporter/package/nop/icons/nop.png`), because the cutout SVG relies on a `<mask>` that Houdini's Qt SVG renderer may not draw. The test variants, the old master and the prototype scripts (`build_nop_icon_prototypes.py`, `build_nop_web_prototypes.py`) were deleted; the earlier ones are in the git history.
+
+### Houdini-style playground and pane header (2026-10-28, owner decisions)
+
+Compared against Houdini 22 screenshots (Network Editor with path and menu rows, pane tabs, status bar). Colors sampled: pane `#383838`, pane tab strip `#282828` with a `#586486` line on the active tab, gutters `#222222`, status bar `#2d2d2d`. Owner decisions: visitors no longer change the label size (a setting of the embedding page); Copy JSON removed; the fullscreen button is hidden for now (`showFullscreenButton` keeps the code and its tests); the playground drops the Houdini version badge, **Open .json** and **Embed** (the `EmbedDialog` component and its tests stay for a later return); the header line is "Houdini Network Web Viewer"; the demos move into a collapsible side pane. Houdini's faint network type name in the canvas corner ("Geometry", `#464646`, about 24px) was tried and removed again: not wanted for now. Later the same day the menu bar went too, since it only held Paste: **Open file** (back, as a button) and **Paste** sit at the top of the Networks pane, and a trial about block at its bottom (logo, "NOP", "Playground for Houdini Network Web Viewer", version, exporter download, feedback) makes the brand more prominent and says the page is only for trying the package. The page title became "NOP Playground"; the `<h1>` stays for screen readers only.
+
+For the tester release (same day) the owner asked for onboarding and a clear line between playground and product. Decisions: a single welcome card instead of a multi-step tour (lighter, robust on phones, accessible), with the guided example networks themselves teaching through sticky notes; the Embed button returns, now with working addresses for the examples and a link to an example website that uses the real web component, so the product is shown as it runs on someone's site; new examples are built by the owner in Houdini rather than taken from SideFX or tutorial files (rights, affiliation look, SOP-only support). The separation of playground and package stays one repository: the playground imports only `src/api.ts`, and each remaining exception in `eslint.config.js` marks a public API decision for the npm release.
 
 ### Rename to NOP (2026-10-28, owner decision)
 
@@ -18,7 +32,7 @@ The product was renamed from **WOP** to **NOP** a day after the rename to WOP, b
 
 ### Repository Review (2026-10-27)
 
-A full review of the code, docs and agent files at `c19d6f5` found 98 issues (plus three more found while fixing); all were fixed on the same day except the testing findings (T), which are planned for later (the web component shrank from 272 KB to 176 KB gzip). The full report and fix log were removed after the fixes; this section keeps the decisions and the finding IDs.
+A full review of the code, docs and agent files at `c19d6f5` found 98 issues (plus three more found while fixing); all were fixed in the working tree on the same day (tests went from none to 134 unit and component tests, 16 exporter tests and 102 browser tests; the web component shrank from 272 KB to 176 KB gzip). The full report and fix log were removed after the fixes; this section keeps the decisions and the finding IDs that test names (`P-01: ...`) and feature tags (`@fixed-X-01`) refer to.
 
 **Owner decisions:**
 
@@ -62,8 +76,8 @@ A full review of the code, docs and agent files at `c19d6f5` found 98 issues (pl
 | A-07 | Tabs had no arrow-key navigation |
 | A-08 | The playground had no `h1` |
 | A-09 | No reduced-motion handling |
-| A-10 | S / M / L and wire style buttons were below 24 px |
-| A-11 | Disabled parameters were not marked as disabled |
+| A-10 | S / M / L and wire style buttons were below 24 px (found by axe) |
+| A-11 | Disabled parameters were not marked as disabled (found by axe) |
 | U-01 | An error inside one subnetwork trapped the visitor |
 | U-02 | Long values were only readable on hover |
 | U-03 | The Embed dialog height field fought typing |
@@ -80,11 +94,11 @@ A full review of the code, docs and agent files at `c19d6f5` found 98 issues (pl
 | Q-05 | One ID namespace for all item kinds |
 | Q-06 to Q-11 | Dead `button` branch, multi-input wires ordered by file order instead of input index (Q-07), stale public type, two canvas colors, mismatched web component source map, double fit on load |
 | Q-12 to Q-15 | Exporter swallowed per-parameter errors, hard-coded package folder, non-reproducible exporter zip, overwrite without asking (Q-15) |
-| Q-16 | Type names starting with a digit were read as versions |
-| T-01 to T-05 | No unit, component, browser or exporter tests, no edge-case fixtures, tests not a merge gate (planned for later) |
+| Q-16 | Type names starting with a digit were read as versions (found by tests) |
+| T-01 to T-05 | No unit, component, browser or exporter tests, no edge-case fixtures (T-04), tests not a merge gate |
 | D-01 to D-34 | Agent skills, AGENTS.md, STATUS.md, ARCHITECTURE.md, SCHEMA.md (D-21 machine-readable schema), README (D-25 debug actions example) and CHANGELOG brought up to date; D-33 (icon prototype archive) resolved by deleting the archive, it stays in the git history |
 
-**Found after the fixes:** the first Houdini export with the new path rule turned commented-out VEX such as `//@Cd = set(1, 0, 0);` into `<path>`, because `//word` looked like a server share. Fixed: a share needs the `//host/share` form.
+**Found after the fixes:** the first Houdini export with the new path rule turned commented-out VEX such as `//@Cd = set(1, 0, 0);` into `<path>`, because `//word` looked like a server share. Fixed: a share needs the `//host/share` form (exporter tests cover it).
 
 ### Tester Release `0.1.0-alpha.1` (2026-10-27)
 

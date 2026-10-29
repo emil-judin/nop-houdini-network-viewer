@@ -28,14 +28,17 @@ Every change must strictly follow our **6 Core Pillars**:
 - **Windows PowerShell Note:** On Windows PowerShell where script execution policy blocks `npm.ps1` and `&&` is unsupported in PS 5.1, invoke `npm.cmd` and separate commands with `;`.
 - **Install Dependencies:** `npm.cmd install`
 - **Start Dev Server:** `npm.cmd run dev`
-- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/`)
+- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/` and the tests)
 - **Lint:** `npm.cmd run lint` (ESLint: TypeScript, React hooks, JSX accessibility)
+- **Unit & Component Tests:** `npm.cmd test` (Vitest, `tests/unit/`, `tests/component/`)
+- **Exporter Tests:** `npm.cmd run test:exporter` (Python `unittest` with a fake `hou`, `exporter/tests/`)
+- **Browser Tests:** `npm.cmd run test:e2e` (Playwright, `tests/e2e/`; first run `npx playwright install`)
 - **Build Playground:** `npm.cmd run build` (output: `dist-playground/`)
 - **Build Library / Web Component:** `npm.cmd run build:lib` (output: `dist/`)
 
 ### Definition of Done
 
-A task is finished only when `check`, `lint`, `build` and `build:lib` pass, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
+A task is finished only when `check`, `lint`, `test`, `test:exporter`, `build` and `build:lib` pass, the browser tests pass for anything a visitor can see or touch, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
 
 ## 3. Critical Architectural Rules
 

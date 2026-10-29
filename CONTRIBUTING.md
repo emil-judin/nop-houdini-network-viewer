@@ -10,7 +10,7 @@ Thank you for helping. NOP is a small project with a few firm rules; reading the
 
 ## Setup
 
-Node.js 20 or newer (CI uses 22).
+Node.js 20 or newer (CI uses 22), Python 3.9+ for the exporter tests.
 
 ```bash
 npm install
@@ -31,12 +31,15 @@ On Windows PowerShell use `npm.cmd` if script execution is blocked.
 ## Checks (the definition of done)
 
 ```bash
-npm run check          # TypeScript
+npm run check          # TypeScript (src and tests)
 npm run lint           # ESLint
+npm test               # unit and component tests
+npm run test:exporter  # exporter tests (fake hou)
 npm run build && npm run build:lib
+npm run test:e2e       # browser tests, for visible changes (first run: npx playwright install)
 ```
 
-CI runs the same checks on every pull request.
+CI runs the same checks on every pull request. Add or update tests with your change; the scenarios in [docs/features/](./docs/features/) describe the expected behavior.
 
 ## Pull requests
 

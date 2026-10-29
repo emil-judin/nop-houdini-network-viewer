@@ -1,6 +1,6 @@
 # Canonical JSON Schema Specification (`SCHEMA.md`)
 
-This document defines the JSON contract produced by `exporter/nop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/nop-network-1.schema.json](../schema/nop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields).
+This document defines the JSON contract produced by `exporter/nop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/nop-network-1.schema.json](../schema/nop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields); the tests check the demo exports against it.
 
 ---
 

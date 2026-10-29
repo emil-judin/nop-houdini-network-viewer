@@ -17,4 +17,5 @@ description: >-
 4. No `<image>`, `<style>`, `<filter>`, `<foreignObject>` or external `href`; gradient and clip ids use the `uid`
    prefix passed to `render`.
 5. Labs drawings load on demand (`loadLabsIcons`): keep them in the `labs/` folder and out of the SOP files.
-6. Check in the Icon Review Gallery (`npm.cmd run dev`).
+6. Check with `npm.cmd test` (`tests/unit/iconRegistry.test.ts`: lookups, completeness, forbidden elements) and in
+   the Icon Review Gallery (`npm.cmd run dev`, then open the playground with `?icons`).
