@@ -6,7 +6,6 @@ import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** Built into `public/downloads/` by `scripts/build_exporter_package.mjs`, relative to the page (works from a sub-path). */
 const PACKAGE_URL = `${import.meta.env.BASE_URL}downloads/nop-exporter.zip`;
-const SCRIPT_URL = `${import.meta.env.BASE_URL}downloads/nop_exporter.py`;
 
 /** Houdini preferences folders per operating system (Houdini 22). */
 const PREFERENCE_FOLDERS: Array<[string, string]> = [
@@ -86,22 +85,13 @@ export const ExporterDialog: React.FC<ExporterDialogProps> = ({ open, onClose })
           <li>Open a network in Houdini. Select nodes to export only those, or nothing for the whole network.</li>
           <li>
             Click <b>Export for NOP</b> and choose <i>Copy to Clipboard</i>, then press <b>Ctrl+V</b> on this page.
-            Or save a .json file and use <b>Open .json</b>.
+            Or save a .json file and use <b>Open file</b>.
           </li>
         </ol>
         <p className="mt-2 text-[#9a9a9a]">
           Optional hotkey: hold Ctrl+Alt+Shift and click <b>Copy for NOP</b>, then add a key such as Ctrl+Shift+Alt+C.
         </p>
       </section>
-
-      <p className="text-[#9a9a9a] border-t border-[#1f1f1f] pt-3">
-        Tested with Houdini 22.0.466. Prefer a manual shelf tool? Download the plain{' '}
-        <a href={SCRIPT_URL} download className="text-[#8c96b2] underline hover:text-[#d2dcfb]">
-          nop_exporter.py
-        </a>{' '}
-        and paste it into a new shelf tool. Update by replacing the nop folder; uninstall by deleting nop.json and the
-        nop folder.
-      </p>
     </div>
   </PlaygroundDialog>
 );

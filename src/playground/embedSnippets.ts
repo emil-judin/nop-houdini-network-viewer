@@ -1,5 +1,4 @@
-import type { HoudiniLabelSize } from '../schema/converter';
-import type { HoudiniWireStyle } from '../schema/types';
+import type { HoudiniLabelSize, HoudiniWireStyle } from '../api';
 
 /**
  * Settings chosen in the playground's Embed dialog.
@@ -13,8 +12,10 @@ export interface EmbedSnippetOptions {
   labelSize: HoudiniLabelSize;
   /** Wire style, or `auto` for the style exported with the network. */
   wireStyle: HoudiniWireStyle | 'auto';
-  /** Show the minimap. */
+  /** Open the network overview (minimap) at the start. */
   showMiniMap: boolean;
+  /** Node of the top level to frame at the start; empty for the whole network. */
+  focusNode: string;
   /** Show the toolbar. */
   showToolbar: boolean;
   /** Open the Parameter Inspector on selection. */
@@ -27,7 +28,8 @@ export const DEFAULT_EMBED_OPTIONS: EmbedSnippetOptions = {
   heightPx: 600,
   labelSize: 'medium',
   wireStyle: 'auto',
-  showMiniMap: true,
+  showMiniMap: false,
+  focusNode: '',
   showToolbar: true,
   showInspector: true,
 };
@@ -39,7 +41,8 @@ function optionPairs(options: EmbedSnippetOptions): Array<[string, string]> {
   const pairs: Array<[string, string]> = [];
   if (options.labelSize !== DEFAULT_EMBED_OPTIONS.labelSize) pairs.push(['label-size', options.labelSize]);
   if (options.wireStyle !== 'auto') pairs.push(['wire-style', options.wireStyle]);
-  if (!options.showMiniMap) pairs.push(['minimap', 'false']);
+  if (options.showMiniMap) pairs.push(['minimap', 'true']);
+  if (options.focusNode.trim()) pairs.push(['focus-node', options.focusNode.trim()]);
   if (!options.showToolbar) pairs.push(['toolbar', 'false']);
   if (!options.showInspector) pairs.push(['inspector', 'false']);
   return pairs;
@@ -60,7 +63,7 @@ function escapeAttribute(value: string): string {
 export function buildWebComponentSnippet(options: EmbedSnippetOptions, scriptUrl: string): string {
   const attributes = [
     `src="${escapeAttribute(options.jsonUrl)}"`,
-    ...optionPairs(options).map(([name, value]) => `${name}="${value}"`),
+    ...optionPairs(options).map(([name, value]) => `${name}="${escapeAttribute(value)}"`),
     `style="display: block; height: ${options.heightPx}px"`,
   ];
   return [
@@ -79,7 +82,8 @@ export function buildReactSnippet(options: EmbedSnippetOptions): string {
   const props: string[] = ['data={network}'];
   if (options.labelSize !== DEFAULT_EMBED_OPTIONS.labelSize) props.push(`labelSize="${options.labelSize}"`);
   if (options.wireStyle !== 'auto') props.push(`wireStyle="${options.wireStyle}"`);
-  if (!options.showMiniMap) props.push('showMiniMap={false}');
+  if (options.showMiniMap) props.push('showMiniMap');
+  if (options.focusNode.trim()) props.push(`focusNode={${JSON.stringify(options.focusNode.trim())}}`);
   if (!options.showToolbar) props.push('showToolbar={false}');
   if (!options.showInspector) props.push('showInspector={false}');
   const fileName = options.jsonUrl.split('/').pop() || 'my-network.json';

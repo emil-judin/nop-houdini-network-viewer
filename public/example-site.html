@@ -1,0 +1,178 @@
+<!doctype html>
+<!--
+  Example website for the NOP Playground: a plain static page that embeds networks with the
+  <houdini-network> web component, exactly as a user would on their own site. View the source to
+  copy the pattern. The build publishes ./lib/ (the web component from `npm run build:lib`) and
+  ./examples/ (the example networks) next to this page, see `exampleSiteFiles` in vite.config.ts.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https: data:; object-src 'none'; base-uri 'self'; form-action 'none'"
+    />
+    <title>Example Website with NOP</title>
+    <meta name="description" content="A sample article with Houdini node networks embedded by the NOP web component." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #1f2328;
+        --muted: #59636e;
+        --line: #d8dee4;
+        --page: #fbfbf9;
+        --note: #fff4d6;
+        --note-line: #e8c96a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font: 17px/1.65 Georgia, "Times New Roman", serif;
+      }
+      .note {
+        margin: 0;
+        background: var(--note);
+        border-bottom: 1px solid var(--note-line);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        padding: 10px 16px;
+        text-align: center;
+      }
+      .note a {
+        color: inherit;
+        font-weight: 600;
+      }
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 16px 64px;
+      }
+      .kicker {
+        color: var(--muted);
+        font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+        letter-spacing: 0.06em;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: clamp(30px, 6vw, 42px);
+        line-height: 1.15;
+        margin: 0 0 16px;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.25;
+        margin: 40px 0 12px;
+      }
+      figure {
+        margin: 24px 0;
+      }
+      houdini-network {
+        display: block;
+        height: 480px;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      figcaption {
+        color: var(--muted);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin-top: 8px;
+      }
+      pre {
+        background: #f0f2f4;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+        overflow-x: auto;
+        padding: 12px 14px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.9em;
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin-top: 48px;
+        padding-top: 16px;
+      }
+      footer a {
+        color: inherit;
+      }
+      /* Phones: the viewers use the full screen width and most of its height, so the network and the
+         parameter sheet have room. One finger scrolls the article, two fingers move the network. */
+      @media (max-width: 600px) {
+        houdini-network {
+          margin: 0 -16px;
+          border-radius: 0;
+          height: 70vh;
+          height: 70svh;
+        }
+      }
+    </style>
+    <script type="module" src="./lib/web-component.js"></script>
+  </head>
+  <body>
+    <p class="note">
+      This is an example website: it shows how Houdini networks look when you embed them with NOP on your own page.
+      <a href="./">Back to the NOP Playground</a>
+    </p>
+
+    <main>
+      <p class="kicker">Sample article</p>
+      <h1>Building a procedural circuit board in Houdini</h1>
+      <p>
+        Imagine this is your portfolio or blog. Below the text you would normally show a screenshot of your node
+        network. With NOP your readers get the real network instead: they can move around, zoom in, open subnetworks
+        and read every parameter and VEX snippet, on desktop and on their phones.
+      </p>
+
+      <h2>The setup</h2>
+      <p>
+        In the scene, the whole board comes from one asset driven by a curve. Click the <code>circuit_gen</code> node
+        to see the parameters the asset exposes.
+      </p>
+      <figure>
+        <houdini-network src="examples/circuit_board-network.json" focus-node="curve1"></houdini-network>
+        <figcaption>The scene level: a curve feeding the circuit generator asset. The view starts on the curve (<code>focus-node="curve1"</code>); press H or double-click the background to see everything.</figcaption>
+      </figure>
+
+      <h2>Inside the asset</h2>
+      <p>
+        Inside, the generator has 169 nodes. Readers can explore it at their own pace instead of squinting at a
+        screenshot. Double-click <code>circuit_board_fan</code> to go into a nested asset, and use the path bar at the
+        top to come back.
+      </p>
+      <figure>
+        <houdini-network src="examples/circuit_gen-network.json"></houdini-network>
+        <figcaption>The complete circuit generator network.</figcaption>
+      </figure>
+
+      <h2>How this page does it</h2>
+      <p>One script tag on the page, then one tag per network, pointing at the file exported from Houdini:</p>
+      <pre><code>&lt;script type="module" src="web-component.js"&gt;&lt;/script&gt;
+
+&lt;houdini-network
+  src="circuit_board-network.json"
+  style="display: block; height: 480px"
+&gt;&lt;/houdini-network&gt;</code></pre>
+      <p>
+        The viewer draws inside its own Shadow DOM, so the styles of your site and of the network never mix. During
+        the tester phase the script is not on npm yet; the Embed button in the playground has an iframe version that
+        works today.
+      </p>
+
+      <footer>
+        Networks shown with <a href="./">NOP</a>, the Houdini Network Web Viewer. Not affiliated with SideFX.
+        Houdini is a trademark of Side Effects Software Inc.
+      </footer>
+    </main>
+  </body>
+</html>

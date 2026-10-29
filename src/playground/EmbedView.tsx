@@ -1,16 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { parseEmbedOptions } from '../embed/embedAttributes';
+import { parseEmbedOptions, RemoteHoudiniNetwork } from '../api';
+import { findExample, loadExample } from './examples';
 import { NetworkErrorState } from '../components/hud/NetworkErrorState';
 import { NetworkLoadingState } from '../components/hud/NetworkLoadingState';
-import { RemoteHoudiniNetwork } from '../embed/RemoteHoudiniNetwork';
 
-/**
- * Bundled demo networks available to `?embed=true&demo=<key>` (loaded on demand).
- */
-const DEMO_LOADERS: Record<string, () => Promise<{ default: unknown }>> = {
-  circuit: () => import('../../fixtures/circuit_gen-network.json'),
-  board: () => import('../../fixtures/circuit_board-network.json'),
-};
 
 /**
  * Host name of `src` when the file comes from another site than this page, else `null`.
@@ -32,9 +25,9 @@ function foreignHost(src: string | null): string | null {
  *
  * URL parameters:
  * - `src`: URL of an exported network `.json` file (must allow cross-origin requests when on another site).
- * - `demo`: `circuit` or `board` to show a bundled demo network instead.
- * - Viewer options shared with the web component: `label-size`, `wire-style`, `minimap`,
- *   `toolbar`, `inspector`, `debug-actions`, `fit-view`, `hotkeys` (see `parseEmbedOptions`).
+ * - `demo`: the key of a playground example (`board`, `circuit`, see `examples.ts`) to show it instead.
+ * - Viewer options shared with the web component: `label-size`, `wire-style`, `focus-node`, `minimap`,
+ *   `touch-pan`, `toolbar`, `fullscreen`, `inspector`, `debug-actions`, `fit-view`, `hotkeys` (see `parseEmbedOptions`).
  */
 export const EmbedView: React.FC = () => {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
@@ -43,13 +36,14 @@ export const EmbedView: React.FC = () => {
   const [demoData, setDemoData] = useState<Record<string, unknown> | null>(null);
   const [demoError, setDemoError] = useState<string | null>(null);
 
+  const demo = findExample(demoKey);
+
   useEffect(() => {
-    const load = demoKey && Object.hasOwn(DEMO_LOADERS, demoKey) ? DEMO_LOADERS[demoKey] : undefined;
-    if (!load) return;
+    if (!demo) return;
     let cancelled = false;
-    load().then(
-      (module) => {
-        if (!cancelled) setDemoData(module.default as Record<string, unknown>);
+    loadExample(demo).then(
+      (data) => {
+        if (!cancelled) setDemoData(data as Record<string, unknown>);
       },
       (err: unknown) => {
         if (!cancelled) setDemoError(err instanceof Error ? err.message : String(err));
@@ -58,9 +52,9 @@ export const EmbedView: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [demoKey]);
+  }, [demo]);
 
-  const isDemo = Boolean(demoKey && Object.hasOwn(DEMO_LOADERS, demoKey));
+  const isDemo = Boolean(demo);
   const src = isDemo ? null : params.get('src');
   const sourceHost = foreignHost(src);
 

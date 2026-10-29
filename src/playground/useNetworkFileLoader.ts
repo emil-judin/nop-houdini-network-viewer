@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatMegabytes, MAX_NETWORK_BYTES } from '../embed/fetchNetwork';
-import { normalizeNetworkDocument } from '../schema/converter';
-import type { HoudiniNetworkDocument } from '../schema/types';
+import { normalizeNetworkDocument, type HoudiniNetworkDocument } from '../api';
 
 /**
  * A network loaded by the user (opened, dropped or pasted).

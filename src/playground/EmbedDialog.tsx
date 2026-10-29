@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { EXAMPLE_SITE_PAGE } from './examples';
 import {
   DEFAULT_EMBED_OPTIONS,
   buildIframeSnippet,
@@ -61,15 +62,17 @@ export interface EmbedDialogProps {
   open: boolean;
   /** Called when the dialog closes (close button, Escape, or backdrop click). */
   onClose: () => void;
-  /** Suggested file name for the network on screen (for example `circuit_gen.json`). */
+  /** Suggested file URL for the network on screen: a published example's address or the visitor's file name. */
   suggestedFileName: string;
+  /** The network on screen is the visitor's own file, which they still have to upload somewhere. */
+  isOwnFile?: boolean;
 }
 
 /**
  * Embed code generator: pick viewer options and copy a ready-to-paste snippet for plain HTML
  * (`<houdini-network>` web component), React (`<HoudiniNetwork />`) or an `<iframe>`.
  */
-export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggestedFileName }) => {
+export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggestedFileName, isOwnFile = false }) => {
   const [tab, setTab] = useState<SnippetTab>('html');
   const [options, setOptions] = useState<EmbedSnippetOptions>({ ...DEFAULT_EMBED_OPTIONS, jsonUrl: suggestedFileName });
   const [copied, setCopied] = useState(false);
@@ -105,6 +108,18 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
   return (
     <PlaygroundDialog open={open} onClose={onClose} title="Embed this network on your website">
       <div className="overflow-y-auto px-4 py-3 space-y-3 text-xs">
+        {/* What the code is for: the viewer on the visitor's own site is the product, not this playground */}
+        <p className="text-[13px] leading-[1.5] text-[#d6d6d6]">
+          This code shows the network on your own website, with the same viewer as here.{' '}
+          <a href={EXAMPLE_SITE_PAGE} className="text-[#a9b8e6] underline underline-offset-2 hover:text-white">
+            See an example website
+          </a>
+          .{' '}
+          {isOwnFile
+            ? 'Upload your .json file to your website first, then enter its address below.'
+            : 'The example file below is published with the playground, so the code works as it is.'}
+        </p>
+
         {/* Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5">
           <label className="flex flex-col gap-1 sm:col-span-2">
@@ -159,11 +174,22 @@ export const EmbedDialog: React.FC<EmbedDialogProps> = ({ open, onClose, suggest
               </select>
             </label>
           </div>
+          <label className="flex flex-col gap-1 sm:col-span-2">
+            <span className="text-[#d2dcfb]">Start framed on node (optional, a node name at the top level)</span>
+            <input
+              type="text"
+              value={options.focusNode}
+              onChange={(e) => update('focusNode', e.target.value)}
+              placeholder="for example transform1"
+              spellCheck={false}
+              className="h-9 px-2 rounded-[3px] border border-transparent bg-[#434343] font-mono text-base sm:text-[13px] text-white placeholder:text-[#9a9a9a] focus:outline-none focus:border-[#7082b9]"
+            />
+          </label>
           <div className="sm:col-span-2 flex flex-wrap gap-x-5 gap-y-1">
             {(
               [
                 ['showToolbar', 'Toolbar'],
-                ['showMiniMap', 'Minimap'],
+                ['showMiniMap', 'Overview open at start'],
                 ['showInspector', 'Parameter Inspector'],
               ] as const
             ).map(([key, label]) => (
