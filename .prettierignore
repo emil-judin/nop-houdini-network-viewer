@@ -4,6 +4,9 @@ dist-playground/
 public/
 local-refs/
 design/
+coverage/
+test-results/
+playwright-report/
 fixtures/
 package-lock.json
 src/components/nodes/shapes/houdiniShapesData.json

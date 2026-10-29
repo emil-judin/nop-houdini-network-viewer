@@ -33,6 +33,8 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run lint
+      # The library first: the playground build publishes its web component for the example site page
+      - run: npm run build:lib
       - run: npm run build
         env:
           VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}

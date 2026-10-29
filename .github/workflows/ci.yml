@@ -28,5 +28,6 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run lint
-      - run: npm run build
+      # The library first: the playground build publishes its web component for the example site page
       - run: npm run build:lib
+      - run: npm run build

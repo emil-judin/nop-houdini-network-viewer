@@ -13,3 +13,8 @@ __pycache__/
 
 # Built by scripts/build_exporter_package.mjs (npm run build:exporter)
 public/downloads/
+
+# Test output (npm run test:coverage, npm run test:e2e)
+coverage/
+test-results/
+playwright-report/
