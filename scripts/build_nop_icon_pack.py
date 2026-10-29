@@ -1,56 +1,219 @@
-"""Generate the production NOP website icon pack.
+"""Generate the NOP icon pack: website icons, the Houdini shelf icon and the pack preview page.
 
-Final chosen design: ``nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg``
-(the master SVG in ``design/nop-icon/``). The earlier prototypes are in the git history.
+The NOP icon (owner choice, 2026-10-28) is a spiral spider web. Eight spokes leave the center of
+the Houdini spiral, the web makes two turns to the outer row (turn radii 76, 208 and 385 px on the
+512 canvas) with a 34px stroke and a gentle organic thickness wave. All geometry is computed here,
+nothing is traced. Earlier designs and the scripts that explored them are in the git history.
 
-1. Writes the master SVG to ``design/nop-icon/``.
+1. Writes the master SVGs to ``design/nop-icon/``: ``nop-icon.svg`` (white web on orange) and
+   ``nop-icon-cutout.svg`` (orange with the web cut out).
 2. Writes vector SVG variants to ``design/nop-icon/pack/``:
-   - ``nop-icon.svg`` (and ``favicon.svg``): 512x512 square icon (Houdini orange #FE4703 + white web)
+   - ``nop-icon.svg``: 512x512 square icon (Houdini orange #FE4703 + white web)
+   - ``favicon.svg``: 512x512 orange square with the spiderweb cut out (transparent web)
    - ``nop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
    - ``nop-icon-circle.svg``: 512x512 circular badge (white web on orange)
-   - ``nop-icon-transparent.svg``: 512x512 Houdini orange (#FE4703) square with the spiderweb cut out (transparent web)
-   - ``nop-icon-rounded-transparent.svg``: 512x512 Houdini orange (#FE4703) rounded square with the spiderweb cut out
-   - ``nop-icon-circle-transparent.svg``: 512x512 Houdini orange (#FE4703) circle with the spiderweb cut out
-   - ``nop-icon-transparent-white.svg``: 512x512 white (#FFFFFF) square with the spiderweb cut out
-   - ``nop-icon-transparent-dark.svg``: 512x512 dark (#1E1E1E) square with the spiderweb cut out
-   - ``safari-pinned-tab.svg``: 512x512 black (#000000) square with the spiderweb cut out
+   - ``nop-icon-transparent.svg`` (and the alias ``nop-icon-cutout.svg``): orange square with the spiderweb cut out
+   - ``nop-icon-rounded-transparent.svg``: orange rounded square with the spiderweb cut out
+   - ``nop-icon-circle-transparent.svg``: orange circle with the spiderweb cut out
+   - ``nop-icon-transparent-white.svg``: white (#FFFFFF) square with the spiderweb cut out
+   - ``nop-icon-transparent-dark.svg``: dark (#1E1E1E) square with the spiderweb cut out
+   - ``safari-pinned-tab.svg``: black (#000000) square with the spiderweb cut out
 3. Writes raster PNGs, multi-size ``favicon.ico``, ``og-image.png`` (1200x630), and
    ``site.webmanifest`` into ``design/nop-icon/pack/``.
 4. Writes the icon pack showcase page to ``design/nop-icon/web.html``.
+5. Copies the website icons into ``public/`` and writes the see-through icon as a 256px PNG for
+   the Houdini shelf (``exporter/package/nop/icons/nop.png``).
 
-Usage: ``python scripts/build_nop_icon_pack.py``
+Usage: ``python scripts/build_nop_icon_pack.py`` (needs numpy and Pillow).
 """
 
 from __future__ import annotations
 
 import json
 import math
+import random
 import shutil
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw
 
-from build_nop_icon_prototypes import ORANGE, SIZE, WHITE, fmt, polar
-from build_nop_web_prototypes import SAG_RATIO, SPOKE_LEN, SpiralSpiderWeb
-
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ICON_DIR = ROOT_DIR / "design" / "nop-icon"
 PACK_DIR = ICON_DIR / "pack"
+SHELF_ICON = ROOT_DIR / "exporter" / "package" / "nop" / "icons" / "nop.png"
+SHELF_ICON_PX = 256  # sharp on high-DPI screens; Houdini scales it down for the shelf
 
-FINAL_SOURCE_NAME = "nop-houdini-web-spiral-center-rot22.5-22px-fill5-vdent-random-spiral.svg"
+FINAL_NAME = "nop-icon"
+
+SIZE = 512
+ORANGE = "#FE4703"  # sampled from the Houdini app icon background
+WHITE = "#FFFFFF"
 DARK = "#1E1E1E"
 
-FINAL_WEB = SpiralSpiderWeb(
-    rotate=22.5,
-    from_center=True,
-    turn_radii=(54.0, 140.0, 256.0, 405.0, 595.0, 830.0),
-    stroke_w=22.0,
-    random_seed=7,
-    random_spokes=False,
-    fill_inner_steps=5,
-    vert_sag_ratio=0.79,
-)
+HUB = (182.0, 316.0)  # center of the Houdini spiral on the 512x512 canvas
+SPOKE_LEN = 600.0  # extends past every edge and corner of the 512x512 square
+SAG_RATIO = 0.855  # midpoint radius as a fraction of the average endpoint radius (~14.5% inward sag)
+
+Point = tuple[float, float]
+
+
+def polar(hub: Point, angle_deg: float, radius: float) -> Point:
+    """Point at ``radius`` from ``hub``; angles are math angles (0 = right, 90 = up)."""
+    a = math.radians(angle_deg)
+    return hub[0] + radius * math.cos(a), hub[1] - radius * math.sin(a)
+
+
+def fmt(p: Point) -> str:
+    return f"{p[0]:.1f} {p[1]:.1f}"
+
+
+@dataclass
+class SpiralWeb:
+    """Spiral spider web: spokes from the hub and one spiral thread with a filled pinhole center."""
+
+    hub: Point = HUB
+    num_spokes: int = 8
+    rotate: float = 22.5
+    start_spoke: int = 5
+    turn_radii: tuple[float, ...] = (76.0, 208.0, 385.0, 620.0, 900.0)
+    turns: int = 5
+    max_step: int = 20
+    skip_steps: set[int] = field(default_factory=lambda: {14, 15, 16})
+    stroke_w: float = 34.0
+    fill_inner_steps: int = 5
+    vert_sag_ratio: float | None = 0.79
+    random_seed: int | None = 7
+    # Asymmetric thickness wave: the organic feel of seed 7 without thin spots
+    mod_plus_frac: float = 0.20
+    mod_minus_frac: float = 0.12
+
+    @property
+    def step_angle(self) -> float:
+        return 360.0 / self.num_spokes
+
+    @property
+    def center_ramp_steps(self) -> int:
+        # Half a turn from the center (0) to turn_radii[0]
+        return max(3, self.num_spokes // 2)
+
+    def interp_radius(self, turn: float) -> float:
+        if turn <= 0:
+            return self.turn_radii[0] * max(0.0, 1.0 + turn)
+        idx = int(turn)
+        frac = turn - idx
+        if idx >= len(self.turn_radii) - 1:
+            step = self.turn_radii[-1] - self.turn_radii[-2]
+            return self.turn_radii[-1] + step * (turn - (len(self.turn_radii) - 1))
+        r0 = self.turn_radii[idx]
+        r1 = self.turn_radii[idx + 1]
+        return r0 + (r1 - r0) * frac
+
+    def spiral_nodes(self) -> list[tuple[int, float, float]]:
+        """``(spoke index, angle, radius)`` where the spiral crosses each spoke."""
+        total_steps = min(self.turns * self.num_spokes, self.max_step)
+        ramp = self.center_ramp_steps
+        nodes: list[tuple[int, float, float]] = []
+        for step in range(total_steps + 1):
+            spoke_idx = (self.start_spoke + step) % self.num_spokes
+            angle = self.rotate + (self.start_spoke + step) * self.step_angle
+            if step >= ramp:
+                turn = (step - ramp) / float(self.num_spokes)
+            else:
+                turn = -1.0 + step / float(ramp)
+            nodes.append((spoke_idx, angle, self.interp_radius(turn)))
+        return nodes
+
+    def segment_sag(self, spoke_idx: int) -> float:
+        # The segments that cross the left and right horizontal get the stronger "vertical dent"
+        if self.vert_sag_ratio is not None and spoke_idx in (3, 7):
+            return self.vert_sag_ratio
+        return SAG_RATIO
+
+    def segment_curve(self, s0: int, a0: float, r0: float, a1: float, r1: float) -> tuple[Point, Point, Point]:
+        """Start, control and end point of the sagging quadratic thread between two spokes."""
+        am = (a0 + a1) / 2.0
+        rm = 0.5 * (r0 + r1) * self.segment_sag(s0)
+        p0 = polar(self.hub, a0, r0)
+        p1 = polar(self.hub, a1, r1)
+        pm = polar(self.hub, am, rm)
+        ctrl = (2 * pm[0] - 0.5 * (p0[0] + p1[0]), 2 * pm[1] - 0.5 * (p0[1] + p1[1]))
+        return p0, ctrl, p1
+
+    def spoke_ends(self) -> list[tuple[Point, Point]]:
+        return [(self.hub, polar(self.hub, self.rotate + i * self.step_angle, SPOKE_LEN)) for i in range(self.num_spokes)]
+
+    def spokes_d(self) -> str:
+        return " ".join(f"M {fmt(p0)} L {fmt(p1)}" for p0, p1 in self.spoke_ends())
+
+    def inner_fill_curves(self) -> list[tuple[Point, Point, Point]]:
+        nodes = self.spiral_nodes()[: self.fill_inner_steps + 1]
+        return [self.segment_curve(s0, a0, r0, a1, r1) for (s0, a0, r0), (_, a1, r1) in zip(nodes, nodes[1:])]
+
+    def inner_fill_d(self) -> str:
+        """Filled pinhole at the center, bounded by the first spiral segments."""
+        if self.fill_inner_steps <= 0:
+            return ""
+        segs = [f"M {fmt(self.hub)}"]
+        segs.extend(f"Q {fmt(ctrl)} {fmt(p1)}" for _, ctrl, p1 in self.inner_fill_curves())
+        segs.append("Z")
+        return " ".join(segs)
+
+    def spiral_strokes(self) -> list[tuple[Point, Point, Point, float]]:
+        """The spiral as short quadratic pieces ``(start, control, end, stroke width)``."""
+        nodes = self.spiral_nodes()
+        rnd = random.Random(self.random_seed or 7)
+        phases = [(rnd.uniform(0, 6.28), rnd.uniform(1.8, 3.4)) for _ in range(5)]
+        strokes: list[tuple[Point, Point, Point, float]] = []
+        sub = 6
+
+        for k, ((s0, a0, r0), (_, a1, r1)) in enumerate(zip(nodes, nodes[1:])):
+            p0, ctrl, p1 = self.segment_curve(s0, a0, r0, a1, r1)
+
+            if k in self.skip_steps:
+                p0_in = 0.0 <= p0[0] <= SIZE and 0.0 <= p0[1] <= SIZE
+                p1_in = 0.0 <= p1[0] <= SIZE and 0.0 <= p1[1] <= SIZE
+                if not p0_in and not p1_in:
+                    continue
+
+            def qpt(t: float, p0: Point = p0, ctrl: Point = ctrl, p1: Point = p1) -> Point:
+                mt = 1.0 - t
+                return (
+                    mt * mt * p0[0] + 2 * mt * t * ctrl[0] + t * t * p1[0],
+                    mt * mt * p0[1] + 2 * mt * t * ctrl[1] + t * t * p1[1],
+                )
+
+            for s in range(sub):
+                t0 = s / sub
+                t1 = (s + 1) / sub
+                tm = 0.5 * (t0 + t1)
+                qa = qpt(t0)
+                qb = qpt(t1)
+                qm = qpt(tm)
+                qctrl = (2 * qm[0] - 0.5 * (qa[0] + qb[0]), 2 * qm[1] - 0.5 * (qa[1] + qb[1]))
+                if self.random_seed is not None:
+                    wave = sum(math.sin(freq * k * 0.45 + freq * tm * 0.45 + ph) for ph, freq in phases) / len(phases)
+                    ramp = min(1.0, max(0.0, (k + tm - 3.0) / 3.0))
+                    if wave >= 0:
+                        delta = self.stroke_w * self.mod_plus_frac * (wave / 0.59) * ramp
+                    else:
+                        delta = self.stroke_w * self.mod_minus_frac * (wave / 0.55) * ramp
+                    w = self.stroke_w + delta
+                else:
+                    w = self.stroke_w
+                strokes.append((qa, qctrl, qb, w))
+        return strokes
+
+    def spiral_subpaths(self, stroke_color: str) -> list[str]:
+        return [
+            f'<path d="M {fmt(qa)} Q {fmt(qctrl)} {fmt(qb)}" fill="none" stroke="{stroke_color}" '
+            f'stroke-width="{w:.1f}" stroke-linecap="round" stroke-linejoin="round"/>'
+            for qa, qctrl, qb, w in self.spiral_strokes()
+        ]
+
+
+FINAL_WEB = SpiralWeb()
 
 
 def shape_element(shape: str, fill: str, extra_attrs: str = "", corner_rx: int = 96) -> str:
@@ -64,40 +227,42 @@ def shape_element(shape: str, fill: str, extra_attrs: str = "", corner_rx: int =
 
 
 def build_svg_variant(
-    web: SpiralSpiderWeb,
+    web: SpiralWeb,
     *,
     bg_color: str = ORANGE,
     fg_color: str | None = WHITE,  # None means the spiderweb is cut out (transparent) from bg_color
-    shape: str = "square",         # "square" | "rounded" | "circle"
+    shape: str = "square",  # "square" | "rounded" | "circle"
     corner_rx: int = 96,
 ) -> str:
     """Render an SVG variant of the final NOP spiderweb icon.
 
-    When ``fg_color`` is ``None``, the spiderweb is punched out of ``bg_color`` using an
-    SVG ``<mask>`` so everything is ``bg_color`` except the transparent web.
+    When ``fg_color`` is ``None``, the spiderweb is punched out of ``bg_color`` with an SVG
+    ``<mask>``, so everything is ``bg_color`` except the transparent web.
     """
     fill_d = web.inner_fill_d()
     if fg_color is None:
         # Cutout mask: white (opaque) everywhere, black (transparent) on the spiderweb
-        common_mask = f'fill="none" stroke="#000000" stroke-width="{web.stroke_w:g}" stroke-linecap="round" stroke-linejoin="round"'
+        common_mask = (
+            f'fill="none" stroke="#000000" stroke-width="{web.stroke_w:g}" '
+            'stroke-linecap="round" stroke-linejoin="round"'
+        )
         lines = [
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" width="{SIZE}" height="{SIZE}">',
-            '  <defs>',
+            "  <defs>",
             f'    <mask id="web-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="{SIZE}" height="{SIZE}">',
             f'      <rect width="{SIZE}" height="{SIZE}" fill="#FFFFFF"/>',
         ]
         if fill_d:
             lines.append(f'      <path d="{fill_d}" fill="#000000"/>')
         lines.append(f'      <path d="{web.spokes_d()}" {common_mask}/>')
-        for path_line in web.variable_spiral_paths():
-            lines.append("  " + path_line.replace(f'stroke="{WHITE}"', 'stroke="#000000"'))
+        lines.extend("      " + sub_path for sub_path in web.spiral_subpaths("#000000"))
         mask_attr = 'mask="url(#web-cutout)"'
         lines.extend([
-            '    </mask>',
-            '  </defs>',
-            f'  {shape_element(shape, bg_color, extra_attrs=mask_attr, corner_rx=corner_rx)}',
-            '</svg>',
-            '',
+            "    </mask>",
+            "  </defs>",
+            f"  {shape_element(shape, bg_color, extra_attrs=mask_attr, corner_rx=corner_rx)}",
+            "</svg>",
+            "",
         ])
         return "\n".join(lines)
 
@@ -110,77 +275,48 @@ def build_svg_variant(
     ]
     if fill_d:
         lines.append(f'    <path d="{fill_d}" fill="{fg_color}"/>')
-    common = f'fill="none" stroke="{fg_color}" stroke-width="{web.stroke_w:g}" stroke-linecap="round" stroke-linejoin="round"'
+    common = (
+        f'fill="none" stroke="{fg_color}" stroke-width="{web.stroke_w:g}" '
+        'stroke-linecap="round" stroke-linejoin="round"'
+    )
     lines.append(f'    <path d="{web.spokes_d()}" {common}/>')
-    for path_line in web.variable_spiral_paths():
-        lines.append(path_line.replace(f'stroke="{WHITE}"', f'stroke="{fg_color}"'))
+    lines.extend("    " + sub_path for sub_path in web.spiral_subpaths(fg_color))
     lines.extend([
-        '  </g>',
-        '</svg>',
-        '',
+        "  </g>",
+        "</svg>",
+        "",
     ])
     return "\n".join(lines)
 
 
-def render_web_alpha_mask(web: SpiralSpiderWeb, out_px: int = 1024) -> np.ndarray:
-    """Compute a high-resolution anti-aliased float alpha mask (0..1) of the spiderweb at ``out_px``."""
+def quad_points(p0: Point, ctrl: Point, p1: Point, steps: int) -> list[Point]:
+    """``steps + 1`` points along a quadratic curve, both ends included."""
+    pts: list[Point] = []
+    for i in range(steps + 1):
+        t = i / steps
+        mt = 1.0 - t
+        pts.append((
+            mt * mt * p0[0] + 2 * mt * t * ctrl[0] + t * t * p1[0],
+            mt * mt * p0[1] + 2 * mt * t * ctrl[1] + t * t * p1[1],
+        ))
+    return pts
+
+
+def render_web_alpha_mask(web: SpiralWeb, out_px: int = 1024) -> np.ndarray:
+    """Anti-aliased float alpha mask (0..1) of the spiderweb at ``out_px``, matching the SVG geometry."""
     scale = out_px / SIZE
+    # Round-capped line segments (x0, y0, x1, y1, half width), like the SVG strokes
     segs: list[tuple[float, float, float, float, float]] = []
-
-    # 1. 8 spokes
-    nodes = web.spiral_nodes()
-    first_r: dict[int, float] = {}
-    for spoke_idx, _, r in nodes:
-        if spoke_idx not in first_r:
-            first_r[spoke_idx] = 0.0 if web.from_center else r
-    for i in range(8):
-        ang = web.rotate + i * 45.0
-        p0 = polar(web.hub, ang, first_r[i])
-        p1 = polar(web.hub, ang, SPOKE_LEN)
+    for p0, p1 in web.spoke_ends():
         segs.append((p0[0], p0[1], p1[0], p1[1], web.stroke_w / 2.0))
-
-    # 2. Subdivided spiral segments
-    import random
-    rnd = random.Random(web.random_seed or 1)
-    phases = [(rnd.uniform(0, 6.28), rnd.uniform(1.8, 3.4)) for _ in range(5)]
-    sub = 6
-    curve_steps = 4
-    for k, ((s0, a0, r0), (_, a1, r1)) in enumerate(zip(nodes, nodes[1:])):
-        if k in web.skip_steps:
-            continue
-        am = (a0 + a1) / 2.0
-        sag = web.vert_sag_ratio if (web.vert_sag_ratio is not None and s0 in (3, 7)) else SAG_RATIO
-        rm = 0.5 * (r0 + r1) * sag
-        p0 = polar(web.hub, a0, r0)
-        p1 = polar(web.hub, a1, r1)
-        pm = polar(web.hub, am, rm)
-        ctrl = (2 * pm[0] - 0.5 * (p0[0] + p1[0]), 2 * pm[1] - 0.5 * (p0[1] + p1[1]))
-
-        def qpt(t: float) -> tuple[float, float]:
-            mt = 1.0 - t
-            return (
-                mt * mt * p0[0] + 2 * mt * t * ctrl[0] + t * t * p1[0],
-                mt * mt * p0[1] + 2 * mt * t * ctrl[1] + t * t * p1[1],
-            )
-
-        for s in range(sub):
-            t0 = s / sub
-            t1 = (s + 1) / sub
-            tm = 0.5 * (t0 + t1)
-            wave = sum(math.sin(freq * k * 0.45 + freq * tm * 0.45 + ph) for ph, freq in phases) / len(phases)
-            ramp = min(1.0, max(0.0, (k + tm - 3.0) / 3.0))
-            w = web.stroke_w + 11.0 * wave * ramp
-            for cs in range(curve_steps):
-                ta = t0 + (t1 - t0) * (cs / curve_steps)
-                tb = t0 + (t1 - t0) * ((cs + 1) / curve_steps)
-                qa = qpt(ta)
-                qb = qpt(tb)
-                segs.append((qa[0], qa[1], qb[0], qb[1], w / 2.0))
+    for qa, qctrl, qb, w in web.spiral_strokes():
+        pts = quad_points(qa, qctrl, qb, 4)
+        for a, b in zip(pts, pts[1:]):
+            segs.append((a[0], a[1], b[0], b[1], w / 2.0))
 
     coords = (np.arange(out_px, dtype=np.float32) + 0.5) / scale
     gx, gy = np.meshgrid(coords, coords)
     signed_dist = np.full((out_px, out_px), 1e6, dtype=np.float32)
-
     for x0, y0, x1, y1, hw in segs:
         vx, vy = x1 - x0, y1 - y0
         l2 = vx * vx + vy * vy
@@ -188,32 +324,18 @@ def render_web_alpha_mask(web: SpiralSpiderWeb, out_px: int = 1024) -> np.ndarra
             d = np.hypot(gx - x0, gy - y0) - hw
         else:
             t = np.clip(((gx - x0) * vx + (gy - y0) * vy) / l2, 0.0, 1.0)
-            px = x0 + t * vx
-            py = y0 + t * vy
-            d = np.hypot(gx - px, gy - py) - hw
+            d = np.hypot(gx - (x0 + t * vx), gy - (y0 + t * vy)) - hw
         signed_dist = np.minimum(signed_dist, d)
 
     aa_half = 0.5 / scale
     alpha = np.clip(0.5 - signed_dist / (2.0 * aa_half), 0.0, 1.0)
 
+    # Filled pinhole at the center
     inner_img = Image.new("L", (out_px, out_px), 0)
-    draw = ImageDraw.Draw(inner_img)
-    poly_pts: list[tuple[float, float]] = [(web.hub[0] * scale, web.hub[1] * scale)]
-    for (s0, a0, r0), (_, a1, r1) in zip(nodes[: web.fill_inner_steps], nodes[1 : web.fill_inner_steps + 1]):
-        am = (a0 + a1) / 2.0
-        sag = web.vert_sag_ratio if (web.vert_sag_ratio is not None and s0 in (3, 7)) else SAG_RATIO
-        rm = 0.5 * (r0 + r1) * sag
-        p0 = polar(web.hub, a0, r0)
-        p1 = polar(web.hub, a1, r1)
-        pm = polar(web.hub, am, rm)
-        ctrl = (2 * pm[0] - 0.5 * (p0[0] + p1[0]), 2 * pm[1] - 0.5 * (p0[1] + p1[1]))
-        for step_i in range(1, 9):
-            t = step_i / 8.0
-            mt = 1.0 - t
-            qx = mt * mt * p0[0] + 2 * mt * t * ctrl[0] + t * t * p1[0]
-            qy = mt * mt * p0[1] + 2 * mt * t * ctrl[1] + t * t * p1[1]
-            poly_pts.append((qx * scale, qy * scale))
-    draw.polygon(poly_pts, fill=255)
+    poly_pts: list[Point] = [(web.hub[0] * scale, web.hub[1] * scale)]
+    for p0, ctrl, p1 in web.inner_fill_curves():
+        poly_pts.extend((x * scale, y * scale) for x, y in quad_points(p0, ctrl, p1, 8)[1:])
+    ImageDraw.Draw(inner_img).polygon(poly_pts, fill=255)
     inner_alpha = np.asarray(inner_img, dtype=np.float32) / 255.0
     return np.maximum(alpha, inner_alpha)
 
@@ -287,16 +409,10 @@ def main() -> None:
     ICON_DIR.mkdir(parents=True, exist_ok=True)
     PACK_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Clean up old transparent files from pack/ if present
-    for stale in ("nop-icon-transparent-orange.svg", "nop-icon-transparent-orange-512.png"):
-        for folder in (ICON_DIR, PACK_DIR):
-            p = folder / stale
-            if p.exists():
-                p.unlink()
-
     final_svg = build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="square")
     cutout_svg = build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="square")
-    (ICON_DIR / FINAL_SOURCE_NAME).write_text(final_svg, encoding="utf-8")
+    (ICON_DIR / f"{FINAL_NAME}.svg").write_text(final_svg, encoding="utf-8", newline="\n")
+    (ICON_DIR / f"{FINAL_NAME}-cutout.svg").write_text(cutout_svg, encoding="utf-8", newline="\n")
 
     svg_variants = [
         ("nop-icon.svg", "Standard 512x512 square icon (Houdini orange #FE4703 + white web)", final_svg),
@@ -348,7 +464,7 @@ def main() -> None:
         ),
     ]
     for filename, _, content in svg_variants:
-        (PACK_DIR / filename).write_text(content, encoding="utf-8")
+        (PACK_DIR / filename).write_text(content, encoding="utf-8", newline="\n")
 
     # Render high-resolution master mask and raster pack
     web_mask = render_web_alpha_mask(FINAL_WEB, out_px=1024)
@@ -387,6 +503,11 @@ def main() -> None:
         resized = source_img if px == 1024 else source_img.resize((px, px), Image.Resampling.LANCZOS)
         resized.save(PACK_DIR / filename, format="PNG", optimize=True)
 
+    # Houdini shelf icon: the see-through version as a PNG. The cutout SVG needs a <mask>, which the
+    # Qt SVG renderer behind Houdini's icons may ignore (it would draw a plain orange square).
+    shelf_icon = master_cutout_square.resize((SHELF_ICON_PX, SHELF_ICON_PX), Image.Resampling.LANCZOS)
+    shelf_icon.save(SHELF_ICON, format="PNG", optimize=True)
+
     # Multi-resolution favicon.ico (16, 32, 48) from transparent cutout square
     ico_16 = master_cutout_square.resize((16, 16), Image.Resampling.LANCZOS)
     ico_32 = master_cutout_square.resize((32, 32), Image.Resampling.LANCZOS)
@@ -409,7 +530,7 @@ def main() -> None:
         "background_color": DARK,
         "display": "standalone",
     }
-    (PACK_DIR / "site.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (PACK_DIR / "site.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     # Sync playground public/ assets
     public_dir = ICON_DIR.parent.parent / "public"
@@ -474,7 +595,7 @@ def main() -> None:
   pre {{ background: #141414; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #ccc; overflow-x: auto; font-size: 13px; }}
 </style></head><body>
 <h1>NOP Final Icon Pack</h1>
-<p>Chosen final icon: <code>{FINAL_SOURCE_NAME}</code> (also saved as <code>nop-icon.svg</code> and <code>favicon.svg</code>).</p>
+<p>Chosen final icon: <code>{FINAL_NAME}.svg</code> and <code>{FINAL_NAME}-cutout.svg</code> (also saved as <code>pack/nop-icon.svg</code>, <code>pack/favicon.svg</code> and the Houdini shelf icon).</p>
 
 <h2>1. Vector SVG Variants (<code>design/nop-icon/</code> &amp; <code>design/nop-icon/pack/</code>)</h2>
 <div class="row">{"".join(svg_cards)}</div>
@@ -490,7 +611,7 @@ def main() -> None:
 </div>
 </body></html>
 """
-    (ICON_DIR / "web.html").write_text(html, encoding="utf-8")
+    (ICON_DIR / "web.html").write_text(html, encoding="utf-8", newline="\n")
     print(f"wrote {len(svg_variants)} SVGs, {len(png_specs)} PNGs, favicon.ico, og-image.png, and site.webmanifest to {PACK_DIR}")
 
 
