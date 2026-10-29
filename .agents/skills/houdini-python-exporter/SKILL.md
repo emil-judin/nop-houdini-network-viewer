@@ -1,8 +1,8 @@
 ---
 name: houdini-python-exporter
 description: >-
-  Rules for the NOP Houdini exporter (exporter/nop_exporter.py, the Houdini package in exporter/package/).
-  Use when changing what or how the exporter serializes, path scrubbing, subnetwork
+  Rules for the NOP Houdini exporter (exporter/nop_exporter.py, the Houdini package in exporter/package/ and
+  the exporter tests). Use when changing what or how the exporter serializes, path scrubbing, subnetwork
   recursion, icon extraction, the shelf tools or the export dialogs.
 ---
 
@@ -52,6 +52,7 @@ Exports must be as safe to share as a screenshot of the network: no user, client
   name: `<path>/rock.exr`. Server shares lose both server and share names. Absolute Houdini node paths
   (`/obj/...`, `/out/...`) are kept.
 - Owner decision: network box comments are exported as the user wrote them (not scrubbed).
+- Add a test case to `exporter/tests/test_nop_exporter.py` for every new path shape you handle.
 
 ### 3.2 Subnetwork recursion (`should_recurse_subnet`)
 
@@ -80,7 +81,9 @@ Exports must be as safe to share as a screenshot of the network: no user, client
   version and a viewer that reads both.
 - Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0).
 
-## 5. Package
+## 5. Package and tests
 
 - `exporter/package/` is the Houdini package: `nop.json` sets `$NOP_EXPORTER_ROOT` from `$HOUDINI_PACKAGE_PATH`,
   so it works in any package folder. `npm run build:exporter` builds the reproducible zip.
+- Tests: `npm.cmd run test:exporter` (standard library `unittest` with the fake `hou` in
+  `exporter/tests/fake_hou.py`). Extend the fake only with what the exporter calls.

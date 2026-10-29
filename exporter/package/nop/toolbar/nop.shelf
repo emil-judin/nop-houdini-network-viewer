@@ -12,7 +12,7 @@
     <addMemberToolshelf name="nop"/>
   </shelfSetEdit>
 
-  <tool name="nop_export" label="Export for NOP" icon="$NOP_EXPORTER_ROOT/icons/nop.svg">
+  <tool name="nop_export" label="Export for NOP" icon="$NOP_EXPORTER_ROOT/icons/nop.png">
     <helpText><![CDATA[Export the current network (or the selected nodes) for the NOP web viewer: copy to the clipboard or save a .json file.]]></helpText>
     <script scriptType="python"><![CDATA[import sys
 
@@ -26,7 +26,7 @@ nop_exporter.run_interactive_export(kwargs.get("pane"))
 ]]></script>
   </tool>
 
-  <tool name="nop_copy" label="Copy for NOP" icon="$NOP_EXPORTER_ROOT/icons/nop.svg">
+  <tool name="nop_copy" label="Copy for NOP" icon="$NOP_EXPORTER_ROOT/icons/nop.png">
     <helpText><![CDATA[Copy the selected nodes of the Network Editor under the mouse (or the whole network) as compact JSON, without a dialog. Paste it into the NOP playground with Ctrl+V. Bind it to a hotkey such as Ctrl+Shift+Alt+C.]]></helpText>
     <script scriptType="python"><![CDATA[import sys
 

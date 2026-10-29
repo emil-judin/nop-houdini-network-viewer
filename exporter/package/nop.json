@@ -2,6 +2,6 @@
   "env": [
     { "NOP_EXPORTER_ROOT": "$HOUDINI_PACKAGE_PATH/nop" }
   ],
-  "path": "$NOP_EXPORTER_ROOT",
+  "hpath": "$NOP_EXPORTER_ROOT",
   "load_package_once": true
 }
