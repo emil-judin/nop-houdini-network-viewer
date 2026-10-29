@@ -10,8 +10,6 @@ import { TOUCH_TARGET } from './touchTarget';
 export interface BreadcrumbBarProps {
   /** Path segments from the exported root down to the deepest visited level (see `buildNetworkPathSegments`). */
   segments: NetworkPathSegment[];
-  /** Number of operator nodes in the network on screen. */
-  nodeCount: number;
   /** Jumps to the exported level at `depth` (`0` is the exported root). */
   onNavigate: (depth: number) => void;
   /** Whether there is an earlier network in the navigation history. */
@@ -64,12 +62,12 @@ const HistoryButton: React.FC<{
  * circuit_gen`) with each node's icon.
  *
  * Like Houdini, levels below the network on screen stay in the bar after going up, dimmed, so
- * they can be entered again with one click. The path starts at the exported network: nodes above
- * it (for example `obj`) were not exported and cannot be opened, so they are not shown.
+ * they can be entered again with one click. Viewers narrower than 448px (phones) show only the
+ * level on screen, next to the back and forward buttons. The path starts at the exported network:
+ * nodes above it (for example `obj`) were not exported and cannot be opened, so they are not shown.
  */
 export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
   segments,
-  nodeCount,
   onNavigate,
   canGoBack,
   canGoForward,
@@ -78,8 +76,9 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
 }) => (
   <nav
     aria-label="Network path"
-    // Touch screens: the bar grows with its 44px tap targets instead of letting them overflow
-    className="pointer-events-auto min-w-0 max-w-full flex items-center h-[25px] [@media(pointer:coarse)]:h-auto [@media(pointer:coarse)]:min-h-11 rounded-[3px] bg-[#383838] border border-[#2a2a2a] pl-0.5 pr-2 text-[14px] text-[#d6d6d6] shadow-md"
+    // A field across the pane like Houdini's path bar: pane grey with the `#2d2d2d` outline. Touch
+    // screens: the bar grows with its 44px tap targets instead of letting them overflow
+    className="flex-1 min-w-0 flex items-center h-[25px] [@media(pointer:coarse)]:h-auto [@media(pointer:coarse)]:min-h-11 rounded-[3px] bg-[#383838] border border-[#2d2d2d] pl-0.5 pr-2 text-[14px] text-[#d6d6d6]"
   >
     <HistoryButton direction="back" enabled={canGoBack} onClick={onBack} />
     <HistoryButton direction="forward" enabled={canGoForward} onClick={onForward} />
@@ -100,10 +99,15 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
         );
         // Dimmed trail levels stay readable (4.9:1 on the bar); the icon carries the strong dimming
         const tone = segment.dimmed ? 'text-[#a8a8a8]' : 'text-[#d6d6d6]';
+        // Narrow viewers (phones) only show the level on screen: back and forward still move between levels
         return (
-          <li key={segment.path} className="min-w-0 flex items-center">
+          <li key={segment.path} className={`min-w-0 items-center ${segment.current ? 'flex' : 'hidden @md:flex'}`}>
             {index > 0 && (
-              <ChevronRight className="shrink-0 w-3 h-3 mx-0.5 text-[#a8a8a8]" strokeWidth={1.75} aria-hidden="true" />
+              <ChevronRight
+                className="hidden @md:block shrink-0 w-3 h-3 mx-0.5 text-[#a8a8a8]"
+                strokeWidth={1.75}
+                aria-hidden="true"
+              />
             )}
             {clickable ? (
               <button
@@ -127,7 +131,5 @@ export const BreadcrumbBar: React.FC<BreadcrumbBarProps> = ({
         );
       })}
     </ol>
-
-    <span className="shrink-0 ml-2 text-[11px] text-[#b0b0b0] whitespace-nowrap">{nodeCount} nodes</span>
   </nav>
 );

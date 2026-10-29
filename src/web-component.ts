@@ -65,8 +65,10 @@ const SHADOW_CSS = [HOST_CSS, buildShadowPropertyDefaults(viewerCss), viewerCss]
  * 3. the `src` attribute (URL of the exported `.json` file).
  *
  * Optional attributes: `label-size` (`small` | `medium` | `large`), `wire-style`
- * (`default` | `rounded`), `hotkeys` (`focus` | `hover` | `off`), and `minimap`, `toolbar`,
- * `inspector`, `debug-actions`, `fit-view` (`"false"` to switch off). The viewer lives in a Shadow
+ * (`default` | `rounded`), `hotkeys` (`focus` | `hover` | `off`), `focus-node` (a node of the top
+ * level to frame at the start), `minimap` (opens the overview at the start), `touch-pan`
+ * (`two-fingers` | `one-finger`, how touch input moves the network outside fullscreen), and
+ * `toolbar`, `fullscreen`, `inspector`, `debug-actions`, `fit-view` (`"false"` to switch off). The viewer lives in a Shadow
  * DOM, so page styles cannot break it and its styles never leak into the page.
  */
 export class HoudiniNetworkElement extends HTMLElement {

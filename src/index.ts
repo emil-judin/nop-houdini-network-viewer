@@ -7,8 +7,4 @@
 
 import './styles/library.css';
 
-export * from './schema/types';
-export * from './schema/converter';
-export { HoudiniNetwork, type HoudiniNetworkProps } from './components/HoudiniNetwork';
-export { RemoteHoudiniNetwork, type RemoteHoudiniNetworkProps } from './embed/RemoteHoudiniNetwork';
-export { parseEmbedOptions, type EmbedViewerOptions } from './embed/embedAttributes';
+export * from './api';

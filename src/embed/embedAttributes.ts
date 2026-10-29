@@ -1,3 +1,4 @@
+import type { TouchPanMode } from '../components/hooks/useTwoFingerPan';
 import type { HotkeyMode } from '../components/hooks/useViewerHotkeys';
 import type { HoudiniLabelSize } from '../schema/converter';
 import type { HoudiniWireStyle } from '../schema/types';
@@ -11,13 +12,19 @@ export interface EmbedViewerOptions {
   labelSize?: HoudiniLabelSize;
   /** `wire-style`: `default` or `rounded` (missing means the style exported with the network). */
   wireStyle?: HoudiniWireStyle;
-  /** `minimap`: `false` hides the minimap. */
+  /** `minimap`: `true` (or an empty attribute) opens the network overview at the start; closed by default. */
   showMiniMap?: boolean;
-  /** `toolbar`: `false` hides the toolbar (path bar, fit, label size, wire style, fullscreen). */
+  /** `focus-node`: name of a node in the top network level to frame at the start. */
+  focusNode?: string;
+  /** `toolbar`: `false` hides the pane header (path bar, wire style, overview, fullscreen). */
   showToolbar?: boolean;
+  /** `fullscreen`: `false` hides the fullscreen button. */
+  showFullscreenButton?: boolean;
+  /** `touch-pan`: `two-fingers` (default) or `one-finger` (see `HoudiniNetworkProps.touchPan`). */
+  touchPan?: TouchPanMode;
   /** `inspector`: `false` never opens the Parameter Inspector. */
   showInspector?: boolean;
-  /** `debug-actions`: `true` shows the Copy/Download JSON buttons (hidden by default in embeds). */
+  /** `debug-actions`: `true` shows the Download JSON button (hidden by default in embeds). */
   showDebugActions?: boolean;
   /** `fit-view`: `false` keeps the initial view instead of fitting the network. */
   fitView?: boolean;
@@ -37,6 +44,9 @@ export const EMBED_OPTION_NAMES = [
   'debug-actions',
   'fit-view',
   'hotkeys',
+  'focus-node',
+  'fullscreen',
+  'touch-pan',
 ] as const;
 
 /**
@@ -69,9 +79,19 @@ export function parseEmbedOptions(read: (name: string) => string | null): EmbedV
   if (hotkeys === 'focus' || hotkeys === 'hover' || hotkeys === 'off') {
     options.hotkeys = hotkeys;
   }
+  const touchPan = read('touch-pan');
+  if (touchPan === 'two-fingers' || touchPan === 'one-finger') {
+    options.touchPan = touchPan;
+  }
+  // A Houdini node name; the viewer ignores names that are not in the network
+  const focusNode = read('focus-node')?.trim();
+  if (focusNode) {
+    options.focusNode = focusNode;
+  }
   const flags: Array<[string, keyof EmbedViewerOptions]> = [
     ['minimap', 'showMiniMap'],
     ['toolbar', 'showToolbar'],
+    ['fullscreen', 'showFullscreenButton'],
     ['inspector', 'showInspector'],
     ['debug-actions', 'showDebugActions'],
     ['fit-view', 'fitView'],
