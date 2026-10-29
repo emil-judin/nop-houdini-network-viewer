@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. Versions follow [Semantic Versioning](https://semver.org/); `alpha` releases can still change the JSON schema and the component API.
 
-## Unreleased
+## 0.1.0-alpha.2 (tester release, 2026-10-29)
 
 Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs/HISTORY.md`).
 
@@ -12,9 +12,17 @@ Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs
 - New optional `exportWarnings`: parameters that could not be read are counted and reported in the status bar.
 - Asks before overwriting a file when it adds `.json` to the chosen name.
 - Hide-when / disable-when rules evaluate each parameter once per node (faster exports of heavy networks).
-- Houdini package: `nop.json` uses `$HOUDINI_PACKAGE_PATH`, so the package works in any package folder; the variable is now `$NOP_EXPORTER_ROOT`. The download zip is reproducible.
+- Houdini package: `nop.json` uses `$HOUDINI_PACKAGE_PATH`, so the package works in any package folder; the variable is now `$NOP_EXPORTER_ROOT`. The download zip is reproducible. The package adds its folder with `hpath` instead of the deprecated `path` key.
 
 ### Viewer
+- **Houdini pane header:** the path bar and the tools no longer float over the canvas. They form one docked row like Houdini's Network Editor: the path bar, then the node count (hidden in narrow viewers), wire style, overview, (debug) Download JSON and fullscreen as icon buttons. Viewers narrower than 448px (phones) keep the back and forward buttons but show only the level on screen and no Download JSON button.
+- **Fullscreen instead of Fit:** the fullscreen button is shown by default (`showFullscreenButton` / `fullscreen="false"` hides it); entering and leaving fullscreen fits the network to the new size. The Fit button is gone: `H`, or a double-click or double-tap on the empty canvas, fits the network.
+- **Touch screens:** new `touchPan` prop / `touch-pan` attribute. By default (`two-fingers`) one finger scrolls the page past the viewer and two fingers move and zoom the network, with a short hint that has a big **Open fullscreen** button; in fullscreen one finger moves it. `one-finger` keeps one-finger panning (the playground uses it).
+- **Narrow viewers** (under 448px) frame a node with zoom at most 1 instead of 1.6 (`F`, `focusNode`), so its name and label stay on screen.
+- **Start view settings:** the network overview now starts **closed** (`showMiniMap` / `minimap="true"` opens it at the start). New `focusNode` prop / `focus-node` attribute: the view starts framed on that node of the top level, like Houdini's `F` (default: the whole network). The wire style still comes from the prop or attribute, else from the network file, else Houdini's default straight style.
+- **Middle mouse button pans** the network, like in Houdini. Over the viewer it never starts the browser's auto-scroll; elsewhere on the page it works as usual.
+- **Selected nodes stay in view:** when the Parameter Inspector opens beside (or below) the canvas and covers any part of the clicked node, the view pans the node to the middle of the remaining canvas and keeps the zoom. A fully visible node does not move the view.
+- **Removed visitor controls:** the S / M / L label size switch (the size stays a setting of the embedding page: `labelSize` prop, `label-size` attribute or URL parameter), and Copy JSON.
 - **For-Each and Compile blocks:** the tinted underlay Houdini draws behind a block, a rounded outline in the Block End color around the begin, metadata, in-between and end nodes. Works with existing exports (read from `blockpath`).
 - **Block method labels:** For-Each Block Begin and End nodes show their method in blue under the name (`Point`, `Metadata`, `Merge`, ...), like Houdini. Works with existing exports.
 - **Dotted wires:** the wire into the second input (target points) of Copy to Points is dotted, like Houdini. Works with existing exports.
@@ -37,11 +45,17 @@ Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs
 - Correct source maps for the minified web component. Peer range narrowed to React 18 (the tested version). `engines.node` is `>=20`. The package ships `schema/nop-network-1.schema.json`.
 
 ### Playground
+- **Houdini layout:** no menu bar. A collapsible **Networks** pane with the example files beside the network view (folded on phones, floats over the network when opened and folds again on a tap beside it): **Open file** and **Paste** at its top, and at its bottom (trial) an about block with the NOP logo, "NOP", "Playground for Houdini Network Web Viewer", the version, **Get the exporter** and **Feedback**. A pane tab over the network, and a status bar with the Houdini version of the network on screen, the exporter version and, while the pane is folded, the NOP icon and name. The page title is "NOP Playground". The Houdini version badge is gone.
+- **Tester onboarding:** a one-screen welcome card on the first visit (export, explore, embed; **Help** opens it again). **Embed this network** at the bottom of the Networks pane (with **Get the exporter** and **Help**) opens the embed code; for the examples the file address is filled in and works, because the playground now publishes the example files at `examples/`. An **example website** (`example-site.html`) shows two networks on a plain light page through the real `<houdini-network>` web component, published at `lib/`; on phones its viewers use the full width and 70% of the screen height. Example rows describe what they show, `?example=<key>` links open one, and new examples in `fixtures/examples/` appear on their own.
+- The playground uses the package only through its public API (`src/api.ts`, enforced by ESLint).
+
+### Icon
+- **New NOP icon:** a bolder spider web with two turns and a 34px stroke, easier to read at favicon sizes. It replaces the favicons, app icons, social preview image and the Houdini shelf icon (now the see-through version, as `icons/nop.png`); the whole pack (orange, white, dark, black, rounded, circle, cutout) is regenerated by `scripts/build_nop_icon_pack.py`.
 - Demos load on demand; the small Circuit Board demo opens first. Content-Security-Policy meta tag. Embed dialog: "Not on npm yet" note on the HTML and React tabs, a height field that keeps what you type. A network from another site is labelled with its host in embed mode. Feedback sends the page address without its query and names Web3Forms. Proper tabs and a page heading for screen readers.
 
 ### Project
 - **Renamed WOP to NOP** (2026-10-28): npm package `nop-houdini-network-viewer`, CSS prefix `.nop-` (`.nop-root`), exporter `nop_exporter.py`, Houdini package `nop.json` with `$NOP_EXPORTER_ROOT`, shelf **NOP**, schema file `schema/nop-network-1.schema.json`. Exported network files are unchanged and keep working. Upgrading from the WOP exporter (before 2026-10-28): delete the old `wop.json` and the `wop` folder first, otherwise Houdini shows both shelves.
-- ESLint, `.editorconfig`, `.nvmrc`. CI workflow on every push and pull request; SHA-pinned actions and Dependabot. `SECURITY.md`, `CONTRIBUTING.md`, JSON Schema file, agent skills rewritten and three new ones.
+- Tests: Vitest unit and component tests, Python exporter tests with a fake `hou`, Playwright browser tests in Chromium, Firefox, WebKit and device profiles. ESLint, `.editorconfig`, `.nvmrc`. CI workflow on every push and pull request; SHA-pinned actions and Dependabot. `SECURITY.md`, `CONTRIBUTING.md`, `docs/TESTING.md`, JSON Schema file, agent skills rewritten and three new ones.
 
 ## 0.1.0-alpha.1 (tester release)
 
@@ -53,7 +67,7 @@ Hosted playground for a small group of testers. Not published on npm yet.
 ### Playground
 - **Exporter** button: download the Houdini package (or the plain `wop_exporter.py`) with install steps.
 - **Feedback** button: testers send a message straight to the author's email (shown when the build sets `VITE_WEB3FORMS_KEY`).
-- The Icon Review tab is now only in the dev server, no longer in the hosted playground.
+- The Icon Review tab is now only in the dev server, no longer in the hosted playground. Since 2026-10-29 it is opened with a `?icons` link instead of a row in the Networks pane.
 - Link previews: absolute `og:url` / `og:image` when the hosted address is known; `noindex` while testing.
 - Deployed to GitHub Pages by `.github/workflows/deploy-playground.yml`.
 
