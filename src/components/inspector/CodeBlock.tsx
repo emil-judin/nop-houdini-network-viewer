@@ -5,19 +5,22 @@ import type { CodeLanguage } from './parmModel';
 import { TOUCH_TARGET } from '../hud/touchTarget';
 
 /**
- * Token colors, tuned for the dark `#1f1f1f` editor field of the Houdini 22 Parameter Pane.
+ * Token colors of Houdini 22's code editors (the `ParmSyntax*Color` entries of its dark UI theme),
+ * checked against screenshots of a VEX snippet: attributes and preprocessor lines share the
+ * reference color, strings are green including their quotes.
  */
 const TOKEN_COLORS: Record<CodeTokenKind, string | undefined> = {
   plain: undefined,
-  comment: '#7f9a7f',
-  string: '#e3b56f',
-  number: '#b8d7a3',
-  keyword: '#d08ad6',
-  type: '#6db4e0',
-  attribute: '#f39b5b',
-  function: '#e0d890',
-  preprocessor: '#c586c0',
-  constant: '#6db4e0',
+  comment: '#7b7e84',
+  string: '#79a978',
+  number: '#ebb845',
+  keyword: '#6799c0',
+  type: '#93d4eb',
+  attribute: '#d2cf9c',
+  function: '#8888c1',
+  preprocessor: '#d2cf9c',
+  // Python's True, False, None and self: keywords in Houdini's editor
+  constant: '#6799c0',
 };
 
 const LANGUAGE_NAMES: Record<CodeLanguage, string> = {
@@ -67,8 +70,8 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
   };
 
   return (
-    // Houdini's code editor: near-black field, line numbers in a gutter, Copy button at the top right
-    <div className="relative rounded-[2px] border border-[#3a3a3a] bg-[#141414]">
+    // Houdini 22's code editor: `#131313` field, plain text `#bcbec3`, line numbers in a gutter, Copy button at the top right
+    <div className="relative rounded-[2px] border border-[#3a3a3a] bg-[#131313]">
       {showCopy && (
         <button
           type="button"
@@ -85,12 +88,13 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
         role="region"
         aria-label={`${LANGUAGE_NAMES[language]} code`}
         tabIndex={0}
-        className="flex max-h-80 overflow-auto [scrollbar-color:#555555_#141414] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]"
+        className="flex max-h-80 overflow-auto [scrollbar-color:#555555_#131313] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]"
       >
-        <pre aria-hidden="true" className="sticky left-0 m-0 py-1.5 pl-2 pr-2 text-right text-[#8c8c8c] bg-[#1c1c1c] select-none">
+        {/* Houdini's dim line numbers on a grey strip (decorative: hidden from screen readers) */}
+        <pre aria-hidden="true" className="sticky left-0 m-0 py-1.5 pl-2 pr-2 text-right text-[#656565] bg-[#282828] select-none">
           {code.split('\n').map((_, i) => `${i + 1}\n`).join('')}
         </pre>
-        <pre className="m-0 flex-1 px-2 py-1.5 text-[#d6d6d6] select-text whitespace-pre">
+        <pre className="m-0 flex-1 px-2 py-1.5 text-[#bcbec3] select-text whitespace-pre">
           <code>
             {tokens.map((token, i) => {
               const color = TOKEN_COLORS[token.kind];
