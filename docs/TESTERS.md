@@ -56,3 +56,5 @@ To remove it later, delete `nop.json` and the `nop` folder. Upgrading from the W
 ## 6. Send feedback
 
 Click **Feedback** at the bottom of the Networks pane. Your message goes straight to me by email (through Web3Forms), with the NOP version, your browser and the name of the network on screen; your network file is never sent. Add your name or email if you would like an answer. Screenshots help: if something looks wrong, mention what you expected and I may ask you for one.
+
+If a Houdini file did not export or does not show correctly, upload it (or a `.zip`) through the [file request on Dropbox](https://www.dropbox.com/request/hcdwq7x51fbvrwvdmbaq). You do not need a Dropbox account, and the link is also in the Feedback form. Only share files you are allowed to share: a `.hip` file contains full file paths, user and project names and every asset in it, so leave out purchased assets and work under an NDA, and cut the scene down to the nodes that show the problem if you can.

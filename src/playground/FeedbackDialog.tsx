@@ -18,6 +18,9 @@ export interface FeedbackDialogProps {
   networkName: string;
 }
 
+/** Dropbox file request for Houdini files that did not export or show correctly (no account needed to upload). */
+export const FILE_UPLOAD_URL = 'https://www.dropbox.com/request/hcdwq7x51fbvrwvdmbaq';
+
 const FIELD = 'w-full px-2 rounded-[3px] border border-transparent bg-[#434343] text-base sm:text-[13px] text-white focus:outline-none focus:border-[#7082b9]';
 
 /**
@@ -89,9 +92,21 @@ export const FeedbackDialog: React.FC<FeedbackDialogProps> = ({ open, onClose, n
             className="hidden"
           />
           <p className="text-[12px] text-[#9a9a9a]">
-            Sent along: the NOP version, your browser, the page address (without its query) and the network on
-            screen ({networkName}). Your network file itself is not sent. The message is delivered by email through
-            Web3Forms.
+            Sent along: the NOP version, your browser, the page address (without its query) and the network name.
+            Your network file itself is not sent.
+          </p>
+          {/* A separate upload page: this form never sends files. A new tab keeps the message typed so far. */}
+          <p className="text-[12px] text-[#9a9a9a]">
+            A Houdini file that did not work?{' '}
+            <a
+              href={FILE_UPLOAD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#a9b8e6] underline underline-offset-2 hover:text-white"
+            >
+              Upload it to Dropbox
+            </a>{' '}
+            (no account needed).
           </p>
           {state.kind === 'error' && (
             <p role="alert" className="text-[#f0c8c8]">
