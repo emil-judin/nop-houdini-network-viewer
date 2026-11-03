@@ -83,12 +83,13 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language }) => {
           <span>{copied ? 'Copied' : 'Copy'}</span>
         </button>
       )}
-      {/* A focusable, named region: keyboard users can scroll long code with the arrow keys */}
+      {/* A focusable, named region: keyboard users can scroll long code with the arrow keys.
+          `items-start`: stretched items would stop at the 320px box height, cutting off the gutter background */}
       <div
         role="region"
         aria-label={`${LANGUAGE_NAMES[language]} code`}
         tabIndex={0}
-        className="flex max-h-80 overflow-auto [scrollbar-color:#555555_#131313] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]"
+        className="flex items-start max-h-80 overflow-auto [scrollbar-color:#555555_#131313] [scrollbar-width:thin] font-mono text-[12px] leading-[1.45]"
       >
         {/* Houdini's dim line numbers on a grey strip (decorative: hidden from screen readers) */}
         <pre aria-hidden="true" className="sticky left-0 m-0 py-1.5 pl-2 pr-2 text-right text-[#656565] bg-[#282828] select-none">
