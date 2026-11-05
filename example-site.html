@@ -1,0 +1,318 @@
+<!doctype html>
+<!--
+  Example page for the NOP Playground: a plain page that embeds networks with the <houdini-network>
+  web component, exactly as a user would on their own site. View the source to copy the pattern.
+  The build publishes ./lib/ (the web component from `npm run build:lib`) and ./examples/ (the
+  example networks) next to this page, see `exampleSiteFiles` in vite.config.ts.
+
+  The playground's Embed button opens this page. The page script (src/examplePage/main.ts) shows one
+  example at the top with the embed options and code, and adds the code under each article network. The Content-Security-Policy is added by the build.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example Page with NOP</title>
+    <meta name="description" content="A sample article with Houdini node networks embedded by the NOP web component." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #1f2328;
+        --muted: #59636e;
+        --line: #d8dee4;
+        --page: #fbfbf9;
+        --note: #fff4d6;
+        --note-line: #e8c96a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font: 17px/1.65 Georgia, "Times New Roman", serif;
+      }
+      .note {
+        margin: 0;
+        background: var(--note);
+        border-bottom: 1px solid var(--note-line);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        padding: 10px 16px;
+        text-align: center;
+      }
+      .note a {
+        color: inherit;
+        font-weight: 600;
+      }
+      main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 40px 16px 64px;
+      }
+      .kicker {
+        color: var(--muted);
+        font: 13px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+        letter-spacing: 0.06em;
+        margin: 0 0 8px;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: clamp(30px, 6vw, 42px);
+        line-height: 1.15;
+        margin: 0 0 16px;
+      }
+      h2 {
+        font-size: 24px;
+        line-height: 1.25;
+        margin: 40px 0 12px;
+      }
+      figure {
+        margin: 24px 0;
+      }
+      houdini-network {
+        display: block;
+        height: 480px;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      /* The embedder's network: its height follows the Height option */
+      houdini-network.preview {
+        height: var(--nop-embed-height, 480px);
+      }
+      .embedder {
+        background: #eef2f8;
+        border-bottom: 1px solid var(--line);
+      }
+      .embedder > div {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 24px 16px 32px;
+      }
+      /* The first heading of the page: as big as the article's */
+      .embedder h2 {
+        font-size: clamp(30px, 6vw, 42px);
+        line-height: 1.15;
+        margin: 0 0 16px;
+      }
+      /* Embed code panel (src/examplePage/embedPanel.ts) */
+      .embed {
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 12px 0 28px;
+        padding: 12px 14px;
+      }
+      .embed-options {
+        display: grid;
+        gap: 10px 16px;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 14px;
+      }
+      .embed-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .embed-field-wide,
+      .embed-checks {
+        grid-column: 1 / -1;
+      }
+      .embed-field-label {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .embed input[type="text"],
+      .embed input[type="number"],
+      .embed select {
+        border: 1px solid #c4ccd4;
+        border-radius: 4px;
+        font: 16px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif;
+        min-height: 40px;
+        padding: 6px 8px;
+      }
+      .embed input[type="text"] {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 14px;
+      }
+      .embed-checks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 20px;
+      }
+      .embed-check {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        min-height: 44px;
+      }
+      .embed-check input {
+        height: 18px;
+        width: 18px;
+      }
+      .embed-tabs {
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        gap: 4px;
+        padding-bottom: 6px;
+      }
+      .embed-tab {
+        background: transparent;
+        border: 0;
+        border-radius: 4px;
+        color: var(--muted);
+        cursor: pointer;
+        font: 600 14px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0 12px;
+      }
+      .embed-tab[aria-selected="true"] {
+        background: var(--text);
+        color: #ffffff;
+      }
+      .embed-help {
+        color: var(--muted);
+        margin: 8px 0 0;
+      }
+      .embed-warning {
+        color: #8a5a00;
+        margin: 4px 0 0;
+      }
+      .embed-code {
+        position: relative;
+      }
+      .embed-code pre {
+        margin: 8px 0 0;
+        max-height: 288px;
+        padding-right: 84px;
+      }
+      .embed-copy {
+        background: var(--text);
+        border: 0;
+        border-radius: 4px;
+        color: #ffffff;
+        cursor: pointer;
+        font: 600 13px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+        min-height: 44px;
+        min-width: 64px;
+        position: absolute;
+        right: 8px;
+        top: 8px;
+      }
+      @media (max-width: 600px) {
+        .embed-options {
+          grid-template-columns: 1fr;
+        }
+      }
+      figcaption {
+        color: var(--muted);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin-top: 8px;
+      }
+      pre {
+        background: #f0f2f4;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 13px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+        overflow-x: auto;
+        padding: 12px 14px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        font-size: 0.9em;
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin-top: 48px;
+        padding-top: 16px;
+      }
+      footer a {
+        color: inherit;
+      }
+      /* Phones: the viewers use the full screen width and most of its height, so the network and the
+         parameter sheet have room. One finger scrolls the article, two fingers move the network. */
+      @media (max-width: 600px) {
+        houdini-network {
+          margin: 0 -16px;
+          border-radius: 0;
+          height: 70vh;
+          height: 70svh;
+        }
+        .embedder > div {
+          padding-top: 16px;
+        }
+      }
+    </style>
+    <!-- The web component as your own page would load it; the build copies it to ./lib/ (vite-ignore: not bundled) -->
+    <script type="module" src="./lib/web-component.js" vite-ignore></script>
+    <script type="module" src="./src/examplePage/main.ts"></script>
+  </head>
+  <body>
+    <p class="note">
+      This is an example page: it shows how Houdini networks look when you embed them with NOP on your own page.
+      <a href="./">Back to the NOP Playground</a>
+    </p>
+
+    <!-- Filled by the page script: one example network with the embed options and code -->
+    <section id="embedder" class="embedder" aria-labelledby="embedder-title" hidden>
+      <div>
+        <h2 id="embedder-title">Embed a network on your website</h2>
+        <p>
+          This is the Start Here example as it looks on a web page. Change the options below: the network follows
+          them, and the code is ready to copy. For your own network, upload the .json file you exported from Houdini
+          next to your page and put its address in the first field.
+        </p>
+        <figure data-preview></figure>
+      </div>
+    </section>
+
+    <main>
+      <p class="kicker">Sample article</p>
+      <h1>Loops and VEX in a Houdini network</h1>
+      <p>
+        Imagine this is your portfolio or blog. Below the text you would normally show a screenshot of your node
+        network. With NOP your readers get the real network instead: they can move around, zoom in, open subnetworks
+        and read every parameter and VEX snippet, on desktop and on their phones.
+      </p>
+
+      <h2>The loop</h2>
+      <p>
+        Boxes are copied onto scattered points, then a For-Each block works on every piece on its own. The tinted
+        block shows which nodes run once per piece. Click <code>twist_piece</code> to see its parameters.
+      </p>
+      <figure>
+        <houdini-network src="examples/for_each-network.json" focus-node="twist_piece" data-embed-code></houdini-network>
+        <figcaption>The view starts on the node inside the loop (<code>focus-node="twist_piece"</code>); press H or double-click the background to see everything.</figcaption>
+      </figure>
+
+      <h2>The code</h2>
+      <p>
+        Readers can open every wrangle and read its VEX in the colors of Houdini's own editor, instead of squinting at a
+        screenshot. Click <code>wrangle_rings</code> to read its code.
+      </p>
+      <figure>
+        <houdini-network src="examples/vex_wrangles-network.json" data-embed-code></houdini-network>
+        <figcaption>A grid run through three Attribute Wrangles and a Python node.</figcaption>
+      </figure>
+
+      <h2>How this page does it</h2>
+      <p>
+        One script tag on the page, then one <code>&lt;houdini-network&gt;</code> tag per network, pointing at the file
+        exported from Houdini: the code under each network above. The viewer draws inside its own Shadow DOM, so the
+        styles of your site and of the network never mix. During the tester phase the script is not on npm yet; the
+        iframe tab has a version that works today.
+      </p>
+
+      <footer>
+        Networks shown with <a href="./">NOP</a>, the Houdini Network Web Viewer. Not affiliated with SideFX.
+        Houdini is a trademark of Side Effects Software Inc.
+      </footer>
+    </main>
+  </body>
+</html>

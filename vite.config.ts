@@ -39,8 +39,9 @@ function localReferenceIcons(): Plugin {
 function openGraphUrls(siteUrl: string | undefined): Plugin {
   return {
     name: 'open-graph-urls',
-    transformIndexHtml() {
-      if (!siteUrl) return [];
+    transformIndexHtml(_html, context) {
+      // Only the playground page: the example page is not meant to be shared or indexed
+      if (!siteUrl || !context.path.endsWith('/index.html')) return [];
       const base = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`;
       return [
         { tag: 'meta', attrs: { property: 'og:url', content: base }, injectTo: 'head' },
@@ -97,7 +98,7 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 /**
- * Publishes what the embed snippets and `public/example-site.html` load, next to the playground page:
+ * Publishes what the embed snippets and `example-site.html` load, next to the playground page:
  *
  * - `examples/<name>-network.json`: the example networks, at stable addresses a snippet can point to.
  * - `lib/`: the `<houdini-network>` web component from `dist/`, so the example site shows the real
@@ -169,7 +170,7 @@ const CONTENT_SECURITY_POLICY = [
   "form-action 'none'",
 ].join('; ');
 
-/** Adds `CONTENT_SECURITY_POLICY` to the built playground page. */
+/** Adds `CONTENT_SECURITY_POLICY` to the built pages (the playground and the example page). */
 function contentSecurityPolicy(): Plugin {
   return {
     name: 'content-security-policy',
@@ -208,6 +209,13 @@ export default defineConfig(({ mode }) => ({
   build: {
     // `dist/` belongs to the library build (`npm.cmd run build:lib`)
     outDir: 'dist-playground',
+    // Two pages: the playground and the example page its Embed button opens
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        example: fileURLToPath(new URL('./example-site.html', import.meta.url)),
+      },
+    },
     // The largest chunks are example networks (JSON data), each loaded only when its example is opened
     chunkSizeWarningLimit: 1000,
   },

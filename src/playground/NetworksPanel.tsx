@@ -25,6 +25,8 @@ export interface NetworksPanelSection {
   title: string;
   /** Rows of the group, in order. */
   items: NetworksPanelItem[];
+  /** Muted line in place of the rows while there are none (pinned group only). */
+  emptyText?: string;
 }
 
 /** Props for {@link NetworksPanel}. */
@@ -41,8 +43,13 @@ export interface NetworksPanelProps {
   onToggleCollapsed: () => void;
   /** Narrow screens: the unfolded panel floats over the network instead of narrowing it. */
   overlay: boolean;
-  /** Content fixed at the top of the unfolded panel, above the list (for example open and paste buttons). */
-  actions?: React.ReactNode;
+  /**
+   * A group right under the list that never scrolls out of view: its title always shows, then its
+   * rows (scrolling on their own when there are many) and `pinnedContent` under them.
+   */
+  pinnedSection?: NetworksPanelSection;
+  /** Content under the rows of the pinned group (for example the open and paste buttons). */
+  pinnedContent?: React.ReactNode;
   /** Content fixed at the bottom of the unfolded panel, under the list (for example the NOP logo). */
   footer?: React.ReactNode;
 }
@@ -51,6 +58,47 @@ const PANEL_ID = 'playground-networks-panel';
 
 /** Square icon button of the pane tab strip. */
 const STRIP_BUTTON = `flex items-center justify-center w-6 h-6 rounded-[3px] text-[#c0c0c0] hover:bg-[#474e62] hover:text-white cursor-pointer ${TOUCH_TARGET}`;
+
+/** The rows of one group of the pane. */
+const SectionRows: React.FC<{
+  items: NetworksPanelItem[];
+  activeKey: string;
+  onSelect: (key: string) => void;
+  className?: string;
+}> = ({ items, activeKey, onSelect, className }) => (
+  <ul className={className}>
+    {items.map(({ key, label, detail, description, title, icon: Icon }) => {
+      const active = key === activeKey;
+      const muted = active ? 'text-[#c4c9d8]' : 'text-[#a8a8a8] group-hover:text-[#c0c0c0]';
+      return (
+        <li key={key}>
+          <button
+            type="button"
+            onClick={() => onSelect(key)}
+            aria-current={active ? 'true' : undefined}
+            title={title}
+            // Houdini's selection highlight is the same blue-grey as its pressed buttons
+            className={`group w-full flex gap-2 pl-4 pr-2 text-left text-[13px] cursor-pointer ${TOUCH_TARGET} ${
+              description ? 'items-start py-1' : 'items-center h-6'
+            } ${active ? 'bg-[#474e62] text-white' : 'text-[#d6d6d6] hover:bg-[#444444] hover:text-white'}`}
+          >
+            <Icon className={`shrink-0 w-3.5 h-3.5 ${description ? 'mt-[3px]' : ''}`} aria-hidden="true" />
+            <span className="flex-1 min-w-0">
+              <span className="block truncate">{label}</span>
+              {/* Trial (2026-11-04): room for two lines in every row, so all examples are the same height */}
+              {description && (
+                <span className={`block min-h-[33px] line-clamp-2 text-[12px] leading-[1.35] ${muted}`}>
+                  {description}
+                </span>
+              )}
+            </span>
+            {detail && <span className={`shrink-0 text-[12px] ${description ? 'mt-px' : ''} ${muted}`}>{detail}</span>}
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+);
 
 /**
  * Collapsible side pane in the style of a Houdini pane (Tree View): a pane tab strip on top and a
@@ -63,7 +111,8 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
   collapsed,
   onToggleCollapsed,
   overlay,
-  actions,
+  pinnedSection,
+  pinnedContent,
   footer,
 }) => {
   // Folded: a thin pane with the name written vertically, the whole strip opens the panel
@@ -93,7 +142,8 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
       onKeyDown={(event) => {
         if (overlay && event.key === 'Escape') onToggleCollapsed();
       }}
-      className={`flex flex-col w-60 bg-[#383838] ${overlay ? 'absolute inset-y-0 left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]' : 'shrink-0'}`}
+      // Wider beside the network on desktops; narrower where it floats over the network on phones
+      className={`flex flex-col bg-[#383838] ${overlay ? 'w-60 absolute inset-y-0 left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]' : 'w-80 shrink-0'}`}
     >
       <PaneTabStrip label="Networks">
         <button
@@ -109,45 +159,37 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
         </button>
       </PaneTabStrip>
 
-      {actions && <div className="shrink-0 border-b border-[#2d2d2d]">{actions}</div>}
+      {/* The pinned group follows the list directly; when space runs short, only the list scrolls */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="min-h-0 overflow-y-auto pt-1">
+          {sections
+            .filter((section) => section.items.length > 0)
+            .map((section) => (
+              <section key={section.title} className="mb-2">
+                <h2 className="px-2 py-1 text-[12px] font-bold text-[#a8a8a8]">{section.title}</h2>
+                <SectionRows items={section.items} activeKey={activeKey} onSelect={onSelect} />
+              </section>
+            ))}
+        </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto py-1">
-        {sections
-          .filter((section) => section.items.length > 0)
-          .map((section) => (
-            <section key={section.title} className="mb-2">
-              <h2 className="px-2 py-1 text-[12px] font-bold text-[#a8a8a8]">{section.title}</h2>
-              <ul>
-                {section.items.map(({ key, label, detail, description, title, icon: Icon }) => {
-                  const active = key === activeKey;
-                  const muted = active ? 'text-[#c4c9d8]' : 'text-[#a8a8a8] group-hover:text-[#c0c0c0]';
-                  return (
-                    <li key={key}>
-                      <button
-                        type="button"
-                        onClick={() => onSelect(key)}
-                        aria-current={active ? 'true' : undefined}
-                        title={title}
-                        // Houdini's selection highlight is the same blue-grey as its pressed buttons
-                        className={`group w-full flex gap-2 pl-4 pr-2 text-left text-[13px] cursor-pointer ${TOUCH_TARGET} ${
-                          description ? 'items-start py-1' : 'items-center h-6'
-                        } ${active ? 'bg-[#474e62] text-white' : 'text-[#d6d6d6] hover:bg-[#444444] hover:text-white'}`}
-                      >
-                        <Icon className={`shrink-0 w-3.5 h-3.5 ${description ? 'mt-[3px]' : ''}`} aria-hidden="true" />
-                        <span className="flex-1 min-w-0">
-                          <span className="block truncate">{label}</span>
-                          {description && <span className={`block text-[12px] leading-[1.35] ${muted}`}>{description}</span>}
-                        </span>
-                        {detail && <span className={`shrink-0 text-[12px] ${description ? 'mt-px' : ''} ${muted}`}>{detail}</span>}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
+        {pinnedSection && (
+          <section className="shrink-0">
+            <h2 className="px-2 py-1 text-[12px] font-bold text-[#a8a8a8]">{pinnedSection.title}</h2>
+            {/* Many files scroll here, so the list of examples above keeps its room */}
+            {pinnedSection.items.length === 0 && pinnedSection.emptyText ? (
+              <p className="px-2 py-1 text-center text-[12px] text-[#a8a8a8]">{pinnedSection.emptyText}</p>
+            ) : (
+              <SectionRows
+                items={pinnedSection.items}
+                activeKey={activeKey}
+                onSelect={onSelect}
+                className="max-h-[132px] overflow-y-auto"
+              />
+            )}
+            {pinnedContent}
+          </section>
+        )}
       </div>
-
       {footer && <div className="shrink-0">{footer}</div>}
     </aside>
   );
