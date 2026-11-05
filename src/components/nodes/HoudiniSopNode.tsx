@@ -10,6 +10,7 @@ import { LABEL_SIZE_STYLES } from './labelSizeStyles';
 import {
   getConnectorShapePosition,
   getFlagEdgePaths,
+  getFlagInteriorEdgePaths,
   getMultiInputBarSvgPath,
   getNodeShapeDef,
   pointsToSvgPath,
@@ -125,12 +126,19 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
 
   const flagRegions = useMemo(() => {
     const flags = shapeDef.flags ?? {};
-    return ['0', '1', '2', '3'].map((slot) => {
+    const slots = ['0', '1', '2', '3'];
+    let edges = slots.map((slot) => getFlagEdgePaths(flags[slot]));
+    // Shapes without divider lines of their own (the round `circle`) show the flag area borders
+    // that run inside the body instead, like Houdini: an inner ring and four spokes
+    if (edges.every((paths) => paths.length === 0)) {
+      edges = slots.map((slot) => getFlagInteriorEdgePaths(flags[slot], shapeDef.outline));
+    }
+    return slots.map((slot, index) => {
       const region = flags[slot];
       return {
         slot,
         fillPath: region?.outline ? pointsToSvgPath(region.outline, true) : '',
-        edgePaths: getFlagEdgePaths(region),
+        edgePaths: edges[index],
       };
     });
   }, [shapeDef]);

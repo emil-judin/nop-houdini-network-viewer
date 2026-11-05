@@ -161,6 +161,37 @@ export const SOP_ATTRIBUTE_ICONS: OperatorIconDef[] = [
     ),
   },
   {
+    id: 'sop.python',
+    label: 'Python',
+    family: 'sop',
+    description:
+      'Two interlocking rounded snake shapes turned 180 degrees to each other: blue at the top left, yellow at the bottom right, each with a small white eye in its head (vendor logo, redrawn).',
+    types: ['python'],
+    refKey: 'SOP_python',
+    render: () => (
+      <>
+        {/* Blue snake: head at the top, body across the middle, tail down the left */}
+        <path
+          d="M9 2H13.5Q15.5 2 15.5 4V9.5Q15.5 11.5 13.5 11.5H8.5Q6.5 11.5 6.5 13.5V15.5H4.5Q2.5 15.5 2.5 13.5V9.5Q2.5 7.5 4.5 7.5H11V6.5H7V4Q7 2 9 2Z"
+          fill="#3672c4"
+          stroke="#262626"
+          strokeWidth="1.1"
+          strokeLinejoin="round"
+        />
+        <circle cx="9" cy="4.2" r="0.95" fill="#ffffff" stroke="#262626" strokeWidth="0.6" />
+        {/* Yellow snake: the blue one turned 180 degrees around the center */}
+        <path
+          d="M15 22H10.5Q8.5 22 8.5 20V14.5Q8.5 12.5 10.5 12.5H15.5Q17.5 12.5 17.5 10.5V8.5H19.5Q21.5 8.5 21.5 10.5V14.5Q21.5 16.5 19.5 16.5H13V17.5H17V20Q17 22 15 22Z"
+          fill="#f2c438"
+          stroke="#262626"
+          strokeWidth="1.1"
+          strokeLinejoin="round"
+        />
+        <circle cx="15" cy="19.8" r="0.95" fill="#ffffff" stroke="#262626" strokeWidth="0.6" />
+      </>
+    ),
+  },
+  {
     id: 'sop.color',
     label: 'Color',
     family: 'sop',

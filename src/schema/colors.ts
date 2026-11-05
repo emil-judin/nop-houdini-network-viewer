@@ -47,3 +47,29 @@ export function houdiniRgbScaledToCss(color: HoudiniRgbColor, factor: number): s
 export function houdiniRgbLuminance(color: HoudiniRgbColor): number {
   return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2];
 }
+
+/** WCAG relative luminance of `#f0f0f0`, the light title color. */
+const LIGHT_TITLE_LUMINANCE = 0.871;
+
+/**
+ * WCAG relative luminance of a Houdini RGB tuple. Houdini colors are display values like CSS colors,
+ * so each channel is linearized first (unlike the quick {@link houdiniRgbLuminance}).
+ */
+function houdiniRgbRelativeLuminance(color: HoudiniRgbColor): number {
+  const linear = (value: number) => {
+    const c = Math.max(0, Math.min(1, value));
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * linear(color[0]) + 0.7152 * linear(color[1]) + 0.0722 * linear(color[2]);
+}
+
+/**
+ * Black or light grey (`#f0f0f0`) text for a background in this Houdini color, whichever has the
+ * higher contrast. Houdini's default grey box header keeps its black title; dark colors get light text.
+ */
+export function houdiniRgbTitleColor(background: HoudiniRgbColor): '#000000' | '#f0f0f0' {
+  const luminance = houdiniRgbRelativeLuminance(background);
+  const blackContrast = (luminance + 0.05) / 0.05;
+  const lightContrast = (LIGHT_TITLE_LUMINANCE + 0.05) / (luminance + 0.05);
+  return blackContrast >= lightContrast ? '#000000' : '#f0f0f0';
+}

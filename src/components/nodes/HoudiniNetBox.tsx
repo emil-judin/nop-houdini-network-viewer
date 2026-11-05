@@ -1,8 +1,8 @@
 import React from 'react';
 import type { NodeProps } from '@xyflow/react';
 import {
-  houdiniRgbLuminance,
   houdiniRgbScaledToCss,
+  houdiniRgbTitleColor,
   houdiniRgbToRgbaCss,
   MINIMIZED_BOX_HEIGHT_PX,
   type HoudiniNetBoxFlowNodeData,
@@ -27,7 +27,8 @@ export const HoudiniNetBox: React.FC<NodeProps> = ({ data }) => {
 
   const color = box.color && box.color.length >= 3 ? box.color : DEFAULT_BOX_COLOR;
   const isMinimized = Boolean(box.minimized);
-  const titleColor = houdiniRgbLuminance(color) * 0.86 > 0.25 ? '#000000' : '#f0f0f0';
+  // Black on Houdini's default grey; light text where black would be hard to read (dark or saturated boxes)
+  const titleColor = houdiniRgbTitleColor([color[0] * 0.86, color[1] * 0.86, color[2] * 0.86]);
 
   return (
     <div
@@ -55,8 +56,13 @@ export const HoudiniNetBox: React.FC<NodeProps> = ({ data }) => {
         {isMinimized && (
           <span className="absolute left-[16.5px] top-1/2 -translate-y-1/2 w-[2px] h-[15px] bg-black" aria-hidden="true" />
         )}
-        <span className="absolute left-[29px] top-[5px] bottom-[5px] w-px bg-white/[0.06]" aria-hidden="true" />
-        <span className="pl-[36px] pr-2 text-[18px] leading-none truncate">{box.comment || box.name}</span>
+        {/* Houdini shows only the comment: a box without one has no title and no separator (never its `__netbox` name) */}
+        {box.comment && (
+          <>
+            <span className="absolute left-[29px] top-[5px] bottom-[5px] w-px bg-white/[0.06]" aria-hidden="true" />
+            <span className="pl-[36px] pr-2 text-[18px] leading-none truncate">{box.comment}</span>
+          </>
+        )}
       </div>
     </div>
   );
