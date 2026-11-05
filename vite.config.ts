@@ -39,8 +39,9 @@ function localReferenceIcons(): Plugin {
 function openGraphUrls(siteUrl: string | undefined): Plugin {
   return {
     name: 'open-graph-urls',
-    transformIndexHtml() {
-      if (!siteUrl) return [];
+    transformIndexHtml(_html, context) {
+      // Only the playground page: the example page is not meant to be shared or indexed
+      if (!siteUrl || !context.path.endsWith('/index.html')) return [];
       const base = siteUrl.endsWith('/') ? siteUrl : `${siteUrl}/`;
       return [
         { tag: 'meta', attrs: { property: 'og:url', content: base }, injectTo: 'head' },
@@ -55,14 +56,27 @@ const ROOT = fileURLToPath(new URL('./', import.meta.url));
 /** Example networks published as plain files (same folders as `src/playground/examples.ts`). */
 function exampleNetworkFiles(): Map<string, string> {
   const files = new Map<string, string>();
-  for (const folder of ['fixtures', join('fixtures', 'examples')]) {
-    const dir = join(ROOT, folder);
-    if (!existsSync(dir)) continue;
-    for (const name of readdirSync(dir)) {
-      if (name.endsWith('-network.json')) files.set(name, join(dir, name));
-    }
+  // Only the playground examples: other files in `fixtures/` are not published
+  const dir = join(ROOT, 'fixtures', 'examples');
+  if (!existsSync(dir)) return files;
+  for (const name of readdirSync(dir)) {
+    if (name.endsWith('-network.json')) files.set(name, join(dir, name));
   }
   return files;
+}
+
+/**
+ * Number of top-level nodes of each example network, by file name, so the Networks pane can show it
+ * before an example is loaded (the files themselves load only when their example is opened).
+ */
+function exampleNodeCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const [name, file] of exampleNetworkFiles()) {
+    const network = JSON.parse(readFileSync(file, 'utf8')) as { root?: { nodes?: unknown } };
+    const nodes = network.root?.nodes;
+    if (Array.isArray(nodes)) counts[name] = nodes.length;
+  }
+  return counts;
 }
 
 /** Files of the web component build in `dist/` (`npm run build:lib`) that a page needs to load it. */
@@ -84,13 +98,13 @@ const CONTENT_TYPES: Record<string, string> = {
 };
 
 /**
- * Publishes what the embed snippets and `public/example-site.html` load, next to the playground page:
+ * Publishes what the embed snippets and `example-site.html` load, next to the playground page:
  *
  * - `examples/<name>-network.json`: the example networks, at stable addresses a snippet can point to.
  * - `lib/`: the `<houdini-network>` web component from `dist/`, so the example site shows the real
  *   package. Run `npm run build:lib` before `npm run build` (the deploy workflow does).
  *
- * The dev server serves the same paths from `fixtures/` and `dist/`.
+ * The dev server serves the same paths from `fixtures/examples/` and `dist/`.
  */
 function exampleSiteFiles(): Plugin {
   return {
@@ -156,7 +170,7 @@ const CONTENT_SECURITY_POLICY = [
   "form-action 'none'",
 ].join('; ');
 
-/** Adds `CONTENT_SECURITY_POLICY` to the built playground page. */
+/** Adds `CONTENT_SECURITY_POLICY` to the built pages (the playground and the example page). */
 function contentSecurityPolicy(): Plugin {
   return {
     name: 'content-security-policy',
@@ -188,14 +202,21 @@ export default defineConfig(({ mode }) => ({
   define: {
     __NOP_VERSION__: JSON.stringify(PACKAGE.version),
     __NOP_PACKAGE_NAME__: JSON.stringify(PACKAGE.name),
+    __NOP_EXAMPLE_NODE_COUNTS__: JSON.stringify(exampleNodeCounts()),
   },
   // Relative asset URLs, so the playground also works from a sub-path such as GitHub Pages (`/<repo>/`)
   base: './',
   build: {
     // `dist/` belongs to the library build (`npm.cmd run build:lib`)
     outDir: 'dist-playground',
-    // The largest chunk is the Circuit Gen demo network (JSON data, about 100 KB gzip), loaded only
-    // when its tab is opened
+    // Two pages: the playground and the example page its Embed button opens
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        example: fileURLToPath(new URL('./example-site.html', import.meta.url)),
+      },
+    },
+    // The largest chunks are example networks (JSON data), each loaded only when its example is opened
     chunkSizeWarningLimit: 1000,
   },
   server: {

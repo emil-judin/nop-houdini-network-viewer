@@ -176,6 +176,62 @@ export function getFlagEdgePaths(region: HoudiniShapeFlagRegion | undefined): st
   return paths;
 }
 
+/** Shortest distance (in shape units) from point `p` to the segment `a`-`b`. */
+function distanceToSegment(p: ShapePoint, a: ShapePoint, b: ShapePoint): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const lengthSquared = dx * dx + dy * dy;
+  const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / lengthSquared));
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+
+/** Shortest distance (in shape units) from point `p` to the closed polygon `outline`. */
+function distanceToOutline(p: ShapePoint, outline: ShapePoint[]): number {
+  let shortest = Infinity;
+  for (let i = 0; i < outline.length; i++) {
+    shortest = Math.min(shortest, distanceToSegment(p, outline[i], outline[(i + 1) % outline.length]));
+  }
+  return shortest;
+}
+
+/** A flag region border closer than this to the body outline lies on it (shape units). */
+const ON_OUTLINE_TOLERANCE = 0.01;
+
+/**
+ * The borders of a flag region that run inside the node body rather than along its outline, as
+ * open SVG paths (one per unbroken run). Houdini draws them for shapes whose flag areas have no
+ * divider lines of their own: the round `circle` shape gets its inner ring and four spokes.
+ */
+export function getFlagInteriorEdgePaths(region: HoudiniShapeFlagRegion | undefined, bodyOutline: ShapePoint[]): string[] {
+  const pts = region?.outline;
+  if (!pts || pts.length < 3 || bodyOutline.length < 3) {
+    return [];
+  }
+  const isInterior = pts.map((p1, i) => {
+    const p2 = pts[(i + 1) % pts.length];
+    return distanceToOutline([(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2], bodyOutline) > ON_OUTLINE_TOLERANCE;
+  });
+  if (isInterior.every(Boolean)) {
+    return [pointsToSvgPath(pts, true)];
+  }
+  // Start after a segment on the outline, so a run that wraps past the last point stays in one piece
+  const start = isInterior.findIndex((interior) => !interior) + 1;
+  const paths: string[] = [];
+  let run: ShapePoint[] = [];
+  for (let k = 0; k < pts.length; k++) {
+    const i = (start + k) % pts.length;
+    if (isInterior[i]) {
+      if (run.length === 0) run.push(pts[i]);
+      run.push(pts[(i + 1) % pts.length]);
+    } else if (run.length > 0) {
+      paths.push(pointsToSvgPath(run, false));
+      run = [];
+    }
+  }
+  if (run.length > 0) paths.push(pointsToSvgPath(run, false));
+  return paths;
+}
+
 /**
  * Generates an SVG `<path d="..." />` for the curved or flat multi-input collector bar
  * above nodes with `maxInputs > 4` (such as `merge` and `switch`), matching the top

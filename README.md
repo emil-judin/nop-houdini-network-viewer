@@ -49,7 +49,7 @@ Click **Get the exporter** at the bottom of the playground's Networks pane to do
 
 ## Embedding on Your Website
 
-The playground's **Embed this network** button (at the bottom of the Networks pane) generates all three snippets below for the network on screen; for the examples, the file address is filled in and works as it is. The playground's [example website](./public/example-site.html) (`example-site.html` next to the hosted playground) is a plain page that embeds two networks with snippet 1: view its source to copy the pattern.
+The playground's **Embed** button (at the bottom of the Networks pane) opens its [example page](./example-site.html) in a new tab: it shows an example network on a plain web page, with the options and all three snippets below to copy; the example's file address is filled in and works as it is, and for your own network you put in the address of your uploaded file. The same page embeds two more networks with snippet 1: view its source to copy the pattern.
 
 > **Not on npm yet (tester release).** Snippets 1 and 2 need the npm package (or its CDN copy) and start working with the public release. Until then, use the iframe embed (3).
 
@@ -97,7 +97,7 @@ npm install nop-houdini-network-viewer
 ```tsx
 import { HoudiniNetwork } from 'nop-houdini-network-viewer';
 import 'nop-houdini-network-viewer/style.css';
-import myGraph from './circuit-gen-network.json';
+import myGraph from './my-network.json';
 
 export function PortfolioBreakdown() {
   return (
@@ -137,12 +137,13 @@ The iframe page accepts the same options as URL parameters (`label-size=large`, 
 | Resize the parameter panel | Drag its edge (arrow keys when focused, double-click resets) | Drag the grip above the panel |
 | Fit all / frame selected | `H` or double-click the empty canvas / `F` | Double-tap the empty canvas |
 | Fullscreen | Fullscreen button (`Esc` leaves it); the network is fitted to the new size | Fullscreen button (a full-screen overlay on iPhone) |
-| Network overview (minimap) | Click to jump, hold and drag to follow, wheel to zoom; `O` or the map button shows / hides it | Hidden on phone-sized viewers |
-| Toggle wire style | `Shift+S` | Wire style switch |
+| Network overview (minimap) | Click to jump, hold and drag to follow, wheel to zoom; `O` or the map button shows / hides it | Settings menu (gear) > Network overview; starts closed on phone-sized viewers |
+| Toggle wire style | `Shift+S` or the two wire buttons | Settings menu (gear) > Wire Style |
+| Screenshot (PNG of what the network shows) | Camera button | Settings menu (gear) > Save screenshot |
 
 The node label size is a setting of the page that embeds the viewer (`label-size` attribute or `labelSize` prop), not a visitor control. The fullscreen button can be hidden with `fullscreen="false"` or `showFullscreenButton={false}`.
 
-**On phones:** give the viewer the full screen width and most of its height (for example `height: 70svh`), as the [example website](./public/example-site.html) does. Narrow viewers get a one-row header without the node count, and frame nodes less closely so their names stay on screen.
+**On phones:** give the viewer the full screen width and most of its height (for example `height: 70svh`), as the [example page](./example-site.html) does. Narrow viewers get a one-row header without the node count (wire style, overview and screenshot sit in one settings menu), and frame nodes less closely so their names stay on screen.
 
 Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters, `Esc` closes them again. The single-key hotkeys only react while the viewer has focus (click into it first), so they never interfere with typing elsewhere on the page. The playground also lets them react while the pointer is over the viewer, like Houdini (`hotkeys="hover"`).
 

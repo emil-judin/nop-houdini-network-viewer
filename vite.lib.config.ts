@@ -124,7 +124,8 @@ function scopeStylesheetToViewer(): Plugin {
  * Library builds (`npm.cmd run build:lib` runs both modes into `dist/`):
  *
  * - `--mode npm`: ES + CommonJS modules for React apps (`dist/index.js`, `dist/index.cjs`) and the
- *   stylesheet `dist/style.css`. React, React Flow and Lucide stay external (peer / regular dependencies).
+ *   stylesheet `dist/style.css`. React, React Flow, Lucide and html-to-image (screenshots) stay
+ *   external (peer / regular dependencies).
  * - `--mode web-component`: one self-contained ES module `dist/web-component.js` that defines
  *   `<houdini-network>` and bundles React, React Flow and the styles, for plain HTML pages.
  */
@@ -166,7 +167,7 @@ export default defineConfig(({ mode }) => {
         preserveEntrySignatures: 'allow-extension',
         ...(isWebComponent
           ? { output: { chunkFileNames: 'web-component-chunks/[name]-[hash].js' } }
-          : { external: [/^react($|\/)/, /^react-dom($|\/)/, /^@xyflow\/react($|\/)/, /^lucide-react($|\/)/] }),
+          : { external: [/^react($|\/)/, /^react-dom($|\/)/, /^@xyflow\/react($|\/)/, /^lucide-react($|\/)/, /^html-to-image($|\/)/] }),
       },
     },
   };

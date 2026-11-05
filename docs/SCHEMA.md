@@ -13,12 +13,12 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
   "exportedAt": "2026-10-23T15:00:00Z",
   "exportMode": "compact",
   "icons": {
-    "opdef:/emjud::Sop/circuit_gen::1.0?IconSVG": "<svg ...>...</svg>"
+    "opdef:/emjud::Sop/pebble_scatter::1.0?IconSVG": "<svg ...>...</svg>"
   },
   "customShapes": {},
   "root": {
-    "path": "/obj/circuit_board/circuit_gen",
-    "type": "emjud::circuit_gen::1.0",
+    "path": "/obj/assets/scene/pebble_scatter1",
+    "type": "emjud::pebble_scatter::1.0",
     "context": "Sop",
     "nodes": [],
     "dots": [],
@@ -29,8 +29,9 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
     "wireStyle": "default",
     "pathNodes": [
       { "name": "obj", "type": "obj", "icon": "NETWORKS_obj" },
-      { "name": "circuit_board", "type": "geo", "icon": "OBJ_geo" },
-      { "name": "circuit_gen", "type": "emjud::circuit_gen::1.0", "icon": "MISC_digital_asset" }
+      { "name": "assets", "type": "geo", "icon": "OBJ_geo" },
+      { "name": "scene", "type": "subnet", "icon": "SOP_subnet" },
+      { "name": "pebble_scatter1", "type": "emjud::pebble_scatter::1.0", "icon": "opdef:/emjud::Sop/pebble_scatter::1.0?IconSVG" }
     ]
   }
 }
@@ -42,7 +43,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 `exportWarnings` (schema 1.4.0, optional) counts parameters the exporter could not read and left out. It is missing when there were none.
 
-`wireStyle` is the Network Editor wire style of the network's node category (`hou.NodeTypeCategory.defaultWireStyle()`): `"default"` draws straight wires with short vertical stubs and rounded bends, `"rounded"` draws orthogonal wires (a short drop below the output, a horizontal run shared by all wires of that output, then a vertical drop into the input) with rounded corners. Older exports without the field render as `"default"`; the viewer's `wireStyle` prop and toolbar switch can override it.
+`wireStyle` is the Network Editor wire style of the network's node category (`hou.NodeTypeCategory.defaultWireStyle()`): `"default"` draws straight wires with short vertical stubs and rounded bends, `"rounded"` draws orthogonal wires (a short drop below the output, a horizontal run shared by all wires of that output, then a vertical drop into the input) with rounded corners. Older exports without the field render as `"default"`; the viewer's `wireStyle` prop and its settings menu can override it.
 
 ---
 

@@ -19,3 +19,5 @@ interface ImportMeta {
 declare const __NOP_VERSION__: string;
 /** Package name from `package.json`, replaced at build time (`define` in `vite.config.ts`). */
 declare const __NOP_PACKAGE_NAME__: string;
+/** Top-level node count of each playground example by file name (`define` in `vite.config.ts`). */
+declare const __NOP_EXAMPLE_NODE_COUNTS__: Record<string, number>;

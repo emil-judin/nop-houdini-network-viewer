@@ -25,7 +25,7 @@ function foreignHost(src: string | null): string | null {
  *
  * URL parameters:
  * - `src`: URL of an exported network `.json` file (must allow cross-origin requests when on another site).
- * - `demo`: the key of a playground example (`board`, `circuit`, see `examples.ts`) to show it instead.
+ * - `demo`: the key of a playground example (`start`, `vex`, see `examples.ts`) to show it instead.
  * - Viewer options shared with the web component: `label-size`, `wire-style`, `focus-node`, `minimap`,
  *   `touch-pan`, `toolbar`, `fullscreen`, `inspector`, `debug-actions`, `fit-view`, `hotkeys` (see `parseEmbedOptions`).
  */

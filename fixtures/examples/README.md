@@ -44,7 +44,6 @@ Feature coverage (from `docs/features/`), so nothing is shown twice and nothing 
 | Sub-Network Input items with their source names | x | | | | | x |
 | Asset padlocks (red open, grey locked), custom SVG icon | | | | | | x |
 | Locked asset exported closed (privacy dialog) | | | | | | x |
-| Wrangle is not enterable (only real subnetworks are) | | x | | | | x |
 
 Not shown on purpose: rounded wires (SOP networks export the straight "default" style; visitors can still switch with Shift+S), VOP / LOP / TOP / DOP networks (not supported yet), path scrubbing of private folders (a separate check below, never published).
 
@@ -252,7 +251,6 @@ Sticky notes:
 
 1. Right of the wrangles: `Click a wrangle to read its VEX code. The copy button puts the code on your clipboard.`
 2. Right of `python_info`: `Python SOPs work too.`
-3. Left of `wrangle_rings`: `Wrangles look like subnetworks inside Houdini, but there is nothing to dive into: double-click only selects them.`
 
 **Check:** the four renamed wrangles and the Python node show their type label above the name; `wrangle_rings` scrolls inside the code field and the grey line number gutter reaches line 29; the last line still reads `//@Cd = {1, 0, 0};` (not `<path>`); `amplitude` and `frequency` show as sliders.
 
@@ -455,7 +453,7 @@ Inside `scene` (level 2):
 | `pebble_scatter1` | `emjud::pebble_scatter::1.0` | Input: Sub-Network Input #1 |
 | `bricks` | `copytopoints` | Input 1: `rounded_brick1`, input 2: Sub-Network Input #2 (dotted wire) |
 | `rounded_brick1` | `emjud::rounded_brick::1.0` | Above `bricks` |
-| `tag_pieces` | `attribwrangle` | Run Over Primitives, code `s@part = "wall";`. A wrangle you cannot enter |
+| `tag_pieces` | `attribwrangle` | Run Over Primitives, code `s@part = "wall";` |
 | `merge1` | `merge` | Inputs: `pebble_scatter1`, `tag_pieces` |
 | `props` | `subnet` | Input 1: `merge1`. Node color blue (0.3, 0.5, 0.85) |
 | `output0` | `output` | Input: `props`. Display flag |
@@ -470,10 +468,9 @@ Sticky notes:
 
 1. Top level, right of `scene`: `Double-click scene to go inside. It holds more subnetworks: the path bar keeps the way back.`
 2. In `scene`, next to the two assets: `Your own assets show a padlock. Red and open: unlocked, you can go inside. Grey: locked, exported closed.`
-3. In `scene`, next to `tag_pieces`: `Wrangles are not subnetworks here: there is nothing inside to show.`
-4. In `scene/props/details`: `Four levels deep. Use the back button or click a name in the path bar. Deeper levels you visited stay in the path bar, dimmed.`
+3. In `scene/props/details`: `Four levels deep. Use the back button or click a name in the path bar. Deeper levels you visited stay in the path bar, dimmed.`
 
-**Check:** `pebble_scatter1` has the red open padlock, its pebble icon and can be entered; `rounded_brick1` has the grey padlock and its brick icon and cannot be entered; the file has exactly two entries in `icons` and no `IconSVG` text elsewhere; `scene` shows "Sub-Network Input #1 / ground" and "#2 / wall_curve"; diving to `details` and clicking `assets` in the path bar keeps `scene > props > details` dimmed; back and forward work; `tag_pieces` only selects on double-click.
+**Check:** `pebble_scatter1` has the red open padlock, its pebble icon and can be entered; `rounded_brick1` has the grey padlock and its brick icon and cannot be entered; the file has exactly two entries in `icons` and no `IconSVG` text elsewhere; `scene` shows "Sub-Network Input #1 / ground" and "#2 / wall_curve"; diving to `details` and clicking `assets` in the path bar keeps `scene > props > details` dimmed; back and forward work.
 
 ## Separate privacy check (never publish)
 
@@ -487,8 +484,7 @@ Export with MCP `export("privacy_check")` but save the file **outside the reposi
 
 ## After exporting
 
-- Add the three new files to `src/playground/examples.ts` (keys `params`, `looks`, `assets`, after `foreach`), so they appear in the Networks pane.
+- All six files are already listed in `src/playground/examples.ts` (keys `start`, `vex`, `foreach`, `params`, `looks`, `assets`): a file shows up in the Networks pane as soon as it exists here under its exact name.
 - Open every file with **Open file** in the playground (`npm run dev`) and go through its check list. If a new file does not show up in the Networks pane, restart `npm run dev`.
 - `grep "<path>" fixtures/examples/*.json` must find nothing, and `grep -i "users" fixtures/examples/*.json` must find no home folder.
-- The browser tests use the Circuit examples (`?example=board`), so the new files need no test changes. If you rename an example key in `examples.ts`, links like `?example=start` change with it.
-- `fixtures/circuit_gen-network.json` still needs one more export with the current exporter (see Owner To-Do in `docs/STATUS.md`).
+- These six files are the only playground examples (owner decision 2026-11-04: the Circuit exports are deleted). The browser tests and `example-site.html` use them, so a changed node name (for example `lift_tube`, `merge1`, `wrangle_rings`, `twist_piece`, `scene`) needs a test change too. If you rename an example key in `examples.ts`, links like `?example=start` change with it.

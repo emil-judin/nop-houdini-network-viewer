@@ -1,0 +1,4434 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-11-03T04:53:38.298477+00:00",
+  "exportMode": "full",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/parameters",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "CONTROLS",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          -4.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.4,
+          0.7,
+          0.3
+        ],
+        "shape": "cigar",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "shape_folder",
+            "label": "shape_folder",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "rows",
+            "label": "Rows",
+            "type": "Int",
+            "val": [
+              20
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "range": [
+              2,
+              100
+            ]
+          },
+          {
+            "name": "height",
+            "label": "Height",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "range": [
+              0.0,
+              2.0
+            ]
+          },
+          {
+            "name": "offset",
+            "label": "Offset",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.5
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              false,
+              true
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "sep1",
+            "label": "sep1",
+            "type": "Separator",
+            "val": [],
+            "expr": [],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "mode",
+            "label": "Mode",
+            "type": "Menu",
+            "val": [
+              "rings"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "menuLabel": "Rings"
+          },
+          {
+            "name": "ring_count",
+            "label": "Ring Count",
+            "type": "Int",
+            "val": [
+              5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "range": [
+              1,
+              12
+            ]
+          },
+          {
+            "name": "use_jitter",
+            "label": "Use Jitter",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "joinNext": "jitter",
+            "labelHidden": true
+          },
+          {
+            "name": "jitter",
+            "label": "Jitter",
+            "type": "Float",
+            "val": [
+              0.2
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Shape"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "look_label",
+            "label": "look_label",
+            "type": "Label",
+            "val": [
+              "Every node reads its settings from here."
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "labelHidden": true
+          },
+          {
+            "name": "base_color",
+            "label": "Base Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              0.45,
+              0.1
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              true,
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "colors",
+            "label": "Colors",
+            "type": "Ramp",
+            "val": [
+              "3"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "ramp": {
+              "color": true,
+              "keys": [
+                0.0,
+                0.5,
+                1.0
+              ],
+              "values": [
+                [
+                  0.1,
+                  0.3,
+                  0.9
+                ],
+                [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                [
+                  1.0,
+                  0.45,
+                  0.1
+                ]
+              ],
+              "basis": [
+                "Linear",
+                "Linear",
+                "Linear"
+              ]
+            }
+          },
+          {
+            "name": "colors1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors1c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              0.1,
+              0.3,
+              0.9
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Linear"
+          },
+          {
+            "name": "profile",
+            "label": "Profile",
+            "type": "Ramp",
+            "val": [
+              "3"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "ramp": {
+              "color": false,
+              "keys": [
+                0.0,
+                0.5,
+                1.0
+              ],
+              "values": [
+                0.0,
+                1.0,
+                0.3
+              ],
+              "basis": [
+                "MonotoneCubic",
+                "MonotoneCubic",
+                "MonotoneCubic"
+              ]
+            }
+          },
+          {
+            "name": "profile1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile1value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "monotonecubic"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Monotone Cubic"
+          },
+          {
+            "name": "notes",
+            "label": "Notes",
+            "type": "String",
+            "val": [
+              "Rows sets the grid resolution.\nHeight sets the extrusion."
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "folderTypes": [
+              "tabs"
+            ]
+          },
+          {
+            "name": "advanced",
+            "label": "advanced",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "tolerance",
+            "label": "Tolerance",
+            "type": "Float",
+            "val": [
+              0.001
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look",
+              "Advanced"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "cache_name",
+            "label": "Cache Name",
+            "type": "String",
+            "val": [
+              "parameters_demo"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look",
+              "Advanced"
+            ],
+            "folderTypes": [
+              "tabs",
+              "collapsible"
+            ]
+          },
+          {
+            "name": "colors2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors2c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Linear"
+          },
+          {
+            "name": "profile2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile2value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "monotonecubic"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Monotone Cubic"
+          },
+          {
+            "name": "colors3pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors3c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              0.45,
+              0.1
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "colors3interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Linear"
+          },
+          {
+            "name": "profile3pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile3value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.3
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ]
+          },
+          {
+            "name": "profile3interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "monotonecubic"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Look"
+            ],
+            "menuLabel": "Monotone Cubic"
+          }
+        ]
+      },
+      {
+        "name": "grid1",
+        "type": "grid",
+        "label": "Grid",
+        "icon": "SOP_grid",
+        "pos": [
+          0.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "type",
+            "label": "Primitive Type",
+            "type": "Menu",
+            "val": [
+              "poly"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Polygon"
+          },
+          {
+            "name": "surftype",
+            "label": "Connectivity",
+            "type": "Menu",
+            "val": [
+              "quads"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Quadrilaterals"
+          },
+          {
+            "name": "orient",
+            "label": "Orientation",
+            "type": "Menu",
+            "val": [
+              "zx"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "ZX Plane"
+          },
+          {
+            "name": "size",
+            "label": "Size",
+            "type": "Float",
+            "val": [
+              10.0,
+              10.0
+            ],
+            "expr": [
+              null,
+              null
+            ]
+          },
+          {
+            "name": "t",
+            "label": "Center",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "rows",
+            "label": "Rows",
+            "type": "Int",
+            "val": [
+              20
+            ],
+            "expr": [
+              "ch(\"../CONTROLS/rows\")"
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              50
+            ]
+          },
+          {
+            "name": "cols",
+            "label": "Columns",
+            "type": "Int",
+            "val": [
+              20
+            ],
+            "expr": [
+              "ch(\"../CONTROLS/rows\")"
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              50
+            ]
+          },
+          {
+            "name": "orderu",
+            "label": "U Order",
+            "type": "Int",
+            "val": [
+              4
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              2,
+              11
+            ],
+            "disabled": true
+          },
+          {
+            "name": "orderv",
+            "label": "V Order",
+            "type": "Int",
+            "val": [
+              4
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              2,
+              11
+            ],
+            "disabled": true
+          },
+          {
+            "name": "interpu",
+            "label": "End-point interpolate in U",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "interpv",
+            "label": "End-point interpolate in V",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          }
+        ]
+      },
+      {
+        "name": "polyextrude1",
+        "type": "polyextrude::2.0",
+        "label": "PolyExtrude",
+        "icon": "SOP_polyextrude-2.0",
+        "pos": [
+          0.0,
+          0.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Geometry for operation",
+          "Spine curve"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "splittype",
+            "label": "Divide Into",
+            "type": "Menu",
+            "val": [
+              "elements"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Individual Elements"
+          },
+          {
+            "name": "usesplitgroup",
+            "label": "usesplitgroup",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "splitgroup",
+            "labelHidden": true,
+            "disabled": true
+          },
+          {
+            "name": "splitgroup",
+            "label": "Split Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "extrusionmode",
+            "label": "Extrusion Mode",
+            "type": "Menu",
+            "val": [
+              "primnormal"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "ptnormalsrc",
+            "menuLabel": "Primitive/Edge Normal"
+          },
+          {
+            "name": "dist",
+            "label": "Distance",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              "ch(\"../CONTROLS/height\")"
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              -1.0,
+              1.0
+            ]
+          },
+          {
+            "name": "inset",
+            "label": "Inset",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              -1.0,
+              1.0
+            ]
+          },
+          {
+            "name": "twist",
+            "label": "Twist",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              -180.0,
+              180.0
+            ]
+          },
+          {
+            "name": "divs",
+            "label": "Divisions",
+            "type": "Int",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              1,
+              50
+            ]
+          },
+          {
+            "name": "spinetype",
+            "label": "Spine Shape",
+            "type": "Menu",
+            "val": [
+              "straight"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Straight"
+          },
+          {
+            "name": "stdswitcher",
+            "label": "stdswitcher",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "xformsection",
+            "label": "xformsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion"
+            ]
+          },
+          {
+            "name": "xformfront",
+            "label": "Transform Extruded Front",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Front Transform"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "pivotxformsection",
+            "label": "pivotxformsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Front Transform"
+            ]
+          },
+          {
+            "name": "prexformsection",
+            "label": "prexformsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Front Transform"
+            ]
+          },
+          {
+            "name": "outputsection",
+            "label": "outputsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion"
+            ]
+          },
+          {
+            "name": "outputfront",
+            "label": "Output Front",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "outputfrontgrp",
+            "label": "outputfrontgrp",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "frontgrp",
+            "labelHidden": true
+          },
+          {
+            "name": "frontgrp",
+            "label": "Front Group",
+            "type": "String",
+            "val": [
+              "extrudeFront"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputback",
+            "label": "Output Back",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "outputbackgrp",
+            "label": "outputbackgrp",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "backgrp",
+            "labelHidden": true
+          },
+          {
+            "name": "backgrp",
+            "label": "Back Group",
+            "type": "String",
+            "val": [
+              "extrudeBack"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputside",
+            "label": "Output Side",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "outputsidegrp",
+            "label": "outputsidegrp",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "sidegrp",
+            "labelHidden": true
+          },
+          {
+            "name": "sidegrp",
+            "label": "Side Group",
+            "type": "String",
+            "val": [
+              "extrudeSide"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputfrontseamgrp",
+            "label": "outputfrontseamgrp",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "frontseamgrp",
+            "labelHidden": true
+          },
+          {
+            "name": "frontseamgrp",
+            "label": "Front Boundary Group",
+            "type": "String",
+            "val": [
+              "extrudeFrontSeam"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "outputbackseamgrp",
+            "label": "outputbackseamgrp",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "backseamgrp",
+            "labelHidden": true
+          },
+          {
+            "name": "backseamgrp",
+            "label": "Back Boundary Group",
+            "type": "String",
+            "val": [
+              "extrudeBackSeam"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "preservegroups",
+            "label": "Preserve Groups",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "copyedgegroups",
+            "label": "Copy Edge Groups",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "copypointgroups",
+            "label": "Copy Point Groups",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "copyprimitivegroups",
+            "label": "Copy Primitive Groups",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Output Geometry and Groups"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "insettingsection",
+            "label": "insettingsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion"
+            ]
+          },
+          {
+            "name": "limitinset",
+            "label": "Limit Insetting",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Insetting"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "commonlimit",
+            "label": "Use Common Limit",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Insetting"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "normalsection",
+            "label": "normalsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion"
+            ]
+          },
+          {
+            "name": "addvertexnomrals",
+            "label": "Add Vertex Normals",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Normals"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "cuspangle",
+            "label": "Cusp Angle",
+            "type": "Float",
+            "val": [
+              60.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Normals"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              180.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "cuspfront",
+            "label": "Cusp All Front Boundary Edges",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Normals"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "cuspback",
+            "label": "Cusp All Back Boundary Edges",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Normals"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uvssection",
+            "label": "uvssection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion"
+            ]
+          },
+          {
+            "name": "genuvs",
+            "label": "Generate Unwrapped Texture Coordinates for Sides",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Texture Coordinates"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ]
+          },
+          {
+            "name": "uvstyle",
+            "label": "Style",
+            "type": "Menu",
+            "val": [
+              "proprtional"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Texture Coordinates"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "menuLabel": "Proportional"
+          },
+          {
+            "name": "uvscaling",
+            "label": "Scaling",
+            "type": "Menu",
+            "val": [
+              "matchuv"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Extrusion",
+              "Texture Coordinates"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "menuLabel": "Match Incident UV Scale"
+          },
+          {
+            "name": "shapecontrolsection",
+            "label": "shapecontrolsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control"
+            ]
+          },
+          {
+            "name": "frontmagnitude",
+            "label": "Front Magnitude",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0001,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "backmagnitude",
+            "label": "Back Magnitude",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0001,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "frontstiffness",
+            "label": "Front Stiffness",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "backstiffness",
+            "label": "Back Stiffness",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "interpolation",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "rotatingframe"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "menuLabel": "Rotating Frame"
+          },
+          {
+            "name": "spacing",
+            "label": "Division Spacing",
+            "type": "Menu",
+            "val": [
+              "arclengthuniform"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Shape Adjustment"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "menuLabel": "Uniform"
+          },
+          {
+            "name": "externalspinesection",
+            "label": "externalspinesection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control"
+            ]
+          },
+          {
+            "name": "reversespinedirection",
+            "label": "Reverse Direction",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "External Spine"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "axialrotation",
+            "label": "Axial Rotation",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "External Spine"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              360.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "frontblend",
+            "label": "Front Blend",
+            "type": "Float",
+            "val": [
+              0.1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "External Spine"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "backblend",
+            "label": "Back Blend",
+            "type": "Float",
+            "val": [
+              0.1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "External Spine"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "thicknesssection",
+            "label": "thicknesssection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control"
+            ]
+          },
+          {
+            "name": "thicknessscale",
+            "label": "Thickness Scale",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "usethicknessattrib",
+            "label": "usethicknessattrib",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "thicknessattrib",
+            "labelHidden": true,
+            "disabled": true
+          },
+          {
+            "name": "thicknessattrib",
+            "label": "Thickness Attribute",
+            "type": "String",
+            "val": [
+              "thickness"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "usethicknessramp",
+            "label": "usethicknessramp",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "thicknessramp",
+            "labelHidden": true
+          },
+          {
+            "name": "thicknessramp",
+            "label": "Thickness Ramp",
+            "type": "Ramp",
+            "val": [
+              "2"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "ramp": {
+              "color": false,
+              "keys": [
+                0.0,
+                1.0
+              ],
+              "values": [
+                1.0,
+                1.0
+              ],
+              "basis": [
+                "CatmullRom",
+                "CatmullRom"
+              ]
+            }
+          },
+          {
+            "name": "twistsection",
+            "label": "twistsection",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control"
+            ]
+          },
+          {
+            "name": "usetwistattrib",
+            "label": "usetwistattrib",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "twistattrib",
+            "labelHidden": true,
+            "disabled": true
+          },
+          {
+            "name": "twistattrib",
+            "label": "Twist Attribute",
+            "type": "String",
+            "val": [
+              "twist"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "usetwistramp",
+            "label": "usetwistramp",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "twistramp",
+            "labelHidden": true
+          },
+          {
+            "name": "twistramp",
+            "label": "Local Twist Ramp",
+            "type": "Ramp",
+            "val": [
+              "2"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "ramp": {
+              "color": false,
+              "keys": [
+                0.0,
+                1.0
+              ],
+              "values": [
+                0.5,
+                0.5
+              ],
+              "basis": [
+                "CatmullRom",
+                "CatmullRom"
+              ]
+            }
+          },
+          {
+            "name": "twistscale",
+            "label": "Range Half-Width",
+            "type": "Float",
+            "val": [
+              180.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "range": [
+              0.0,
+              360.0
+            ]
+          },
+          {
+            "name": "localattribs",
+            "label": "localattribs",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control"
+            ]
+          },
+          {
+            "name": "uselocalzscaleattrib",
+            "label": "uselocalzscaleattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localzscaleattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "localzscaleattrib",
+            "label": "Distance Scale",
+            "type": "String",
+            "val": [
+              "zscale"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uselocalinsetscaleattrib",
+            "label": "uselocalinsetscaleattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localinsetscaleattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "localinsetscaleattrib",
+            "label": "Inset Scale",
+            "type": "String",
+            "val": [
+              "insetscale"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uselocaltwistattrib",
+            "label": "uselocaltwistattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localtwistscaleattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "localtwistscaleattrib",
+            "label": "Twist Scale",
+            "type": "String",
+            "val": [
+              "twistscale"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uselocaldivsattrib",
+            "label": "uselocaldivsattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "locadivscaleattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "locadivscaleattrib",
+            "label": "Divisions Scale",
+            "type": "String",
+            "val": [
+              "divsscale"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Attributes"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "localframeattribs",
+            "label": "localframeattribs",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control"
+            ]
+          },
+          {
+            "name": "uselocalxattrib",
+            "label": "uselocalxattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localxattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "localxattrib",
+            "label": "X Direction",
+            "type": "String",
+            "val": [
+              "localx"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uselocalzattirb",
+            "label": "uselocalzattirb",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localzattirb",
+            "labelHidden": true
+          },
+          {
+            "name": "localzattirb",
+            "label": "Z Direction",
+            "type": "String",
+            "val": [
+              "localz"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "uselocalctrattrib",
+            "label": "uselocalctrattrib",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "joinNext": "localctrattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "localctrattrib",
+            "label": "Center",
+            "type": "String",
+            "val": [
+              "localctr"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Local Control",
+              "Local Frames"
+            ],
+            "folderTypes": [
+              "tabs",
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "thicknessramp1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ]
+          },
+          {
+            "name": "thicknessramp1value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ]
+          },
+          {
+            "name": "thicknessramp1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "menuLabel": "Catmull-Rom"
+          },
+          {
+            "name": "thicknessramp2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ]
+          },
+          {
+            "name": "thicknessramp2value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ]
+          },
+          {
+            "name": "thicknessramp2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Thickness"
+            ],
+            "menuLabel": "Catmull-Rom"
+          },
+          {
+            "name": "twistramp1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ]
+          },
+          {
+            "name": "twistramp1value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ]
+          },
+          {
+            "name": "twistramp1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "menuLabel": "Catmull-Rom"
+          },
+          {
+            "name": "twistramp2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ]
+          },
+          {
+            "name": "twistramp2value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ]
+          },
+          {
+            "name": "twistramp2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Spine Control",
+              "Twist"
+            ],
+            "menuLabel": "Catmull-Rom"
+          }
+        ]
+      },
+      {
+        "name": "fuse1",
+        "type": "fuse::2.0",
+        "label": "Fuse",
+        "icon": "SOP_fuse-2.0",
+        "pos": [
+          0.0,
+          -0.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Query Geometry",
+          "Target Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "querygroup",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "usetargetgroup",
+            "label": "Target Group",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "targetgroup",
+            "labelHidden": true
+          },
+          {
+            "name": "targetgroup",
+            "label": "Target Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "modifyboth",
+            "label": "Modify Target",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "posattrib",
+            "label": "Position Attribute",
+            "type": "String",
+            "val": [
+              "P"
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "snapgroup",
+            "label": "snapgroup",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "snaptype",
+            "label": "Snap To",
+            "type": "Menu",
+            "val": [
+              "distancesnap"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "algorithm",
+            "menuLabel": "Near Points"
+          },
+          {
+            "name": "algorithm",
+            "label": "Using",
+            "type": "Menu",
+            "val": [
+              "lowest"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "menuLabel": "Least Target Point Number (for cloud reduction)"
+          },
+          {
+            "name": "usetol3d",
+            "label": "Use Snap Distance",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "tol3d",
+            "labelHidden": true
+          },
+          {
+            "name": "tol3d",
+            "label": "Snap Distance",
+            "type": "Float",
+            "val": [
+              0.01
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "range": [
+              0.001,
+              10.0
+            ]
+          },
+          {
+            "name": "usepositionsnapmethod",
+            "label": "Snap Positions",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "positionsnapmethod",
+            "labelHidden": true
+          },
+          {
+            "name": "positionsnapmethod",
+            "label": "Output Positions",
+            "type": "Menu",
+            "val": [
+              "average"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "menuLabel": "Average Value"
+          },
+          {
+            "name": "useradiusattrib",
+            "label": "Radius Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "radiusattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "radiusattrib",
+            "label": "Radius Attribute",
+            "type": "String",
+            "val": [
+              "pscale"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "usematchattrib",
+            "label": "Match Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "matchattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "matchattrib",
+            "label": "Match Attribute",
+            "type": "String",
+            "val": [
+              "name"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "matchtype",
+            "label": "Match Condition",
+            "type": "Menu",
+            "val": [
+              "match"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "disabled": true,
+            "menuLabel": "Equal Attribute Values"
+          },
+          {
+            "name": "matchtol",
+            "label": "Match Tolerance",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Snap"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "range": [
+              0.0,
+              1.0
+            ],
+            "disabled": true
+          },
+          {
+            "name": "consolidategroup",
+            "label": "consolidategroup",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "consolidatesnappedpoints",
+            "label": "Fuse Snapped Points",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Fuse"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "keepconsolidatedpoints",
+            "label": "Keep Fused Points",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Fuse"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "deldegen",
+            "label": "Remove Repeated Vertices and Degenerate Primitives",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Fuse"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "deldegenpoints",
+            "label": "Remove Unused Points from Degenerate Primitives",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Fuse"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "delunusedpoints",
+            "label": "Remove All Unused Points",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Fuse"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "outputgroup",
+            "label": "outputgroup",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "recomputenml",
+            "label": "Recompute Affected Normals",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ],
+            "folderTypes": [
+              "simple"
+            ]
+          },
+          {
+            "name": "createsnappedgroup",
+            "label": "Create Snapped Points Group",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "snappedgroupname",
+            "labelHidden": true
+          },
+          {
+            "name": "snappedgroupname",
+            "label": "Snapped Points Group",
+            "type": "String",
+            "val": [
+              "snapped_points"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "createsnappedattrib",
+            "label": "Create Snapped Destination Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "snappedattribname",
+            "labelHidden": true
+          },
+          {
+            "name": "snappedattribname",
+            "label": "Snapped Destination Attribute",
+            "type": "String",
+            "val": [
+              "snapped_to"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "disabled": true
+          },
+          {
+            "name": "numpointattribs",
+            "label": "Attributes to Snap",
+            "type": "Folder",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ]
+          },
+          {
+            "name": "numgroups",
+            "label": "Groups to Snap",
+            "type": "Folder",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Output Attributes and Groups"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "blast1",
+        "type": "blast",
+        "label": "Blast",
+        "icon": "SOP_blast",
+        "pos": [
+          0.0,
+          -1.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              "@P.y<0.01"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "grouptype",
+            "label": "Group Type",
+            "type": "Menu",
+            "val": [
+              "prims"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Primitives"
+          },
+          {
+            "name": "computenorms",
+            "label": "Recompute Normals",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "negate",
+            "label": "Delete Non Selected",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "fillhole",
+            "label": "Fill Simple Holes",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "disabled": true
+          },
+          {
+            "name": "removegrp",
+            "label": "Delete Unused Groups",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "spin",
+        "type": "xform",
+        "label": "Transform",
+        "icon": "SOP_xform",
+        "pos": [
+          0.0,
+          -2.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Transform geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "grouptype",
+            "label": "Group Type",
+            "type": "Menu",
+            "val": [
+              "guess"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Guess from Group"
+          },
+          {
+            "name": "xOrd",
+            "label": "Transform Order",
+            "type": "Menu",
+            "val": [
+              "srt"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "rOrd",
+            "menuLabel": "Scale Rot Trans"
+          },
+          {
+            "name": "rOrd",
+            "label": "Rotate Order",
+            "type": "Menu",
+            "val": [
+              "xyz"
+            ],
+            "expr": [
+              null
+            ],
+            "labelHidden": true,
+            "menuLabel": "Rx Ry Rz"
+          },
+          {
+            "name": "t",
+            "label": "Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0326,
+              0.5
+            ],
+            "expr": [
+              "ch(\"../CONTROLS/offsetx\")",
+              "sin($F * 7.5) * 0.25",
+              "ch(\"../CONTROLS/offsetz\")"
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              true,
+              false
+            ],
+            "keyframed": [
+              false,
+              true,
+              false
+            ]
+          },
+          {
+            "name": "s",
+            "label": "Scale",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "shear",
+            "label": "Shear",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "parmgroup_pivotxform",
+            "label": "parmgroup_pivotxform",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "p",
+            "label": "Pivot Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "pr",
+            "label": "Pivot Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pivot Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "parmgroup_prexform",
+            "label": "parmgroup_prexform",
+            "type": "FolderSet",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "prexform_xOrd",
+            "label": "Pre-Transform Order",
+            "type": "Menu",
+            "val": [
+              "srt"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "joinNext": "prexform_rOrd",
+            "menuLabel": "Scale Rot Trans"
+          },
+          {
+            "name": "prexform_rOrd",
+            "label": "Pre-Rotate Order",
+            "type": "Menu",
+            "val": [
+              "xyz"
+            ],
+            "expr": [
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ],
+            "labelHidden": true,
+            "menuLabel": "Rx Ry Rz"
+          },
+          {
+            "name": "prexform_t",
+            "label": "Pre-Translate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_r",
+            "label": "Pre-Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_s",
+            "label": "Pre-Scale",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "prexform_shear",
+            "label": "Pre-Shear",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "folders": [
+              "Pre-Transform"
+            ],
+            "folderTypes": [
+              "collapsible"
+            ]
+          },
+          {
+            "name": "attribs",
+            "label": "Attributes",
+            "type": "String",
+            "val": [
+              "*"
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "updatenmls",
+            "label": "Recompute Point Normals",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "updateaffectednmls",
+            "label": "Recompute Affected Normals",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "vlength",
+            "label": "Preserve Normal Length",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "invertxform",
+            "label": "Invert Transformation",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "addattrib",
+            "label": "Output Attribute",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "outputattrib",
+            "labelHidden": true
+          },
+          {
+            "name": "outputattrib",
+            "label": "Output Attribute",
+            "type": "String",
+            "val": [
+              "xform"
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "outputmerge",
+            "disabled": true
+          },
+          {
+            "name": "outputmerge",
+            "label": "Combine",
+            "type": "Menu",
+            "val": [
+              "post"
+            ],
+            "expr": [
+              null
+            ],
+            "labelHidden": true,
+            "disabled": true,
+            "menuLabel": "Post-Multiply"
+          }
+        ]
+      },
+      {
+        "name": "color1",
+        "type": "color",
+        "label": "Color",
+        "icon": "SOP_color",
+        "pos": [
+          0.0,
+          -4.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Geometry to Color"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "group",
+            "label": "Group",
+            "type": "String",
+            "val": [
+              ""
+            ],
+            "expr": [
+              null
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "grouptype",
+            "label": "Group Type",
+            "type": "Menu",
+            "val": [
+              "guess"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Guess from Group"
+          },
+          {
+            "name": "deleteallcolorattribs",
+            "label": "Delete All Existing Color Attributes",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "joinNext": "enable"
+          },
+          {
+            "name": "enable",
+            "label": "Set Color Attribute",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "class",
+            "label": "Class",
+            "type": "Int",
+            "val": [
+              2
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              0,
+              10
+            ]
+          },
+          {
+            "name": "colortype",
+            "label": "Color Type",
+            "type": "Int",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ],
+            "range": [
+              0,
+              10
+            ]
+          },
+          {
+            "name": "color",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              0.45,
+              0.1
+            ],
+            "expr": [
+              "ch(\"../CONTROLS/base_colorr\")",
+              "ch(\"../CONTROLS/base_colorg\")",
+              "ch(\"../CONTROLS/base_colorb\")"
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "name": "ramp1pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              0.0
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "ramp1c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "name": "ramp1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Linear"
+          },
+          {
+            "name": "ramp2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "ramp2c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ]
+          },
+          {
+            "name": "ramp2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "linear"
+            ],
+            "expr": [
+              null
+            ],
+            "menuLabel": "Linear"
+          }
+        ]
+      },
+      {
+        "name": "OUT",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          0.0,
+          -5.2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.6,
+          0.7,
+          0.77
+        ],
+        "shape": "null",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "copyinput",
+            "label": "Copy Input (Note: Input will be still cooked if disabled)",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ]
+          },
+          {
+            "name": "cacheinput",
+            "label": "Cache Input",
+            "type": "Toggle",
+            "val": [
+              0
+            ],
+            "expr": [
+              null
+            ]
+          }
+        ]
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [
+      {
+        "name": "__stickynote1",
+        "text": "Click CONTROLS: tabs, sliders, menus, ramps and folders look like Houdini's parameter pane.",
+        "pos": [
+          -8.5,
+          1.5
+        ],
+        "size": [
+          4.0,
+          1.2
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote2",
+        "text": "Teal fields are animated or driven by an expression. For an expression you see the formula and its value.",
+        "pos": [
+          2.2,
+          -3.2
+        ],
+        "size": [
+          4.5,
+          1.2
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote3",
+        "text": "This file shows every parameter. Bold values were changed from the default.",
+        "pos": [
+          2.2,
+          0.4
+        ],
+        "size": [
+          4.2,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      }
+    ],
+    "wires": [
+      {
+        "from": "grid1",
+        "fromOutput": 0,
+        "to": "polyextrude1",
+        "toInput": 0
+      },
+      {
+        "from": "polyextrude1",
+        "fromOutput": 0,
+        "to": "fuse1",
+        "toInput": 0
+      },
+      {
+        "from": "fuse1",
+        "fromOutput": 0,
+        "to": "blast1",
+        "toInput": 0
+      },
+      {
+        "from": "blast1",
+        "fromOutput": 0,
+        "to": "spin",
+        "toInput": 0
+      },
+      {
+        "from": "spin",
+        "fromOutput": 0,
+        "to": "color1",
+        "toInput": 0
+      },
+      {
+        "from": "color1",
+        "fromOutput": 0,
+        "to": "OUT",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "parameters",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
+  }
+}

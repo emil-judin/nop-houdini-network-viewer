@@ -4,14 +4,14 @@ Thank you for trying NOP. It shows Houdini node networks on a web page, so you c
 
 This is an early test version. Some things will be missing or broken, and that is exactly what I would like to hear about.
 
-**Tested the first version already?** The project is now called NOP (it was WOP), so the playground has a new address: use the link from this invitation. The exporter must be installed again (see step 2). New since then: a layout like Houdini's desktop with a Networks pane, a fullscreen button, better phone support, an example website and a welcome card.
+**Tested the first version already?** The project is now called NOP (it was WOP), so the playground has a new address: use the link from this invitation. The exporter must be installed again (see step 2). New since then: a layout like Houdini's desktop with a Networks pane, a fullscreen button, better phone support, an example page and a welcome card.
 
 ## 1. Open the playground
 
 Open the link from your invitation. It works in a desktop or phone browser, and a welcome card explains the basics on the first visit (**Help** brings it back).
 
-- The **Networks** pane on the left lists the demo networks. On a phone it is folded to a thin strip: tap it to open the pane, and tap beside the pane to close it again.
-- Click nodes to see their parameters. Choose **Circuit Gen HDA** and double-click (or double-tap) its subnetworks to go inside; the arrows and the path above the network bring you back.
+- The **Networks** pane on the left lists the example networks: start with **Start Here**. On a phone it is folded to a thin strip: tap it to open the pane, and tap beside the pane to close it again.
+- Click nodes to see their parameters. Choose **Subnetworks and Assets** and double-click (or double-tap) **scene** to go inside; the arrows and the path above the network bring you back.
 - Press `H` or double-click the empty background to fit the whole network, and use the button at the top right for fullscreen.
 
 ## 2. Install the exporter in Houdini
@@ -31,11 +31,11 @@ To remove it later, delete `nop.json` and the `nop` folder. Upgrading from the W
 ## 3. Things to try
 
 - Export one of your own networks: select nodes (or nothing for the whole network), click **Export for NOP**, choose **Copy to Clipboard**, then press `Ctrl+V` in the playground (or click **Paste** in the Networks pane). **Copy for NOP** does the same in one click.
-- Save a `.json` file instead and open it with **Open file** in the Networks pane, or drop it on the page.
-- Click **Embed this network** at the bottom of the Networks pane and look at the **example website**: that is how a network looks on your own site. If you have a website, try the iframe code there.
+- Save a `.json` file instead and open it with **Open file** under **Your Files** in the Networks pane (right under the examples), or drop it on the page. Each file you open gets its own row there.
+- Click **Embed** at the bottom of the Networks pane: a new tab shows an example network on a plain web page, the way it looks on your own site, with the options and the code to copy under it. If you have a website, try the iframe code there.
 - Compare with Houdini: node shapes, colors, flags, wires, network boxes, the parameter panel. Anything that looks different from Houdini is useful feedback.
 - Go into subnetworks and your own unlocked digital assets, and back out with the path bar.
-- Try the playground and the example website on your phone or tablet. On the example website one finger scrolls the page and two fingers move the network, like a map on a web page; the fullscreen button gives the network the whole screen. In the playground one finger moves the network.
+- Try the playground and the example page on your phone or tablet. On the example page one finger scrolls the page and two fingers move the network, like a map on a web page; the fullscreen button gives the network the whole screen. In the playground one finger moves the network.
 
 ## 4. Known limits
 

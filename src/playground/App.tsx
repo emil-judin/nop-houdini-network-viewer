@@ -7,8 +7,7 @@ import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import { registerLabsIcons } from '../components/nodes/icons/iconRegistry';
 import { LABS_BUILTIN_ICON_ALIASES, LABS_ICONS } from '../components/nodes/icons/labs';
 import { AboutBlock } from './AboutBlock';
-import { EmbedDialog } from './EmbedDialog';
-import { AVAILABLE_EXAMPLES, exampleFileUrl, findExample, loadExample, type PlaygroundExample } from './examples';
+import { AVAILABLE_EXAMPLES, exampleNodeCount, findExample, loadExample, type PlaygroundExample } from './examples';
 import { ExporterDialog } from './ExporterDialog';
 import { FeedbackDialog } from './FeedbackDialog';
 import { NetworksPanel, type NetworksPanelSection } from './NetworksPanel';
@@ -52,8 +51,25 @@ function useExampleNetworks(active: PlaygroundExample | undefined): Partial<Reco
   return examples;
 }
 
-/** An example key, `custom` (the visitor's own file) or `icons` (the dev-only icon gallery). */
+/** An example key, the key of one of the visitor's own files (`file-1`) or `icons` (the dev-only icon gallery). */
 type PlaygroundTab = string;
+
+/** One of the visitor's own networks (opened, dropped or pasted), kept for this visit only. */
+interface OwnFile {
+  /** Row key, also the tab key (`file-1`, `file-2`, ...). */
+  key: string;
+  /** Name in the list: the file name, or "Pasted: <network>" for the clipboard. */
+  label: string;
+  /** Normalized network document. */
+  doc: HoudiniNetworkDocument;
+}
+
+/** Name of an own network in the list. Pastes are named after the network they hold. */
+function ownFileLabel({ doc, sourceName }: LoadedNetwork): string {
+  if (sourceName !== 'Clipboard') return sourceName;
+  const name = doc.root.path.split('/').filter(Boolean).pop();
+  return `Pasted: ${name ?? 'network'}`;
+}
 
 /**
  * First thing on screen: the icon gallery for a `?icons` link in the dev server, else the example a
@@ -63,7 +79,7 @@ function initialTab(): PlaygroundTab {
   const params = new URLSearchParams(window.location.search);
   if (IconReviewGallery && params.has('icons')) return 'icons';
   const requested = findExample(params.get('example'));
-  return (requested ?? AVAILABLE_EXAMPLES[0])?.key ?? 'custom';
+  return (requested ?? AVAILABLE_EXAMPLES[0])?.key ?? '';
 }
 
 /** Local storage key that remembers the welcome card was closed once. */
@@ -90,27 +106,44 @@ function rememberWelcomeSeen(): void {
 /** Screens at least this wide show the networks panel beside the network; narrower ones fold it. */
 const WIDE_SCREEN_QUERY = '(min-width: 768px)';
 
-/** Button at the top of the Networks pane, in Houdini's raised button grey with the blue-grey highlight on hover. */
-const PANEL_ACTION = `flex-1 min-w-0 flex items-center justify-center gap-1.5 h-7 px-2 rounded-[3px] bg-[#444444] text-[13px] text-[#d6d6d6] hover:bg-[#474e62] hover:text-white transition-colors cursor-pointer ${TOUCH_TARGET}`;
+/** Button of the open and paste box: `primary` in Houdini's blue-grey (Open file, the main action), else its raised grey. */
+const panelAction = (primary: boolean) =>
+  `min-w-0 flex items-center justify-center gap-1.5 h-7 px-3 rounded-[3px] text-[13px] transition-colors cursor-pointer ${TOUCH_TARGET} ${
+    primary ? 'bg-[#474e62] hover:bg-[#535b72] text-white' : 'bg-[#444444] hover:bg-[#4e4e4e] text-[#d6d6d6] hover:text-white'
+  }`;
+
+/**
+ * Dashed frame of the open and paste drop zone in `color`: an SVG outline, because a CSS dashed
+ * border cannot set the length of its dashes and gaps (here 6px dashes, 5px apart). The stroke is
+ * 2px wide and half of it is clipped by the box edge, so 1px shows.
+ */
+const openBoxFrame = (color: string): React.CSSProperties => ({
+  backgroundImage: `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' rx='3' fill='none' stroke='${color}' stroke-width='2' stroke-dasharray='6 5'/></svg>`,
+  )}")`,
+});
 
 /** NOP icon (orange square, web cut out) from public/, relative to the page so it also works from a sub-path. */
 const LOGO_URL = `${import.meta.env.BASE_URL}favicon.svg`;
 
 /** Node count of a network for the panel rows. */
-const nodeCountText = (doc: HoudiniNetworkDocument) => `${doc.root.nodes.length} nodes`;
+const nodeCountText = (count: number) => `${count} nodes`;
 
 /**
  * Interactive Playground application for testing and showcasing NOP, laid out like a Houdini
  * desktop: a collapsible networks pane beside the network view, and a status bar. The pane holds
- * the examples, the open and paste buttons for a visitor's own export, the exporter download and
- * Embed (the code for a website). A welcome card introduces the playground on the first visit.
+ * the examples, the visitor's own networks with the open and paste buttons, the exporter download and
+ * Embed (the example page with an example network and its code, in a new tab). A welcome card
+ * introduces the playground on the first visit.
  */
 export const App: React.FC = () => {
   const [tab, setTab] = useState<PlaygroundTab>(initialTab);
-  const [loaded, setLoaded] = useState<LoadedNetwork | null>(null);
+  const [ownFiles, setOwnFiles] = useState<OwnFile[]>([]);
+  const ownFilesRef = useRef(ownFiles);
+  ownFilesRef.current = ownFiles;
+  const nextFileIdRef = useRef(1);
   const [exporterOpen, setExporterOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [embedOpen, setEmbedOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(() => !welcomeSeen());
   const wideScreen = useMediaQuery(WIDE_SCREEN_QUERY);
   // The panel starts open on wide screens and folded on phones, and follows the screen when it changes
@@ -119,8 +152,12 @@ export const App: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const loader = useNetworkFileLoader((network) => {
-    setLoaded(network);
-    setTab('custom');
+    // A new name adds a row; the same file (or the same network pasted) again reloads its row
+    const label = ownFileLabel(network);
+    const existing = ownFilesRef.current.find((file) => file.label === label);
+    const file: OwnFile = { key: existing?.key ?? `file-${nextFileIdRef.current++}`, label, doc: network.doc };
+    setOwnFiles((files) => (existing ? files.map((f) => (f.key === file.key ? file : f)) : [...files, file]));
+    setTab(file.key);
     // On phones the panel floats over the network: get it out of the way to show the loaded file
     if (!wideScreen) setPanelOpen(false);
   });
@@ -128,36 +165,89 @@ export const App: React.FC = () => {
   const activeExample = findExample(tab);
   const examples = useExampleNetworks(activeExample);
   const exampleState = activeExample ? examples[activeExample.key] : undefined;
-  const activeDocument: HoudiniNetworkDocument | null =
-    tab === 'custom' && loaded ? loaded.doc : exampleState?.status === 'ready' ? exampleState.doc : null;
-  const activeLabel =
-    tab === 'icons' ? 'Icons Overview' : tab === 'custom' && loaded ? loaded.sourceName : (activeExample?.label ?? '');
-  const activeNetworkName =
-    tab === 'icons' ? activeLabel : tab === 'custom' && loaded ? `own file: ${activeLabel}` : `example: ${activeLabel}`;
-  // Examples are published next to the page, so their snippet works as it is; an own file is named for the visitor to upload
-  const embedFileUrl = activeExample ? exampleFileUrl(activeExample) : loaded ? loaded.sourceName : 'my-network.json';
+  const activeFile = ownFiles.find((file) => file.key === tab);
+  const activeDocument: HoudiniNetworkDocument | null = activeFile
+    ? activeFile.doc
+    : exampleState?.status === 'ready'
+      ? exampleState.doc
+      : null;
+  const activeLabel = tab === 'icons' ? 'Icons Overview' : (activeFile?.label ?? activeExample?.label ?? '');
+  const activeNetworkName = tab === 'icons' ? activeLabel : activeFile ? `own file: ${activeLabel}` : `example: ${activeLabel}`;
 
   const sections: NetworksPanelSection[] = [
     {
       title: 'Examples',
       items: AVAILABLE_EXAMPLES.map((example) => {
         const state = examples[example.key];
+        // Known from the build before the example is loaded, so every row shows it from the start
+        const count = state?.status === 'ready' ? state.doc.root.nodes.length : exampleNodeCount(example);
         return {
           key: example.key,
           label: example.label,
           description: example.description,
-          detail: state?.status === 'ready' ? nodeCountText(state.doc) : undefined,
+          detail: count === undefined ? undefined : nodeCountText(count),
           icon: Network,
         };
       }),
     },
-    {
-      title: 'Your File',
-      items: loaded
-        ? [{ key: 'custom', label: loaded.sourceName, detail: nodeCountText(loaded.doc), title: `Your network: ${loaded.sourceName}`, icon: FileUp }]
-        : [],
-    },
   ];
+
+  // Right under the examples and always in view, with each opened or pasted network as a row
+  // between the title and the open and paste box (owner decision 2026-11-04)
+  const ownSection: NetworksPanelSection = {
+    title: 'Your Files',
+    emptyText: 'No networks uploaded',
+    items: ownFiles.map((file) => ({
+      key: file.key,
+      label: file.label,
+      detail: nodeCountText(file.doc.root.nodes.length),
+      title: `Your network: ${file.label}`,
+      icon: FileUp,
+    })),
+  };
+  const openTools = (
+    // A drop zone: centered, set slightly into the pane, with an icon and "Drop ... here" as its main
+    // line (owner decision 2026-11-05). It lights up blue while a file is dragged over the page.
+    <div
+      className={`mx-2 mt-3 mb-2 px-3 py-4 rounded-[3px] text-center transition-colors ${loader.isDragging ? 'bg-[#3b4052]' : 'bg-[#333333]'}`}
+      style={openBoxFrame(loader.isDragging ? '#7082b9' : '#6a6a6a')}
+    >
+      {/* Phones and tablets cannot drag files onto a page: there the box shows only the buttons */}
+      <div className="[@media(pointer:coarse)]:hidden">
+        <FileUp
+          className={`w-6 h-6 mx-auto transition-colors ${loader.isDragging ? 'text-[#9aaae0]' : 'text-[#8c8c8c]'}`}
+          aria-hidden="true"
+        />
+        <p className="mt-1.5 text-[13px] text-[#d6d6d6]">Drop a .json file here</p>
+      </div>
+      <div className="mt-2.5 [@media(pointer:coarse)]:mt-0 flex justify-center gap-1">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          title="Open a .json file made with the NOP exporter (or drop it on the page)"
+          className={panelAction(true)}
+        >
+          <FileUp className="shrink-0 w-3.5 h-3.5" aria-hidden="true" />
+          <span className="truncate">Open file</span>
+        </button>
+        <button
+          type="button"
+          onClick={loader.pasteFromClipboard}
+          title="Paste from Houdini: JSON copied with the NOP shelf tool (or press Ctrl+V)"
+          className={panelAction(false)}
+        >
+          <ClipboardPaste className="shrink-0 w-3.5 h-3.5" aria-hidden="true" />
+          <span className="truncate">Paste</span>
+        </button>
+      </div>
+      <p className="mt-2 text-[12px] leading-[1.35] text-[#a8a8a8]">Files stay in your browser.</p>
+    </div>
+  );
+
+  const closeWelcome = () => {
+    setWelcomeOpen(false);
+    rememberWelcomeSeen();
+  };
 
   const selectNetwork = (key: string) => {
     setTab(key);
@@ -192,46 +282,11 @@ export const App: React.FC = () => {
           collapsed={!panelOpen}
           onToggleCollapsed={() => setPanelOpen((open) => !open)}
           overlay={!wideScreen}
-          actions={
-            <div className="flex gap-1 p-2">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                title="Open a .json file made with the NOP exporter (or drop it on the page)"
-                className={PANEL_ACTION}
-              >
-                <FileUp className="shrink-0 w-3.5 h-3.5" aria-hidden="true" />
-                <span className="truncate">Open file</span>
-              </button>
-              <button
-                type="button"
-                onClick={loader.pasteFromClipboard}
-                title="Paste from Houdini: JSON copied with the NOP shelf tool (or press Ctrl+V)"
-                className={PANEL_ACTION}
-              >
-                <ClipboardPaste className="shrink-0 w-3.5 h-3.5" aria-hidden="true" />
-                <span className="truncate">Paste</span>
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json,application/json"
-                className="hidden"
-                tabIndex={-1}
-                aria-hidden="true"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (file) loader.openFile(file);
-                  // Cleared so that choosing the same file again reloads it
-                  event.target.value = '';
-                }}
-              />
-            </div>
-          }
+          pinnedSection={ownSection}
+          pinnedContent={openTools}
           footer={
             <AboutBlock
               onOpenExporter={() => setExporterOpen(true)}
-              onOpenEmbed={activeDocument && tab !== 'icons' ? () => setEmbedOpen(true) : undefined}
               onOpenHelp={() => setWelcomeOpen(true)}
               onOpenFeedback={FEEDBACK_ACCESS_KEY ? () => setFeedbackOpen(true) : undefined}
             />
@@ -287,17 +342,34 @@ export const App: React.FC = () => {
             <span title="Houdini version the network on screen was exported from">Houdini {activeDocument.houdiniVersion}</span>
           )}
           <span title="Version of the NOP exporter on the Exporter download">Exporter {__NOP_VERSION__}</span>
+          {/* The page's own version, here since the about block lost its version line (2026-11-05) */}
+          <span title="Version of this playground page">Playground {__NOP_VERSION__}</span>
           <span>MIT License, Emil Judin</span>
         </span>
       </footer>
 
+      {/* Outside the Networks pane, so Open file works even while the pane is folded */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json,application/json"
+        className="hidden"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) loader.openFile(file);
+          // Cleared so that choosing the same file again reloads it
+          event.target.value = '';
+        }}
+      />
       <ExporterDialog open={exporterOpen} onClose={() => setExporterOpen(false)} />
-      <EmbedDialog open={embedOpen} onClose={() => setEmbedOpen(false)} suggestedFileName={embedFileUrl} isOwnFile={tab === 'custom'} />
       <WelcomeDialog
         open={welcomeOpen}
-        onClose={() => {
-          setWelcomeOpen(false);
-          rememberWelcomeSeen();
+        onClose={closeWelcome}
+        onOpenExporter={() => {
+          closeWelcome();
+          setExporterOpen(true);
         }}
       />
       {FEEDBACK_ACCESS_KEY && (

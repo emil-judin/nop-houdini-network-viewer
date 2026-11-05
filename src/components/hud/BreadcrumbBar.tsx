@@ -58,8 +58,8 @@ const HistoryButton: React.FC<{
 };
 
 /**
- * Houdini-style network path bar: back and forward buttons, then the path (`obj > circuit_board >
- * circuit_gen`) with each node's icon.
+ * Houdini-style network path bar: back and forward buttons, then the path (`assets > scene >
+ * pebble_scatter1`) with each node's icon.
  *
  * Like Houdini, levels below the network on screen stay in the bar after going up, dimmed, so
  * they can be entered again with one click. Viewers narrower than 448px (phones) show only the

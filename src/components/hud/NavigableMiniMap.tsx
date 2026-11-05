@@ -12,7 +12,8 @@ export interface NavigableMiniMapProps {
 /**
  * Minimap that navigates like Houdini's network overview: clicking (or tapping) a spot centers
  * the view there, and holding the button down makes the view follow the pointer. The wheel still
- * zooms. Hidden in narrow viewers (phones), where it would cover a large part of the network.
+ * zooms. Narrow viewers (phones) start without it, because it covers much of the network there;
+ * the settings menu turns it on.
  */
 export const NavigableMiniMap: React.FC<NavigableMiniMapProps> = ({ nodeColor }) => {
   const { setCenter, getZoom } = useReactFlow();
@@ -53,7 +54,7 @@ export const NavigableMiniMap: React.FC<NavigableMiniMapProps> = ({ nodeColor })
       onPointerCancel={endDrag}
     >
       <MiniMap
-        className="hidden! @md:block! touch-none cursor-crosshair"
+        className="touch-none cursor-crosshair"
         nodeColor={nodeColor}
         maskColor="rgba(18, 18, 18, 0.72)"
         style={{

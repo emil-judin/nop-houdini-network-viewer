@@ -35,7 +35,7 @@ import { buildNetworkPathSegments } from './hud/networkPathSegments';
 import { NavigableMiniMap } from './hud/NavigableMiniMap';
 import { NetworkErrorState } from './hud/NetworkErrorState';
 import { NetworkLoadingState } from './hud/NetworkLoadingState';
-import { ViewerToolbar } from './hud/ViewerToolbar';
+import { ViewerToolbar, type ScreenshotState } from './hud/ViewerToolbar';
 import { ResizableInspectorPanel, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
 import { useElementSize } from './useElementSize';
 import { NetworkErrorBoundary } from './NetworkErrorBoundary';
@@ -45,6 +45,7 @@ import { HoudiniNetBox } from './nodes/HoudiniNetBox';
 import { HoudiniSopNode } from './nodes/HoudiniSopNode';
 import { HoudiniStickyNote } from './nodes/HoudiniStickyNote';
 import { HoudiniSubnetInput } from './nodes/HoudiniSubnetInput';
+import { saveNetworkScreenshot, screenshotFileName } from './screenshot';
 import { CANVAS_BG_CLASS, GRID_LINE_COLOR } from './theme';
 
 // The Parameter Inspector (pane layout, code highlighting, ramps) is only needed once a node is
@@ -149,6 +150,9 @@ const FRAME_PADDING = 0.8;
 const FRAME_MAX_ZOOM = 1.6;
 /** Narrower viewers (phones) frame a node less closely, so its name and label stay on screen. */
 const NARROW_VIEWER_WIDTH = 448;
+
+/** How long the screenshot button shows that the last screenshot failed. */
+const SCREENSHOT_FAILED_MS = 3000;
 const FRAME_MAX_ZOOM_NARROW = 1;
 
 /**
@@ -227,18 +231,27 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   const onNodeSelectRef = useRef(onNodeSelect);
   onNodeSelectRef.current = onNodeSelect;
 
-  // Network overview (minimap): toolbar button or the O hotkey
-  const [miniMapVisible, setMiniMapVisible] = useState(showMiniMap);
-
-  useEffect(() => {
-    setMiniMapVisible(showMiniMap);
-  }, [showMiniMap]);
-
   const rootRef = useRef<HTMLDivElement>(null);
   const viewerSize = useElementSize(rootRef);
   const isSidePanel = viewerSize.width >= SIDE_PANEL_MIN_VIEWER_WIDTH;
   // `0` before the first measurement (or while hidden): treated as a wide viewer
-  const frameMaxZoom = viewerSize.width > 0 && viewerSize.width < NARROW_VIEWER_WIDTH ? FRAME_MAX_ZOOM_NARROW : FRAME_MAX_ZOOM;
+  const isNarrow = viewerSize.width > 0 && viewerSize.width < NARROW_VIEWER_WIDTH;
+  const frameMaxZoom = isNarrow ? FRAME_MAX_ZOOM_NARROW : FRAME_MAX_ZOOM;
+
+  // Network overview (minimap): toolbar button, settings menu or the O hotkey. Narrow viewers
+  // (phones) start without it whatever `showMiniMap` says, because it covers much of the network
+  // there; each width keeps its own on/off state
+  const [miniMapVisible, setMiniMapVisible] = useState(showMiniMap);
+  const [narrowMiniMapVisible, setNarrowMiniMapVisible] = useState(false);
+  const miniMapShown = isNarrow ? narrowMiniMapVisible : miniMapVisible;
+  const toggleMiniMap = useCallback(() => {
+    if (isNarrow) setNarrowMiniMapVisible((visible) => !visible);
+    else setMiniMapVisible((visible) => !visible);
+  }, [isNarrow]);
+
+  useEffect(() => {
+    setMiniMapVisible(showMiniMap);
+  }, [showMiniMap]);
   const twoFingerPan = touchPan === 'two-fingers' && !isFullscreen;
   const touchHintVisible = useTwoFingerPan(rootRef, twoFingerPan);
   const lastClickRef = useRef<{ id: string; time: number } | null>(null);
@@ -330,7 +343,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     if (event.shiftKey) return false;
     switch (event.code) {
       case 'KeyO':
-        setMiniMapVisible((visible) => !visible);
+        toggleMiniMap();
         return true;
       case 'KeyH':
         fitAll();
@@ -432,6 +445,16 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     return () => clearTimeout(timer);
   }, [activeGraph, fitView, focusCanvasNode, selectNode, setViewport, triggerFitView]);
 
+  // A page that changes `focusNode` later (for example the example page's start node list) gets the
+  // new start view right away, while the top level is on screen
+  const shownStartFocusRef = useRef(startFocus);
+  useEffect(() => {
+    if (shownStartFocusRef.current === startFocus) return;
+    shownStartFocusRef.current = startFocus;
+    if (activeGraph.path !== rootPathRef.current) return;
+    triggerFitView({ ...startFitOptionsRef.current, duration: reducedMotionRef.current ? 0 : 250 });
+  }, [activeGraph.path, startFocus, triggerFitView]);
+
   // A node the visitor selects (click, tap or keyboard) stays in view: when the Parameter Inspector
   // beside or below the canvas covers any part of it, the view pans the node to the middle of the
   // remaining canvas and keeps the zoom. A fully visible node does not move the view.
@@ -461,6 +484,14 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     return () => cancelAnimationFrame(frame);
   }, [duration, getViewport, isSidePanel, selectedNodeId, setViewport, showInspector]);
 
+  // The first click on a node the visitor can go inside opens its parameters only after the
+  // double-click time: opened at once, the panel can cover the node (the bottom sheet in narrow
+  // viewers, the side panel at the right edge) and catch the second click or tap
+  const clickSelectTimerRef = useRef<number | undefined>(undefined);
+  const cancelClickSelect = useCallback(() => window.clearTimeout(clickSelectTimerRef.current), []);
+  // A waiting selection belongs to the network on screen: drop it when the level changes or the viewer goes
+  useEffect(() => cancelClickSelect, [activeGraph, cancelClickSelect]);
+
   // Double-clicks are detected from two clicks on the same node, so a double tap works on
   // touch screens too (mobile browsers do not reliably fire `dblclick`)
   const handleNodeClick = useCallback(
@@ -469,16 +500,24 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
       const sopNode = (rfNode.data as unknown as HoudiniSopFlowNodeData).node;
       const now = performance.now();
       const last = lastClickRef.current;
+      cancelClickSelect();
       if (last && last.id === rfNode.id && now - last.time < DOUBLE_CLICK_MS && canDiveInto(sopNode)) {
         lastClickRef.current = null;
         diveInto(sopNode);
         return;
       }
       lastClickRef.current = { id: rfNode.id, time: now };
-      revealOnSelectRef.current = sopNode.name;
-      selectNode(sopNode);
+      const select = () => {
+        revealOnSelectRef.current = sopNode.name;
+        selectNode(sopNode);
+      };
+      if (showInspector && canDiveInto(sopNode)) {
+        clickSelectTimerRef.current = window.setTimeout(select, DOUBLE_CLICK_MS);
+      } else {
+        select();
+      }
     },
-    [diveInto, selectNode],
+    [cancelClickSelect, diveInto, selectNode, showInspector],
   );
 
   // Keyboard access to the canvas: Enter or Space on a focused node selects it and moves focus to the
@@ -491,6 +530,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
       if (!node) return;
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        cancelClickSelect();
         revealOnSelectRef.current = node.name;
         selectNode(node, showInspector);
       } else if (event.key === 'Escape' && selectedNodeId) {
@@ -498,7 +538,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
         selectNode(null);
       }
     },
-    [activeGraph, selectNode, selectedNodeId, showInspector],
+    [activeGraph, cancelClickSelect, selectNode, selectedNodeId, showInspector],
   );
 
   // A click or tap on the empty canvas clears the selection; a double-click or double-tap fits the
@@ -513,8 +553,9 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     } else {
       lastPaneClickRef.current = now;
     }
+    cancelClickSelect();
     selectNode(null);
-  }, [fitAll, selectNode]);
+  }, [cancelClickSelect, fitAll, selectNode]);
 
   // Entering or leaving fullscreen changes the viewer size a lot: fit the network to the new size.
   // Browsers resize in steps and in any order around the `fullscreenchange` event (WebKit can resize
@@ -542,6 +583,27 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   const handleMoveStart = useCallback((event: MouseEvent | TouchEvent | null) => {
     if (event) fitOnResizeRef.current = false;
   }, []);
+
+  // Screenshot of what the canvas shows (header button, or the settings menu in narrow viewers)
+  const [screenshotState, setScreenshotState] = useState<ScreenshotState>('idle');
+  const screenshotBusyRef = useRef(false);
+
+  const takeScreenshot = useCallback(async () => {
+    const canvas = rootRef.current?.querySelector<HTMLElement>('.react-flow');
+    if (!canvas || screenshotBusyRef.current) return;
+    screenshotBusyRef.current = true;
+    setScreenshotState('busy');
+    try {
+      await saveNetworkScreenshot(canvas, screenshotFileName(activeGraph.path));
+      setScreenshotState('idle');
+    } catch (error) {
+      console.warn('NOP: the screenshot could not be drawn.', error);
+      setScreenshotState('failed');
+      window.setTimeout(() => setScreenshotState('idle'), SCREENSHOT_FAILED_MS);
+    } finally {
+      screenshotBusyRef.current = false;
+    }
+  }, [activeGraph.path]);
 
   const itemCount = baseNodes.length + baseEdges.length;
   const canGoUp = levels.length > 1;
@@ -595,8 +657,10 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
               onChangeWireStyle={setWireStyle}
               document={normalizedDoc}
               showDebugActions={showDebugActions}
-              miniMapVisible={miniMapVisible}
-              onToggleMiniMap={() => setMiniMapVisible((visible) => !visible)}
+              miniMapVisible={miniMapShown}
+              onToggleMiniMap={toggleMiniMap}
+              onScreenshot={takeScreenshot}
+              screenshotState={screenshotState}
               showFullscreenButton={showFullscreenButton}
               isFullscreen={isFullscreen}
               onToggleFullscreen={onToggleFullscreen}
@@ -638,7 +702,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
               >
                 <Background variant={BackgroundVariant.Lines} gap={50} size={1} color={GRID_LINE_COLOR} />
 
-                {miniMapVisible && <NavigableMiniMap nodeColor={resolveMiniMapNodeColor} />}
+                {miniMapShown && <NavigableMiniMap nodeColor={resolveMiniMapNodeColor} />}
               </ReactFlow>
             </NetworkErrorBoundary>
 
