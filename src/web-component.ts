@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { NetworkErrorState } from './components/hud/NetworkErrorState';
+import { CANVAS_COLOR } from './components/theme';
 import { EMBED_OPTION_NAMES, parseEmbedOptions } from './embed/embedAttributes';
 import { RemoteHoudiniNetwork } from './embed/RemoteHoudiniNetwork';
 import fontsCss from './styles/fonts.css?inline';
@@ -9,8 +10,11 @@ import viewerCss from './styles/viewer-bundle.css?inline';
 /** Custom element tag name. */
 export const HOUDINI_NETWORK_TAG = 'houdini-network';
 
-/** Default size of the element; any `style="height: ..."` on the page overrides it. */
-const HOST_CSS = ':host { display: block; position: relative; height: 480px; } :host([hidden]) { display: none; }';
+/**
+ * Default size of the element, in the canvas grey while the network loads; any `style="height: ..."`
+ * or background on the page overrides it.
+ */
+const HOST_CSS = `:host { display: block; position: relative; height: 480px; background: ${CANVAS_COLOR}; } :host([hidden]) { display: none; }`;
 
 /**
  * Font URLs in the built `fonts.css` are relative to this script (`./fonts/...`, see

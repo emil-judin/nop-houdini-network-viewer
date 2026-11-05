@@ -80,11 +80,18 @@ function escapeAttribute(value: string): string {
  *
  * @param scriptUrl URL of the published `web-component.js` bundle.
  */
+/**
+ * Background of an embed's space while the viewer loads: the canvas grey (`CANVAS_COLOR` in
+ * `src/components/theme.ts`), so the space looks like the network before it appears.
+ */
+export const EMBED_PLACEHOLDER_COLOR = '#242424';
+
 export function buildWebComponentSnippet(options: EmbedSnippetOptions, scriptUrl: string): string {
   const attributes = [
     `src="${escapeAttribute(options.jsonUrl)}"`,
     ...optionPairs(options).map(([name, value]) => `${name}="${escapeAttribute(value)}"`),
-    `style="display: block; height: ${options.heightPx}px"`,
+    // Size and canvas grey in the page's own style: the space is reserved before the script loads
+    `style="display: block; height: ${options.heightPx}px; background: ${EMBED_PLACEHOLDER_COLOR}"`,
   ];
   return [
     `<script type="module" src="${escapeAttribute(scriptUrl)}"></script>`,
@@ -150,7 +157,8 @@ export function buildIframeSnippet(options: EmbedSnippetOptions, pageUrl: string
     '<iframe',
     `  src="${escapeAttribute(buildEmbedPageUrl(options, pageUrl))}"`,
     `  width="100%" height="${options.heightPx}"`,
-    '  style="border: 0"',
+    // Canvas grey until the page inside has loaded (an iframe is transparent until then)
+    `  style="border: 0; background: ${EMBED_PLACEHOLDER_COLOR}"`,
     '  allow="fullscreen" allowfullscreen',
     '  loading="lazy"',
     '  title="Houdini node network"',
