@@ -54,13 +54,12 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({ open, onClose, onO
       <PlaygroundBanner className="[@media(max-height:560px)]:hidden" />
       <div className="overflow-y-auto px-4 py-3">
         <p className="text-[13px] leading-[1.5] text-[#d6d6d6]">
-          NOP shows Houdini node networks on websites. This playground is for trying it out: the network in the
+          NOP allows you to display Houdini node networks on the web. This playground is for trying it out: the network in the
           middle is what visitors of your site will see.
         </p>
         <ol className="mt-4 space-y-3">
           <Step icon={<Download className="w-4 h-4" />} title="1. Export from Houdini">
-            Install the exporter (<InlineAction onClick={onOpenExporter}>Get the exporter</InlineAction> in the Networks
-            pane), then click <b>Export for NOP</b> on the NOP shelf.
+            <InlineAction onClick={onOpenExporter}>Get the exporter</InlineAction>, then click <b>Export for NOP</b> on the NOP shelf.
           </Step>
           <Step icon={<MousePointer2 className="w-4 h-4" />} title="2. Explore it here">
             {touch
@@ -68,7 +67,6 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({ open, onClose, onO
               : 'Drag to move, scroll to zoom, double-click a subnetwork to go inside and click a node to see its parameters.'}
           </Step>
           <Step icon={<Code2 className="w-4 h-4" />} title="3. Put it on your website">
-            One HTML tag or an iframe shows the network on your own page.{' '}
             <a href={EXAMPLE_SITE_PAGE} target="_blank" rel="noopener" onClick={onClose} className={INLINE_LINK}>
               Embed
             </a>{' '}
