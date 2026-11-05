@@ -2,7 +2,22 @@
 
 All notable changes to this project are documented here. Versions follow [Semantic Versioning](https://semver.org/); `alpha` releases can still change the JSON schema and the component API.
 
-## 0.1.0-alpha.2 (tester release, 2026-10-29)
+## 0.1.0-alpha.3 (tester release, 2026-11-05)
+
+Fixes from the owner's test on a phone (mobile Chrome), on top of 0.1.0-alpha.2.
+
+### Viewer
+- The Parameter Inspector header no longer lists the flags as badges (Display, Bypass, ...): they show on the node itself.
+- On phones the parameter sheet slides up when it opens and down when it closes (at once with reduced motion).
+- The Exit fullscreen button shows the blue selected state instead of a gold icon.
+
+### Web component
+- An embed's space is the canvas grey from the start: the web component snippet and the iframe snippet set the background, and so does the element itself, so the page shows a grey area instead of an empty gap while the viewer loads.
+
+### Playground
+- **Phones:** the floating Networks pane scrolls as a whole (nothing is pinned), its buttons are smaller (the tap area stays 44px), the status bar shows only the NOP icon, name and version, and the page itself no longer scrolls, which left a gap at the bottom in mobile Chrome.
+
+## 0.1.0-alpha.2 (2026-10-29, finished 2026-11-05; not handed to testers, replaced by 0.1.0-alpha.3)
 
 Fixes from the repository review of 2026-10-27 (summary and finding IDs in `docs/HISTORY.md`).
 

@@ -1,10 +1,10 @@
-# Testing NOP (`0.1.0-alpha.2`)
+# Testing NOP (`0.1.0-alpha.3`)
 
 Thank you for trying NOP. It shows Houdini node networks on a web page, so you can put an interactive network on your portfolio or in a tutorial instead of a screenshot. Visitors can pan, zoom, open subnetworks and read parameters and VEX, but cannot change anything.
 
 This is an early test version. Some things will be missing or broken, and that is exactly what I would like to hear about.
 
-**Tested the first version already?** The project is now called NOP (it was WOP), so the playground has a new address: use the link from this invitation. The exporter must be installed again (see step 2). New since then: a layout like Houdini's desktop with a Networks pane, a fullscreen button, better phone support, an example page and a welcome card.
+**Tested the first version already?** The project is now called NOP (it was WOP), so the playground has a new address: use the link from this invitation. The exporter must be installed again (see step 2). New since then: a layout like Houdini's desktop with a Networks pane, six example networks that each show one part of the viewer, a fullscreen button, a screenshot button, better phone support, an example page with the embed code and a welcome card.
 
 ## 1. Open the playground
 

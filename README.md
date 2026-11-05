@@ -58,7 +58,7 @@ The playground's **Embed** button (at the bottom of the Networks pane) opens its
 Upload the exported `.json` file next to your page, then:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.2/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.3/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
