@@ -75,7 +75,7 @@
   "dependencies": {
     "@xyflow/react": "^12.4.2",
     "html-to-image": "1.11.11",
-    "lucide-react": "^1.61.0"
+    "lucide-react": "^1.66.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
