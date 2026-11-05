@@ -6,6 +6,7 @@ All notable changes to this project are documented here. Versions follow [Semant
 
 ### Playground
 - **Example page without jumps:** the example network at the top is part of the page from the start, and the space for the embed options and code under each network is reserved before the page script has loaded. The page no longer jumps while it loads (layout shift 0.36 on desktops and 0.88 on phones before, now under 0.01). The top network also keeps its height: the page reserved 480px, but the Height option starts at 600px, and on phones it now gets 70% of the screen height like the other networks.
+- The phone status bar shows "Not affiliated with SideFX." again, next to the NOP icon, name and version.
 
 ### Viewer
 - **No jump when a network appears:** for one frame every viewer showed its network unframed (large, in the top-left corner) before it jumped into the start view. The network now stays hidden over the grey canvas until the start view is on screen.
