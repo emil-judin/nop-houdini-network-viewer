@@ -9,19 +9,6 @@ import { buildParmLayout } from './parmModel';
 import { PANE } from './paneStyles';
 
 /**
- * Node flags listed in the inspector header, with the flag colors used on the node itself.
- */
-const FLAG_BADGES: Array<{ key: keyof HoudiniNodeData['flags']; label: string; color: string }> = [
-  { key: 'display', label: 'Display', color: '#3098e5' },
-  { key: 'render', label: 'Render', color: '#8a6be0' },
-  { key: 'bypass', label: 'Bypass', color: '#ead02a' },
-  { key: 'template', label: 'Template', color: '#d45ca8' },
-  { key: 'selectableTemplate', label: 'Selectable Template', color: '#d45ca8' },
-  { key: 'lock', label: 'Locked', color: '#d94040' },
-  { key: 'softLock', label: 'Soft Locked', color: '#d98c40' },
-];
-
-/**
  * Props for the read-only Parameter Inspector (`ParameterInspector`).
  */
 export interface ParameterInspectorProps {
@@ -42,7 +29,7 @@ export interface ParameterInspectorProps {
 
 /**
  * Read-only Houdini 22 Parameter Pane for the selected node: the pane header (operator icon,
- * type in bold, node name field), active flags and comment, then the exported parameters with
+ * type in bold, node name field), the operator type and comment, then the exported parameters with
  * Houdini's layout (tabs, section folders, joined rows, toggles, menus, sliders). Values cannot be edited.
  */
 export const ParameterInspector: React.FC<ParameterInspectorProps> = ({
@@ -53,7 +40,6 @@ export const ParameterInspector: React.FC<ParameterInspectorProps> = ({
   focusOnOpen = false,
 }) => {
   const layout = useMemo(() => buildParmLayout(node), [node]);
-  const activeFlags = FLAG_BADGES.filter(({ key }) => Boolean(node.flags?.[key]));
   const isNavigable = canDiveInto(node);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -103,14 +89,9 @@ export const ParameterInspector: React.FC<ParameterInspectorProps> = ({
           </button>
         </div>
 
-        <div className="mt-1 flex flex-wrap items-center gap-1 text-[11px]">
-          <span className="font-mono text-[#a0a0a0] truncate max-w-full">{node.type}</span>
-          {activeFlags.map(({ key, label, color }) => (
-            <span key={key} className="inline-flex items-center gap-1 px-1.5 rounded-[3px] bg-[#383838] text-[#cfcfcf]">
-              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
-              {label}
-            </span>
-          ))}
+        {/* No flag badges (owner decision 2026-11-05): the flags show on the node itself */}
+        <div className="mt-1 text-[11px]">
+          <span className="block font-mono text-[#a0a0a0] truncate max-w-full">{node.type}</span>
         </div>
 
         {node.comment && (

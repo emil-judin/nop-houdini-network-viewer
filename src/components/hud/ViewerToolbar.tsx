@@ -183,10 +183,11 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
               onClick={onToggleFullscreen}
               title={isFullscreen ? 'Exit Fullscreen (Esc)' : 'Fullscreen'}
               aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-              className={toolButtonClass()}
+              // In fullscreen the button shows the blue selected state, like an active wire style
+              className={toolButtonClass(isFullscreen)}
             >
               {isFullscreen ? (
-                <Minimize2 className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                <Minimize2 className="w-4 h-4" aria-hidden="true" />
               ) : (
                 <Maximize2 className="w-4 h-4" aria-hidden="true" />
               )}

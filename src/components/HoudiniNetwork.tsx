@@ -36,7 +36,7 @@ import { NavigableMiniMap } from './hud/NavigableMiniMap';
 import { NetworkErrorState } from './hud/NetworkErrorState';
 import { NetworkLoadingState } from './hud/NetworkLoadingState';
 import { ViewerToolbar, type ScreenshotState } from './hud/ViewerToolbar';
-import { ResizableInspectorPanel, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
+import { ResizableInspectorPanel, SHEET_SLIDE_MS, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
 import { useElementSize } from './useElementSize';
 import { NetworkErrorBoundary } from './NetworkErrorBoundary';
 import { HoudiniBlockUnderlay } from './nodes/HoudiniBlockUnderlay';
@@ -455,6 +455,22 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     triggerFitView({ ...startFitOptionsRef.current, duration: reducedMotionRef.current ? 0 : 250 });
   }, [activeGraph.path, startFocus, triggerFitView]);
 
+  // The bottom sheet slides down when it closes: the last node stays on it until the slide ends.
+  // Set while rendering (React's pattern for state that follows a prop), cleared by a timer.
+  const sheetSlides = !isSidePanel && !reducedMotion;
+  const [closingNode, setClosingNode] = useState<HoudiniNodeData | null>(null);
+  const [previousSelectedNode, setPreviousSelectedNode] = useState(selectedNode);
+  if (previousSelectedNode !== selectedNode) {
+    setPreviousSelectedNode(selectedNode);
+    setClosingNode(!selectedNode && previousSelectedNode && sheetSlides ? previousSelectedNode : null);
+  }
+  useEffect(() => {
+    if (!closingNode) return;
+    const timer = window.setTimeout(() => setClosingNode(null), SHEET_SLIDE_MS);
+    return () => window.clearTimeout(timer);
+  }, [closingNode]);
+  const inspectorNode = selectedNode ?? closingNode;
+
   // A node the visitor selects (click, tap or keyboard) stays in view: when the Parameter Inspector
   // beside or below the canvas covers any part of it, the view pans the node to the middle of the
   // remaining canvas and keeps the zoom. A fully visible node does not move the view.
@@ -736,19 +752,21 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
           </div>
         </div>
 
-        {showInspector && selectedNode && (
+        {showInspector && inspectorNode && (
           <ResizableInspectorPanel
             isSidePanel={isSidePanel}
             viewerWidth={viewerSize.width}
             viewerHeight={viewerSize.height}
+            open={selectedNode !== null}
+            slide={sheetSlides}
           >
-            <NetworkErrorBoundary resetKey={selectedNode}>
+            <NetworkErrorBoundary resetKey={inspectorNode}>
               <React.Suspense fallback={<NetworkLoadingState message="Loading parameters..." />}>
                 <ParameterInspector
-                  node={selectedNode}
+                  node={inspectorNode}
                   exportMode={normalizedDoc.exportMode}
                   onClose={closeInspector}
-                  onDiveInto={() => diveInto(selectedNode)}
+                  onDiveInto={() => diveInto(inspectorNode)}
                   focusOnOpen={focusInspector}
                 />
               </React.Suspense>

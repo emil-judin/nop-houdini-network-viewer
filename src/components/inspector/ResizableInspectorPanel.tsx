@@ -1,7 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 /** Viewer width from which the inspector is a side panel instead of a bottom sheet. */
 export const SIDE_PANEL_MIN_VIEWER_WIDTH = 672;
+
+/** How long the bottom sheet takes to slide in and out, in milliseconds. */
+export const SHEET_SLIDE_MS = 200;
 
 const MIN_WIDTH = 260;
 const MIN_HEIGHT = 120;
@@ -39,6 +42,13 @@ export interface ResizableInspectorPanelProps {
   /** Current viewer size in pixels, used to keep room for the canvas. */
   viewerWidth: number;
   viewerHeight: number;
+  /**
+   * Bottom sheet only: `false` slides the sheet down out of its space (it is closing; the caller
+   * unmounts it after {@link SHEET_SLIDE_MS}). Defaults to `true`.
+   */
+  open?: boolean;
+  /** Bottom sheet only: slide up when it first appears and down when it closes. Defaults to `false`. */
+  slide?: boolean;
   children: React.ReactNode;
 }
 
@@ -47,14 +57,28 @@ export interface ResizableInspectorPanelProps {
  * (drag sideways) or on top of the bottom sheet (drag up and down, with a grip for fingers).
  * Works with mouse, touch and pen (pointer events with capture), and with the arrow keys when the
  * handle has focus. Double-click (or double-tap) the handle to restore the default size. The size
- * is remembered in this browser.
+ * is remembered in this browser. With `slide`, the bottom sheet slides up into its space when it
+ * opens and down when it closes; the space itself is taken at once, so the canvas above has its
+ * final size from the start.
  */
 export const ResizableInspectorPanel: React.FC<ResizableInspectorPanelProps> = ({
   isSidePanel,
   viewerWidth,
   viewerHeight,
+  open = true,
+  slide = false,
   children,
 }) => {
+  // Starts below its space and slides up one frame after the first paint
+  const [entered, setEntered] = useState(!slide);
+  useEffect(() => {
+    if (entered) return;
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => setEntered(true));
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [entered]);
+
   const [width, setWidth] = useState<number | null>(() => readStoredSize(STORAGE_KEYS.width));
   const [height, setHeight] = useState<number | null>(() => readStoredSize(STORAGE_KEYS.height));
   const [isDragging, setIsDragging] = useState(false);
@@ -160,15 +184,28 @@ export const ResizableInspectorPanel: React.FC<ResizableInspectorPanelProps> = (
     </div>
   );
 
+  if (isSidePanel) {
+    return (
+      <div className="relative shrink-0 flex h-full border-l border-[#1c1c1c]" style={{ width: size }}>
+        {handle}
+        <div className="flex-1 min-w-0 min-h-0">{children}</div>
+      </div>
+    );
+  }
+
+  const shown = entered && open;
   return (
-    <div
-      className={`relative shrink-0 flex ${
-        isSidePanel ? 'h-full border-l border-[#1c1c1c]' : 'w-full flex-col border-t border-[#1c1c1c]'
-      }`}
-      style={isSidePanel ? { width: size } : { height: size }}
-    >
-      {handle}
-      <div className="flex-1 min-w-0 min-h-0">{children}</div>
+    // The space of the sheet, with the sheet sliding inside it
+    <div className="relative shrink-0 w-full overflow-hidden" style={{ height: size }}>
+      <div
+        className={`flex flex-col h-full border-t border-[#1c1c1c] ${
+          slide ? 'transition-transform ease-out motion-reduce:transition-none' : ''
+        } ${shown ? 'translate-y-0' : 'translate-y-full'} ${open ? '' : 'pointer-events-none'}`}
+        style={slide ? { transitionDuration: `${SHEET_SLIDE_MS}ms` } : undefined}
+      >
+        {handle}
+        <div className="flex-1 min-w-0 min-h-0">{children}</div>
+      </div>
     </div>
   );
 };
