@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. Versions follow [Semantic Versioning](https://semver.org/); `alpha` releases can still change the JSON schema and the component API.
 
+## Unreleased
+
+### Viewer
+- **No jump when a network appears:** for one frame every viewer showed its network unframed (large, in the top-left corner) before it jumped into the start view. The network now stays hidden over the grey canvas until the start view is on screen.
+
 ## 0.1.0-alpha.3 (tester release, 2026-11-05)
 
 Fixes from the owner's test on a phone (mobile Chrome), on top of 0.1.0-alpha.2.
