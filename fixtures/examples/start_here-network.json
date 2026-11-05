@@ -1,0 +1,1363 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-11-03T04:53:38.211317+00:00",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/start_here",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "box1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          -2.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Bounding Source"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              0.8
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "polybevel1",
+        "type": "polybevel::3.0",
+        "label": "PolyBevel",
+        "icon": "SOP_polybevel-3.0",
+        "pos": [
+          -2.0,
+          0.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Polygons to Bevel",
+          "Cross-section Curve"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "Rounds the edges",
+        "showComment": true,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "offset",
+            "label": "Distance",
+            "type": "Float",
+            "val": [
+              0.06
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Offsetting"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "useoffsetscale",
+            "range": [
+              0.0,
+              1.0
+            ]
+          },
+          {
+            "name": "divisions",
+            "label": "Divisions",
+            "type": "Int",
+            "val": [
+              3
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet"
+            ],
+            "folderTypes": [
+              "simple"
+            ],
+            "joinNext": "profilesampling",
+            "range": [
+              1,
+              20
+            ]
+          },
+          {
+            "name": "profileramp1value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet",
+              "Profile Control"
+            ]
+          },
+          {
+            "name": "profileramp1interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet",
+              "Profile Control"
+            ],
+            "menuLabel": "Catmull-Rom"
+          },
+          {
+            "name": "profileramp2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet",
+              "Profile Control"
+            ]
+          },
+          {
+            "name": "profileramp2value",
+            "label": "Value",
+            "type": "Float",
+            "val": [
+              0.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet",
+              "Profile Control"
+            ]
+          },
+          {
+            "name": "profileramp2interp",
+            "label": "Interpolation",
+            "type": "Menu",
+            "val": [
+              "catmull-rom"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Fillet",
+              "Profile Control"
+            ],
+            "menuLabel": "Catmull-Rom"
+          }
+        ]
+      },
+      {
+        "name": "color1",
+        "type": "color",
+        "label": "Color",
+        "icon": "SOP_color",
+        "pos": [
+          -2.0,
+          -0.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          1.0,
+          0.45,
+          0.1
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Geometry to Color"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "color",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              0.45,
+              0.1
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              true,
+              true
+            ]
+          },
+          {
+            "name": "ramp2pos",
+            "label": "Position",
+            "type": "Float",
+            "val": [
+              1.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "ramp2c",
+            "label": "Color",
+            "type": "Float",
+            "val": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "tube1",
+        "type": "tube",
+        "label": "Tube",
+        "icon": "SOP_tube",
+        "pos": [
+          2.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Bounding Source"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "type",
+            "label": "Primitive Type",
+            "type": "Menu",
+            "val": [
+              "poly"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Polygon"
+          },
+          {
+            "name": "cap",
+            "label": "End Caps",
+            "type": "Toggle",
+            "val": [
+              1
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "height",
+            "label": "Height",
+            "type": "Float",
+            "val": [
+              1.5
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "cols",
+            "label": "Columns",
+            "type": "Int",
+            "val": [
+              24
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              3,
+              50
+            ]
+          }
+        ]
+      },
+      {
+        "name": "lift_tube",
+        "type": "xform",
+        "label": "Transform",
+        "icon": "SOP_xform",
+        "pos": [
+          2.0,
+          0.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Transform geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "t",
+            "label": "Translate",
+            "type": "Float",
+            "val": [
+              1.5,
+              0.25,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              false
+            ]
+          },
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              45.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              true,
+              false
+            ]
+          }
+        ]
+      },
+      {
+        "name": "merge1",
+        "type": "merge",
+        "label": "Merge",
+        "icon": "SOP_merge",
+        "pos": [
+          0.0,
+          -1.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "cigar",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 9999,
+        "inputLabels": [
+          "Input 1",
+          "Input 2",
+          "Input 3"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      },
+      {
+        "name": "details",
+        "type": "subnet",
+        "label": "Subnetwork",
+        "icon": "SOP_subnet",
+        "pos": [
+          0.0,
+          -2.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.3,
+          0.5,
+          0.85
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Sub-Network Input #1",
+          "Sub-Network Input #2",
+          "Sub-Network Input #3",
+          "Sub-Network Input #4"
+        ],
+        "maxOutputs": 11,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": true,
+        "hdaState": null,
+        "parms": [],
+        "children": {
+          "path": "/obj/start_here/details",
+          "type": "subnet",
+          "context": "Sop",
+          "nodes": [
+            {
+              "name": "polyextrude1",
+              "type": "polyextrude::2.0",
+              "label": "PolyExtrude",
+              "icon": "SOP_polyextrude-2.0",
+              "pos": [
+                0.0,
+                1.0
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 2,
+              "inputLabels": [
+                "Geometry for operation",
+                "Spine curve"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": [
+                {
+                  "name": "splittype",
+                  "label": "Divide Into",
+                  "type": "Menu",
+                  "val": [
+                    "elements"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "menuLabel": "Individual Elements"
+                },
+                {
+                  "name": "dist",
+                  "label": "Distance",
+                  "type": "Float",
+                  "val": [
+                    0.15
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    -1.0,
+                    1.0
+                  ]
+                },
+                {
+                  "name": "thicknessramp1value",
+                  "label": "Value",
+                  "type": "Float",
+                  "val": [
+                    1.0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Thickness"
+                  ]
+                },
+                {
+                  "name": "thicknessramp1interp",
+                  "label": "Interpolation",
+                  "type": "Menu",
+                  "val": [
+                    "catmull-rom"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Thickness"
+                  ],
+                  "menuLabel": "Catmull-Rom"
+                },
+                {
+                  "name": "thicknessramp2pos",
+                  "label": "Position",
+                  "type": "Float",
+                  "val": [
+                    1.0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Thickness"
+                  ]
+                },
+                {
+                  "name": "thicknessramp2value",
+                  "label": "Value",
+                  "type": "Float",
+                  "val": [
+                    1.0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Thickness"
+                  ]
+                },
+                {
+                  "name": "thicknessramp2interp",
+                  "label": "Interpolation",
+                  "type": "Menu",
+                  "val": [
+                    "catmull-rom"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Thickness"
+                  ],
+                  "menuLabel": "Catmull-Rom"
+                },
+                {
+                  "name": "twistramp1value",
+                  "label": "Value",
+                  "type": "Float",
+                  "val": [
+                    0.5
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Twist"
+                  ]
+                },
+                {
+                  "name": "twistramp1interp",
+                  "label": "Interpolation",
+                  "type": "Menu",
+                  "val": [
+                    "catmull-rom"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Twist"
+                  ],
+                  "menuLabel": "Catmull-Rom"
+                },
+                {
+                  "name": "twistramp2pos",
+                  "label": "Position",
+                  "type": "Float",
+                  "val": [
+                    1.0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Twist"
+                  ]
+                },
+                {
+                  "name": "twistramp2value",
+                  "label": "Value",
+                  "type": "Float",
+                  "val": [
+                    0.5
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Twist"
+                  ]
+                },
+                {
+                  "name": "twistramp2interp",
+                  "label": "Interpolation",
+                  "type": "Menu",
+                  "val": [
+                    "catmull-rom"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Spine Control",
+                    "Twist"
+                  ],
+                  "menuLabel": "Catmull-Rom"
+                }
+              ]
+            },
+            {
+              "name": "normal1",
+              "type": "normal",
+              "label": "Normal",
+              "icon": "SOP_normal",
+              "pos": [
+                0.0,
+                -0.2
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 1,
+              "inputLabels": [
+                "Geometry to add normals to"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": [
+                {
+                  "name": "cuspangle",
+                  "label": "Cusp Angle",
+                  "type": "Float",
+                  "val": [
+                    30.0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Construct"
+                  ],
+                  "folderTypes": [
+                    "simple"
+                  ],
+                  "range": [
+                    0.0,
+                    180.0
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "output0",
+              "type": "output",
+              "label": "Output",
+              "icon": "SOP_output",
+              "pos": [
+                0.0,
+                -1.4
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": true,
+                "render": true,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 1,
+              "inputLabels": [
+                "Input 1"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": [
+                {
+                  "name": "outputidx",
+                  "label": "Output Index",
+                  "type": "Int",
+                  "val": [
+                    0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    0,
+                    10
+                  ]
+                }
+              ]
+            }
+          ],
+          "dots": [],
+          "boxes": [],
+          "stickies": [
+            {
+              "name": "__stickynote1",
+              "text": "You are inside the subnetwork. Click start_here in the path bar at the top, or press U, to go back up.",
+              "pos": [
+                2.0,
+                0.6
+              ],
+              "size": [
+                4.5,
+                1.2
+              ],
+              "color": [
+                1.0,
+                0.97,
+                0.6
+              ],
+              "minimized": false,
+              "textColor": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "drawBackground": true
+            }
+          ],
+          "wires": [
+            {
+              "from": "1",
+              "fromOutput": 0,
+              "to": "polyextrude1",
+              "toInput": 0
+            },
+            {
+              "from": "polyextrude1",
+              "fromOutput": 0,
+              "to": "normal1",
+              "toInput": 0
+            },
+            {
+              "from": "normal1",
+              "fromOutput": 0,
+              "to": "output0",
+              "toInput": 0
+            }
+          ],
+          "subnetInputs": [
+            {
+              "name": "1",
+              "num": 0,
+              "pos": [
+                0.0,
+                2.2
+              ],
+              "inputName": "merge1"
+            },
+            {
+              "name": "2",
+              "num": 1,
+              "pos": [
+                3.0,
+                6.5
+              ],
+              "inputName": ""
+            },
+            {
+              "name": "3",
+              "num": 2,
+              "pos": [
+                6.0,
+                7.0
+              ],
+              "inputName": ""
+            },
+            {
+              "name": "4",
+              "num": 3,
+              "pos": [
+                9.0,
+                7.5
+              ],
+              "inputName": ""
+            }
+          ],
+          "wireStyle": "default"
+        }
+      },
+      {
+        "name": "OUT",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          0.0,
+          -4.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.3,
+          0.3,
+          0.3
+        ],
+        "shape": "null",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      }
+    ],
+    "dots": [
+      {
+        "name": "__dot1",
+        "pos": [
+          2.4,
+          -0.6
+        ],
+        "pinned": false
+      }
+    ],
+    "boxes": [
+      {
+        "name": "__netbox1",
+        "comment": "Shapes",
+        "pos": [
+          -2.2,
+          -0.6
+        ],
+        "size": [
+          5.5296,
+          3.0824
+        ],
+        "color": [
+          0.25,
+          0.35,
+          0.5
+        ],
+        "minimized": false,
+        "items": [
+          "box1",
+          "polybevel1",
+          "color1",
+          "tube1",
+          "lift_tube"
+        ]
+      }
+    ],
+    "stickies": [
+      {
+        "name": "__stickynote1",
+        "text": "Welcome! This is a real Houdini network, shown in your browser with NOP. Drag to move around, scroll or pinch to zoom.",
+        "pos": [
+          -3.5,
+          3.3
+        ],
+        "size": [
+          7.5,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote2",
+        "text": "Click any node to see its parameters. On a phone, tap it.",
+        "pos": [
+          -6.5,
+          -0.8
+        ],
+        "size": [
+          3.4,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote3",
+        "text": "This is a subnetwork. Double-click it (double-tap on a phone) to go inside.",
+        "pos": [
+          2.0,
+          -3.1
+        ],
+        "size": [
+          4.2,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote4",
+        "text": "Press H to see the whole network again. The blue flag marks the node Houdini displays.",
+        "pos": [
+          2.0,
+          -4.5
+        ],
+        "size": [
+          4.2,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      }
+    ],
+    "wires": [
+      {
+        "from": "box1",
+        "fromOutput": 0,
+        "to": "polybevel1",
+        "toInput": 0
+      },
+      {
+        "from": "polybevel1",
+        "fromOutput": 0,
+        "to": "color1",
+        "toInput": 0
+      },
+      {
+        "from": "tube1",
+        "fromOutput": 0,
+        "to": "lift_tube",
+        "toInput": 0
+      },
+      {
+        "from": "color1",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 0
+      },
+      {
+        "from": "__dot1",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 1
+      },
+      {
+        "from": "merge1",
+        "fromOutput": 0,
+        "to": "details",
+        "toInput": 0
+      },
+      {
+        "from": "details",
+        "fromOutput": 0,
+        "to": "OUT",
+        "toInput": 0
+      },
+      {
+        "from": "lift_tube",
+        "fromOutput": 0,
+        "to": "__dot1",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "start_here",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
+  }
+}

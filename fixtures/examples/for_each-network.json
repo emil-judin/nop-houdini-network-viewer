@@ -1,0 +1,1395 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-11-03T04:53:38.234153+00:00",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/for_each",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "box1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          -4.5,
+          4.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Bounding Source"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              0.25
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "grid1",
+        "type": "grid",
+        "label": "Grid",
+        "icon": "SOP_grid",
+        "pos": [
+          -1.5,
+          4.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "size",
+            "label": "Size",
+            "type": "Float",
+            "val": [
+              6.0,
+              6.0
+            ],
+            "expr": [
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "scatter1",
+        "type": "scatter::2.0",
+        "label": "Scatter",
+        "icon": "SOP_scatter-2.0",
+        "pos": [
+          -1.5,
+          3.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Geometry to scatter points onto"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "npts",
+            "label": "Force Total Count",
+            "type": "Int",
+            "val": [
+              20
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Options"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "range": [
+              1,
+              100000
+            ]
+          }
+        ]
+      },
+      {
+        "name": "copytopoints1",
+        "type": "copytopoints::2.0",
+        "label": "Copy to Points",
+        "icon": "SOP_copytopoints-2.0",
+        "pos": [
+          -3.5,
+          2.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          1.0,
+          0.65,
+          0.1
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Geometry to Copy",
+          "Target Points to Copy to"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      },
+      {
+        "name": "connectivity1",
+        "type": "connectivity",
+        "label": "Connectivity",
+        "icon": "SOP_connectivity",
+        "pos": [
+          -3.5,
+          1.2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "connecttype",
+            "label": "Connectivity Type",
+            "type": "Menu",
+            "val": [
+              "prim"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Primitive"
+          }
+        ]
+      },
+      {
+        "name": "foreach_begin1",
+        "type": "block_begin",
+        "label": "Block Begin",
+        "icon": "SOP_block_begin",
+        "pos": [
+          -3.5,
+          0.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.4,
+          0.0
+        ],
+        "shape": "chevron_down",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Initial Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "method",
+            "label": "Method",
+            "type": "Menu",
+            "val": [
+              "piece"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Extract Piece or Point"
+          },
+          {
+            "name": "blockpath",
+            "label": "Block Path",
+            "type": "String",
+            "val": [
+              "../foreach_end1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "foreach_begin1_metadata1",
+        "type": "block_begin",
+        "label": "Block Begin",
+        "icon": "SOP_block_begin",
+        "pos": [
+          -0.8,
+          0.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.4,
+          0.0
+        ],
+        "shape": "chevron_down",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Initial Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "method",
+            "label": "Method",
+            "type": "Menu",
+            "val": [
+              "metadata"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Fetch Metadata"
+          },
+          {
+            "name": "blockpath",
+            "label": "Block Path",
+            "type": "String",
+            "val": [
+              "../foreach_end1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "twist_piece",
+        "type": "xform",
+        "label": "Transform",
+        "icon": "SOP_xform",
+        "pos": [
+          -3.5,
+          -1.2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Transform geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              110.5021,
+              0.0
+            ],
+            "expr": [
+              null,
+              "rand(detail(\"../foreach_begin1_metadata1\", \"iteration\", 0)) * 360",
+              null
+            ],
+            "changed": [
+              false,
+              true,
+              false
+            ]
+          }
+        ]
+      },
+      {
+        "name": "foreach_end1",
+        "type": "block_end",
+        "label": "Block End",
+        "icon": "SOP_block_end",
+        "pos": [
+          -3.5,
+          -2.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.4,
+          0.0
+        ],
+        "shape": "chevron_up",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Nodes to Iterate Over",
+          "Geometry Pieces to Loop Over"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "itermethod",
+            "label": "Iteration Method",
+            "type": "Menu",
+            "val": [
+              "pieces"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "By Pieces or Points"
+          },
+          {
+            "name": "method",
+            "label": "Gather Method",
+            "type": "Menu",
+            "val": [
+              "merge"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Merge Each Iteration"
+          },
+          {
+            "name": "class",
+            "label": "Piece Elements",
+            "type": "Menu",
+            "val": [
+              "primitive"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Primitives"
+          },
+          {
+            "name": "attrib",
+            "label": "Piece Attribute",
+            "type": "String",
+            "val": [
+              "class"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "blockpath",
+            "label": "Default Block Path",
+            "type": "String",
+            "val": [
+              "../foreach_begin1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "templatepath",
+            "label": "Piece Block Path",
+            "type": "String",
+            "val": [
+              "../foreach_begin1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "circle1",
+        "type": "circle",
+        "label": "Circle",
+        "icon": "SOP_circle",
+        "pos": [
+          3.5,
+          4.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "type",
+            "label": "Primitive Type",
+            "type": "Menu",
+            "val": [
+              "poly"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "Polygon"
+          },
+          {
+            "name": "divs",
+            "label": "Divisions",
+            "type": "Int",
+            "val": [
+              6
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              50
+            ]
+          }
+        ]
+      },
+      {
+        "name": "compile_begin1",
+        "type": "compile_begin",
+        "label": "Block Begin Compile",
+        "icon": "SOP_compile_begin",
+        "pos": [
+          3.5,
+          3.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.75,
+          0.0
+        ],
+        "shape": "chevron_down",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Uncompiled Source"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "blockpath",
+            "label": "Block Path",
+            "type": "String",
+            "val": [
+              "../compile_end1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "repeat_begin1",
+        "type": "block_begin",
+        "label": "Block Begin",
+        "icon": "SOP_block_begin",
+        "pos": [
+          3.5,
+          2.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.4,
+          0.0
+        ],
+        "shape": "chevron_down",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Initial Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "blockpath",
+            "label": "Block Path",
+            "type": "String",
+            "val": [
+              "../repeat_end1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "shrink_and_turn",
+        "type": "xform",
+        "label": "Transform",
+        "icon": "SOP_xform",
+        "pos": [
+          5.0,
+          1.2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Transform geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "r",
+            "label": "Rotate",
+            "type": "Float",
+            "val": [
+              0.0,
+              0.0,
+              10.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              false,
+              false,
+              true
+            ]
+          },
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              0.9
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "merge_rings",
+        "type": "merge",
+        "label": "Merge",
+        "icon": "SOP_merge",
+        "pos": [
+          3.5,
+          0.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "cigar",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 9999,
+        "inputLabels": [
+          "Input 1",
+          "Input 2",
+          "Input 3"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      },
+      {
+        "name": "repeat_end1",
+        "type": "block_end",
+        "label": "Block End",
+        "icon": "SOP_block_end",
+        "pos": [
+          3.5,
+          -1.2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.4,
+          0.0
+        ],
+        "shape": "chevron_up",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Nodes to Iterate Over",
+          "Geometry Pieces to Loop Over"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "itermethod",
+            "label": "Iteration Method",
+            "type": "Menu",
+            "val": [
+              "count"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "menuLabel": "By Count"
+          },
+          {
+            "name": "iterations",
+            "label": "Iterations",
+            "type": "Int",
+            "val": [
+              8
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0,
+              10
+            ]
+          },
+          {
+            "name": "blockpath",
+            "label": "Default Block Path",
+            "type": "String",
+            "val": [
+              "../repeat_begin1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          },
+          {
+            "name": "templatepath",
+            "label": "Piece Block Path",
+            "type": "String",
+            "val": [
+              "../repeat_begin1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "compile_end1",
+        "type": "compile_end",
+        "label": "Block End Compile",
+        "icon": "SOP_compile_end",
+        "pos": [
+          3.5,
+          -2.4
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.75,
+          0.75,
+          0.0
+        ],
+        "shape": "chevron_up",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Nodes to Compile"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "primarypath",
+            "label": "Primary Path",
+            "type": "String",
+            "val": [
+              "../compile_begin1"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "merge1",
+        "type": "merge",
+        "label": "Merge",
+        "icon": "SOP_merge",
+        "pos": [
+          0.0,
+          -3.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "cigar",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 9999,
+        "inputLabels": [
+          "Input 1",
+          "Input 2",
+          "Input 3"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      },
+      {
+        "name": "OUT",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          0.0,
+          -5.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.6,
+          0.7,
+          0.77
+        ],
+        "shape": "null",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [
+      {
+        "name": "__stickynote1",
+        "text": "A For-Each loop. NOP draws the block like Houdini, with the loop method in blue under the nodes.",
+        "pos": [
+          -5.0,
+          5.8
+        ],
+        "size": [
+          5.0,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote2",
+        "text": "The dotted wire brings in the points to copy onto, like in Houdini.",
+        "pos": [
+          -7.8,
+          2.0
+        ],
+        "size": [
+          3.8,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote3",
+        "text": "A feedback loop inside a Compile block. Each block gets its own color underneath.",
+        "pos": [
+          2.0,
+          5.8
+        ],
+        "size": [
+          4.8,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      }
+    ],
+    "wires": [
+      {
+        "from": "grid1",
+        "fromOutput": 0,
+        "to": "scatter1",
+        "toInput": 0
+      },
+      {
+        "from": "box1",
+        "fromOutput": 0,
+        "to": "copytopoints1",
+        "toInput": 0
+      },
+      {
+        "from": "scatter1",
+        "fromOutput": 0,
+        "to": "copytopoints1",
+        "toInput": 1
+      },
+      {
+        "from": "copytopoints1",
+        "fromOutput": 0,
+        "to": "connectivity1",
+        "toInput": 0
+      },
+      {
+        "from": "connectivity1",
+        "fromOutput": 0,
+        "to": "foreach_begin1",
+        "toInput": 0
+      },
+      {
+        "from": "foreach_begin1",
+        "fromOutput": 0,
+        "to": "twist_piece",
+        "toInput": 0
+      },
+      {
+        "from": "twist_piece",
+        "fromOutput": 0,
+        "to": "foreach_end1",
+        "toInput": 0
+      },
+      {
+        "from": "circle1",
+        "fromOutput": 0,
+        "to": "compile_begin1",
+        "toInput": 0
+      },
+      {
+        "from": "compile_begin1",
+        "fromOutput": 0,
+        "to": "repeat_begin1",
+        "toInput": 0
+      },
+      {
+        "from": "repeat_begin1",
+        "fromOutput": 0,
+        "to": "shrink_and_turn",
+        "toInput": 0
+      },
+      {
+        "from": "repeat_begin1",
+        "fromOutput": 0,
+        "to": "merge_rings",
+        "toInput": 0
+      },
+      {
+        "from": "shrink_and_turn",
+        "fromOutput": 0,
+        "to": "merge_rings",
+        "toInput": 1
+      },
+      {
+        "from": "merge_rings",
+        "fromOutput": 0,
+        "to": "repeat_end1",
+        "toInput": 0
+      },
+      {
+        "from": "repeat_end1",
+        "fromOutput": 0,
+        "to": "compile_end1",
+        "toInput": 0
+      },
+      {
+        "from": "foreach_end1",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 0
+      },
+      {
+        "from": "compile_end1",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 1
+      },
+      {
+        "from": "merge1",
+        "fromOutput": 0,
+        "to": "OUT",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "for_each",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
+  }
+}

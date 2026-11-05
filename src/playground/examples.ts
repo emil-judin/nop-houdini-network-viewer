@@ -1,6 +1,6 @@
 /**
  * Example networks of the playground, in the order of the Networks pane. Each file is an export
- * from Houdini in `fixtures/` (the Circuit demos) or `fixtures/examples/` (the guided examples).
+ * from Houdini in `fixtures/examples/` (built from the plan in its README).
  *
  * An example whose file does not exist yet is left out, so the files can be added one at a time.
  * The build also publishes every file at `examples/<file name>` next to the page (see
@@ -13,7 +13,7 @@ export interface PlaygroundExample {
   label: string;
   /** One line under the name: what this example shows. */
   description: string;
-  /** File below `fixtures/`, ending in `-network.json`. */
+  /** File below `fixtures/` (`examples/<name>-network.json`). */
   file: string;
 }
 
@@ -37,23 +37,35 @@ const EXAMPLES: PlaygroundExample[] = [
     file: 'examples/for_each-network.json',
   },
   {
-    key: 'board',
-    label: 'Circuit Board',
-    description: 'A locked asset as it sits in a scene',
-    file: 'circuit_board-network.json',
+    key: 'params',
+    label: 'Parameters',
+    description: 'Sliders, menus, ramps, expressions and keyframes',
+    file: 'examples/parameters-network.json',
   },
   {
-    key: 'circuit',
-    label: 'Circuit Gen HDA',
-    description: 'Inside the asset: 169 nodes, nested assets to dive into',
-    file: 'circuit_gen-network.json',
+    key: 'looks',
+    label: 'Node Looks',
+    description: 'Flags, colors, custom shapes, boxes, notes and dots',
+    file: 'examples/node_looks-network.json',
+  },
+  {
+    key: 'assets',
+    label: 'Subnetworks and Assets',
+    description: 'Nested subnetworks and custom digital assets',
+    file: 'examples/assets-network.json',
   },
 ];
 
 /** The network files, each loaded only when its example is first shown. */
-const LOADERS = import.meta.glob<{ default: unknown }>(['../../fixtures/*-network.json', '../../fixtures/examples/*-network.json']);
+const LOADERS = import.meta.glob<{ default: unknown }>('../../fixtures/examples/*-network.json');
 
 const loaderPath = (example: PlaygroundExample) => `../../fixtures/${example.file}`;
+
+/** Top-level node count of the example (read from its file at build time), before it is loaded. */
+export function exampleNodeCount(example: PlaygroundExample): number | undefined {
+  const fileName = example.file.split('/').pop() ?? example.file;
+  return Object.hasOwn(__NOP_EXAMPLE_NODE_COUNTS__, fileName) ? __NOP_EXAMPLE_NODE_COUNTS__[fileName] : undefined;
+}
 
 /** The examples whose files exist, in order. */
 export const AVAILABLE_EXAMPLES: readonly PlaygroundExample[] = EXAMPLES.filter((example) =>
@@ -70,8 +82,19 @@ export function loadExample(example: PlaygroundExample): Promise<unknown> {
   return LOADERS[loaderPath(example)]().then((module) => module.default);
 }
 
-/** Sample website page with networks embedded by the `<houdini-network>` web component (`public/`). */
+/**
+ * Example page with networks embedded by the `<houdini-network>` web component (`example-site.html`,
+ * a second page of the build). The Embed button opens it: an embedder with one example, its options
+ * and its code, above a sample article.
+ */
 export const EXAMPLE_SITE_PAGE = 'example-site.html';
+
+/**
+ * The example in the example page's embedder, always the same whatever the playground shows (owner
+ * decision 2026-11-04). Start Here fits best: small, with a subnetwork, a network box and notes that
+ * tell a site's visitors how to move around; the article below already shows For-Each and VEX.
+ */
+export const EMBED_PAGE_EXAMPLE = 'start';
 
 /** Address of the example's published copy, for embed snippets (absolute, next to this page). */
 export function exampleFileUrl(example: PlaygroundExample): string {

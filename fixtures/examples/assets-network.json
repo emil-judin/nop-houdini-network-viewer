@@ -1,0 +1,2009 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-11-04T00:51:41.226400+00:00",
+  "exportMode": "compact",
+  "icons": {
+    "opdef:/emjud::Sop/pebble_scatter::1.0?IconSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><ellipse cx=\"20\" cy=\"40\" rx=\"13\" ry=\"10\" fill=\"#9aa3ad\"/><ellipse cx=\"42\" cy=\"44\" rx=\"11\" ry=\"8\" fill=\"#7d8792\"/><ellipse cx=\"33\" cy=\"22\" rx=\"10\" ry=\"8\" fill=\"#b7bec6\"/><ellipse cx=\"17\" cy=\"37\" rx=\"5\" ry=\"3\" fill=\"#ffffff\" opacity=\"0.35\"/></svg>",
+    "opdef:/emjud::Sop/rounded_brick::1.0?IconSVG": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect x=\"6\" y=\"18\" width=\"52\" height=\"28\" rx=\"7\" fill=\"#c8643c\"/><path d=\"M6 32H58M24 18V32M40 32V46\" stroke=\"#7a3a22\" stroke-width=\"3\" fill=\"none\"/></svg>"
+  },
+  "customShapes": {},
+  "root": {
+    "path": "/obj/assets",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "ground",
+        "type": "grid",
+        "label": "Grid",
+        "icon": "SOP_grid",
+        "pos": [
+          -2.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "size",
+            "label": "Size",
+            "type": "Float",
+            "val": [
+              4.0,
+              4.0
+            ],
+            "expr": [
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "name": "wall_curve",
+        "type": "line",
+        "label": "Line",
+        "icon": "SOP_line",
+        "pos": [
+          2.0,
+          2.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "dir",
+            "label": "Direction",
+            "type": "Float",
+            "val": [
+              1.0,
+              0.0,
+              0.0
+            ],
+            "expr": [
+              null,
+              null,
+              null
+            ],
+            "changed": [
+              true,
+              true,
+              false
+            ]
+          },
+          {
+            "name": "dist",
+            "label": "Length",
+            "type": "Float",
+            "val": [
+              3.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "name": "points",
+            "label": "Points",
+            "type": "Int",
+            "val": [
+              8
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0,
+              50
+            ]
+          }
+        ]
+      },
+      {
+        "name": "scene",
+        "type": "subnet",
+        "label": "Subnetwork",
+        "icon": "SOP_subnet",
+        "pos": [
+          0.0,
+          0.5
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.3,
+          0.5,
+          0.85
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Sub-Network Input #1",
+          "Sub-Network Input #2",
+          "Sub-Network Input #3",
+          "Sub-Network Input #4"
+        ],
+        "maxOutputs": 11,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": true,
+        "hdaState": null,
+        "parms": [],
+        "children": {
+          "path": "/obj/assets/scene",
+          "type": "subnet",
+          "context": "Sop",
+          "nodes": [
+            {
+              "name": "pebble_scatter1",
+              "type": "emjud::pebble_scatter::1.0",
+              "label": "Pebble Scatter",
+              "icon": "opdef:/emjud::Sop/pebble_scatter::1.0?IconSVG",
+              "pos": [
+                -2.5,
+                1.4
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 1,
+              "inputLabels": [
+                "Sub-Network Input #1"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": true,
+              "hdaState": "unlocked",
+              "parms": [
+                {
+                  "name": "count",
+                  "label": "Count",
+                  "type": "Int",
+                  "val": [
+                    40
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    1,
+                    200
+                  ]
+                },
+                {
+                  "name": "pebble_scale",
+                  "label": "Pebble Scale",
+                  "type": "Float",
+                  "val": [
+                    0.06
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    0.01,
+                    0.5
+                  ]
+                }
+              ],
+              "children": {
+                "path": "/obj/assets/scene/pebble_scatter1",
+                "type": "emjud::pebble_scatter::1.0",
+                "context": "Sop",
+                "nodes": [
+                  {
+                    "name": "pebble",
+                    "type": "sphere",
+                    "label": "Sphere",
+                    "icon": "SOP_sphere",
+                    "pos": [
+                      -2.0,
+                      1.2
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Bounding Source"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "type",
+                        "label": "Primitive Type",
+                        "type": "Menu",
+                        "val": [
+                          "poly"
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "menuLabel": "Polygon"
+                      },
+                      {
+                        "name": "scale",
+                        "label": "Uniform Scale",
+                        "type": "Float",
+                        "val": [
+                          0.06
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "range": [
+                          0.0,
+                          10.0
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "scatter1",
+                    "type": "scatter::2.0",
+                    "label": "Scatter",
+                    "icon": "SOP_scatter-2.0",
+                    "pos": [
+                      1.0,
+                      1.2
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Geometry to scatter points onto"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "npts",
+                        "label": "Force Total Count",
+                        "type": "Int",
+                        "val": [
+                          40
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "folders": [
+                          "Options"
+                        ],
+                        "folderTypes": [
+                          "tabs"
+                        ],
+                        "range": [
+                          1,
+                          100000
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "copytopoints1",
+                    "type": "copytopoints::2.0",
+                    "label": "Copy to Points",
+                    "icon": "SOP_copytopoints-2.0",
+                    "pos": [
+                      0.0,
+                      0.0
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      1.0,
+                      0.65,
+                      0.1
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 2,
+                    "inputLabels": [
+                      "Geometry to Copy",
+                      "Target Points to Copy to"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": []
+                  },
+                  {
+                    "name": "output0",
+                    "type": "output",
+                    "label": "Output",
+                    "icon": "SOP_output",
+                    "pos": [
+                      0.0,
+                      -1.2
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": true,
+                      "render": true,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Input 1"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "outputidx",
+                        "label": "Output Index",
+                        "type": "Int",
+                        "val": [
+                          0
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "range": [
+                          0,
+                          10
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "dots": [],
+                "boxes": [],
+                "stickies": [],
+                "wires": [
+                  {
+                    "from": "1",
+                    "fromOutput": 0,
+                    "to": "scatter1",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "pebble",
+                    "fromOutput": 0,
+                    "to": "copytopoints1",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "scatter1",
+                    "fromOutput": 0,
+                    "to": "copytopoints1",
+                    "toInput": 1
+                  },
+                  {
+                    "from": "copytopoints1",
+                    "fromOutput": 0,
+                    "to": "output0",
+                    "toInput": 0
+                  }
+                ],
+                "subnetInputs": [
+                  {
+                    "name": "1",
+                    "num": 0,
+                    "pos": [
+                      1.0,
+                      2.4
+                    ],
+                    "inputName": "ground"
+                  }
+                ],
+                "wireStyle": "default"
+              }
+            },
+            {
+              "name": "rounded_brick1",
+              "type": "emjud::rounded_brick::1.0",
+              "label": "Rounded Brick",
+              "icon": "opdef:/emjud::Sop/rounded_brick::1.0?IconSVG",
+              "pos": [
+                0.8,
+                2.0
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 1,
+              "inputLabels": [
+                "Sub-Network Input #1"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": "locked",
+              "parms": [
+                {
+                  "name": "brick_size",
+                  "label": "Brick Size",
+                  "type": "Float",
+                  "val": [
+                    0.4,
+                    0.2,
+                    0.2
+                  ],
+                  "expr": [
+                    null,
+                    null,
+                    null
+                  ],
+                  "changed": [
+                    true,
+                    true,
+                    true
+                  ]
+                },
+                {
+                  "name": "bevel",
+                  "label": "Bevel",
+                  "type": "Float",
+                  "val": [
+                    0.02
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    0.0,
+                    0.05
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "bricks",
+              "type": "copytopoints::2.0",
+              "label": "Copy to Points",
+              "icon": "SOP_copytopoints-2.0",
+              "pos": [
+                2.0,
+                0.8
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                1.0,
+                0.65,
+                0.1
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 2,
+              "inputLabels": [
+                "Geometry to Copy",
+                "Target Points to Copy to"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": []
+            },
+            {
+              "name": "tag_pieces",
+              "type": "attribwrangle",
+              "label": "Attribute Wrangle",
+              "icon": "SOP_attribwrangle",
+              "pos": [
+                2.0,
+                -0.4
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "wave",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 4,
+              "inputLabels": [
+                "Geometry to Process with Wrangle",
+                "Ancillary Input, point(1, ...) to Access",
+                "Ancillary Input, point(2, ...) to Access",
+                "Ancillary Input, point(3, ...) to Access"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": "locked",
+              "parms": [
+                {
+                  "name": "class",
+                  "label": "Run Over",
+                  "type": "Menu",
+                  "val": [
+                    "primitive"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Code"
+                  ],
+                  "folderTypes": [
+                    "tabs"
+                  ],
+                  "menuLabel": "Primitives"
+                },
+                {
+                  "name": "snippet",
+                  "label": "VEXpression",
+                  "type": "String",
+                  "val": [
+                    "s@part = \"wall\";"
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "folders": [
+                    "Code"
+                  ],
+                  "folderTypes": [
+                    "tabs"
+                  ],
+                  "hasMenu": true
+                }
+              ]
+            },
+            {
+              "name": "merge1",
+              "type": "merge",
+              "label": "Merge",
+              "icon": "SOP_merge",
+              "pos": [
+                0.0,
+                -1.6
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "cigar",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 9999,
+              "inputLabels": [
+                "Input 1",
+                "Input 2",
+                "Input 3"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": []
+            },
+            {
+              "name": "props",
+              "type": "subnet",
+              "label": "Subnetwork",
+              "icon": "SOP_subnet",
+              "pos": [
+                0.0,
+                -2.8
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.3,
+                0.5,
+                0.85
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": false,
+                "render": false,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 4,
+              "inputLabels": [
+                "Sub-Network Input #1",
+                "Sub-Network Input #2",
+                "Sub-Network Input #3",
+                "Sub-Network Input #4"
+              ],
+              "maxOutputs": 11,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": true,
+              "hdaState": null,
+              "parms": [],
+              "children": {
+                "path": "/obj/assets/scene/props",
+                "type": "subnet",
+                "context": "Sop",
+                "nodes": [
+                  {
+                    "name": "crate",
+                    "type": "box",
+                    "label": "Box",
+                    "icon": "SOP_box",
+                    "pos": [
+                      -2.5,
+                      1.8
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Bounding Source"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "scale",
+                        "label": "Uniform Scale",
+                        "type": "Float",
+                        "val": [
+                          0.3
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "range": [
+                          0.0,
+                          10.0
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "scatter_props",
+                    "type": "scatter::2.0",
+                    "label": "Scatter",
+                    "icon": "SOP_scatter-2.0",
+                    "pos": [
+                      0.0,
+                      1.8
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Geometry to scatter points onto"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "npts",
+                        "label": "Force Total Count",
+                        "type": "Int",
+                        "val": [
+                          6
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "folders": [
+                          "Options"
+                        ],
+                        "folderTypes": [
+                          "tabs"
+                        ],
+                        "range": [
+                          1,
+                          100000
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "copytopoints1",
+                    "type": "copytopoints::2.0",
+                    "label": "Copy to Points",
+                    "icon": "SOP_copytopoints-2.0",
+                    "pos": [
+                      -1.2,
+                      0.6
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      1.0,
+                      0.65,
+                      0.1
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 2,
+                    "inputLabels": [
+                      "Geometry to Copy",
+                      "Target Points to Copy to"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": []
+                  },
+                  {
+                    "name": "details",
+                    "type": "subnet",
+                    "label": "Subnetwork",
+                    "icon": "SOP_subnet",
+                    "pos": [
+                      -1.2,
+                      -0.6
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.3,
+                      0.5,
+                      0.85
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 4,
+                    "inputLabels": [
+                      "Sub-Network Input #1",
+                      "Sub-Network Input #2",
+                      "Sub-Network Input #3",
+                      "Sub-Network Input #4"
+                    ],
+                    "maxOutputs": 11,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": true,
+                    "hdaState": null,
+                    "parms": [],
+                    "children": {
+                      "path": "/obj/assets/scene/props/details",
+                      "type": "subnet",
+                      "context": "Sop",
+                      "nodes": [
+                        {
+                          "name": "polybevel1",
+                          "type": "polybevel::3.0",
+                          "label": "PolyBevel",
+                          "icon": "SOP_polybevel-3.0",
+                          "pos": [
+                            0.0,
+                            0.8
+                          ],
+                          "size": [
+                            1.1296,
+                            0.2824
+                          ],
+                          "color": [
+                            0.8,
+                            0.8,
+                            0.8
+                          ],
+                          "shape": "rect",
+                          "flags": {
+                            "bypass": false,
+                            "display": false,
+                            "render": false,
+                            "template": false,
+                            "selectableTemplate": false,
+                            "lock": false,
+                            "softLock": false
+                          },
+                          "maxInputs": 2,
+                          "inputLabels": [
+                            "Polygons to Bevel",
+                            "Cross-section Curve"
+                          ],
+                          "maxOutputs": 1,
+                          "outputLabels": [
+                            "Output 1"
+                          ],
+                          "comment": "",
+                          "showComment": false,
+                          "isSubnetwork": false,
+                          "hdaState": null,
+                          "parms": [
+                            {
+                              "name": "offset",
+                              "label": "Distance",
+                              "type": "Float",
+                              "val": [
+                                0.03
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Offsetting"
+                              ],
+                              "folderTypes": [
+                                "simple"
+                              ],
+                              "joinNext": "useoffsetscale",
+                              "range": [
+                                0.0,
+                                1.0
+                              ]
+                            },
+                            {
+                              "name": "profileramp1value",
+                              "label": "Value",
+                              "type": "Float",
+                              "val": [
+                                0.5
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Fillet",
+                                "Profile Control"
+                              ]
+                            },
+                            {
+                              "name": "profileramp1interp",
+                              "label": "Interpolation",
+                              "type": "Menu",
+                              "val": [
+                                "catmull-rom"
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Fillet",
+                                "Profile Control"
+                              ],
+                              "menuLabel": "Catmull-Rom"
+                            },
+                            {
+                              "name": "profileramp2pos",
+                              "label": "Position",
+                              "type": "Float",
+                              "val": [
+                                1.0
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Fillet",
+                                "Profile Control"
+                              ]
+                            },
+                            {
+                              "name": "profileramp2value",
+                              "label": "Value",
+                              "type": "Float",
+                              "val": [
+                                0.5
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Fillet",
+                                "Profile Control"
+                              ]
+                            },
+                            {
+                              "name": "profileramp2interp",
+                              "label": "Interpolation",
+                              "type": "Menu",
+                              "val": [
+                                "catmull-rom"
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "folders": [
+                                "Fillet",
+                                "Profile Control"
+                              ],
+                              "menuLabel": "Catmull-Rom"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "color1",
+                          "type": "color",
+                          "label": "Color",
+                          "icon": "SOP_color",
+                          "pos": [
+                            0.0,
+                            -0.4
+                          ],
+                          "size": [
+                            1.1296,
+                            0.2824
+                          ],
+                          "color": [
+                            0.8,
+                            0.8,
+                            0.8
+                          ],
+                          "shape": "rect",
+                          "flags": {
+                            "bypass": false,
+                            "display": false,
+                            "render": false,
+                            "template": false,
+                            "selectableTemplate": false,
+                            "lock": false,
+                            "softLock": false
+                          },
+                          "maxInputs": 1,
+                          "inputLabels": [
+                            "Geometry to Color"
+                          ],
+                          "maxOutputs": 1,
+                          "outputLabels": [
+                            "Output 1"
+                          ],
+                          "comment": "",
+                          "showComment": false,
+                          "isSubnetwork": false,
+                          "hdaState": "locked",
+                          "parms": [
+                            {
+                              "name": "color",
+                              "label": "Color",
+                              "type": "Float",
+                              "val": [
+                                0.55,
+                                0.38,
+                                0.2
+                              ],
+                              "expr": [
+                                null,
+                                null,
+                                null
+                              ],
+                              "changed": [
+                                true,
+                                true,
+                                true
+                              ]
+                            },
+                            {
+                              "name": "ramp2pos",
+                              "label": "Position",
+                              "type": "Float",
+                              "val": [
+                                1.0
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ]
+                            },
+                            {
+                              "name": "ramp2c",
+                              "label": "Color",
+                              "type": "Float",
+                              "val": [
+                                1.0,
+                                1.0,
+                                1.0
+                              ],
+                              "expr": [
+                                null,
+                                null,
+                                null
+                              ],
+                              "changed": [
+                                true,
+                                true,
+                                true
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "output0",
+                          "type": "output",
+                          "label": "Output",
+                          "icon": "SOP_output",
+                          "pos": [
+                            0.0,
+                            -1.6
+                          ],
+                          "size": [
+                            1.1296,
+                            0.2824
+                          ],
+                          "color": [
+                            0.8,
+                            0.8,
+                            0.8
+                          ],
+                          "shape": "rect",
+                          "flags": {
+                            "bypass": false,
+                            "display": true,
+                            "render": true,
+                            "template": false,
+                            "selectableTemplate": false,
+                            "lock": false,
+                            "softLock": false
+                          },
+                          "maxInputs": 1,
+                          "inputLabels": [
+                            "Input 1"
+                          ],
+                          "maxOutputs": 1,
+                          "outputLabels": [
+                            "Output 1"
+                          ],
+                          "comment": "",
+                          "showComment": false,
+                          "isSubnetwork": false,
+                          "hdaState": null,
+                          "parms": [
+                            {
+                              "name": "outputidx",
+                              "label": "Output Index",
+                              "type": "Int",
+                              "val": [
+                                0
+                              ],
+                              "expr": [
+                                null
+                              ],
+                              "changed": [
+                                true
+                              ],
+                              "range": [
+                                0,
+                                10
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "dots": [],
+                      "boxes": [],
+                      "stickies": [
+                        {
+                          "name": "__stickynote1",
+                          "text": "Four levels deep. Use the back button or click a name in the path bar. Deeper levels you visited stay in the path bar, dimmed.",
+                          "pos": [
+                            2.0,
+                            0.0
+                          ],
+                          "size": [
+                            4.5,
+                            1.3
+                          ],
+                          "color": [
+                            1.0,
+                            0.97,
+                            0.6
+                          ],
+                          "minimized": false,
+                          "textColor": [
+                            0.1,
+                            0.1,
+                            0.1
+                          ],
+                          "drawBackground": true
+                        }
+                      ],
+                      "wires": [
+                        {
+                          "from": "1",
+                          "fromOutput": 0,
+                          "to": "polybevel1",
+                          "toInput": 0
+                        },
+                        {
+                          "from": "polybevel1",
+                          "fromOutput": 0,
+                          "to": "color1",
+                          "toInput": 0
+                        },
+                        {
+                          "from": "color1",
+                          "fromOutput": 0,
+                          "to": "output0",
+                          "toInput": 0
+                        }
+                      ],
+                      "subnetInputs": [
+                        {
+                          "name": "1",
+                          "num": 0,
+                          "pos": [
+                            0.0,
+                            2.0
+                          ],
+                          "inputName": "copytopoints1"
+                        },
+                        {
+                          "name": "2",
+                          "num": 1,
+                          "pos": [
+                            3.0,
+                            6.5
+                          ],
+                          "inputName": ""
+                        },
+                        {
+                          "name": "3",
+                          "num": 2,
+                          "pos": [
+                            6.0,
+                            7.0
+                          ],
+                          "inputName": ""
+                        },
+                        {
+                          "name": "4",
+                          "num": 3,
+                          "pos": [
+                            9.0,
+                            7.5
+                          ],
+                          "inputName": ""
+                        }
+                      ],
+                      "wireStyle": "default"
+                    }
+                  },
+                  {
+                    "name": "merge1",
+                    "type": "merge",
+                    "label": "Merge",
+                    "icon": "SOP_merge",
+                    "pos": [
+                      0.0,
+                      -1.8
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "cigar",
+                    "flags": {
+                      "bypass": false,
+                      "display": false,
+                      "render": false,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 9999,
+                    "inputLabels": [
+                      "Input 1",
+                      "Input 2",
+                      "Input 3"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": []
+                  },
+                  {
+                    "name": "output0",
+                    "type": "output",
+                    "label": "Output",
+                    "icon": "SOP_output",
+                    "pos": [
+                      0.0,
+                      -3.0
+                    ],
+                    "size": [
+                      1.1296,
+                      0.2824
+                    ],
+                    "color": [
+                      0.8,
+                      0.8,
+                      0.8
+                    ],
+                    "shape": "rect",
+                    "flags": {
+                      "bypass": false,
+                      "display": true,
+                      "render": true,
+                      "template": false,
+                      "selectableTemplate": false,
+                      "lock": false,
+                      "softLock": false
+                    },
+                    "maxInputs": 1,
+                    "inputLabels": [
+                      "Input 1"
+                    ],
+                    "maxOutputs": 1,
+                    "outputLabels": [
+                      "Output 1"
+                    ],
+                    "comment": "",
+                    "showComment": false,
+                    "isSubnetwork": false,
+                    "hdaState": null,
+                    "parms": [
+                      {
+                        "name": "outputidx",
+                        "label": "Output Index",
+                        "type": "Int",
+                        "val": [
+                          0
+                        ],
+                        "expr": [
+                          null
+                        ],
+                        "changed": [
+                          true
+                        ],
+                        "range": [
+                          0,
+                          10
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "dots": [],
+                "boxes": [],
+                "stickies": [],
+                "wires": [
+                  {
+                    "from": "1",
+                    "fromOutput": 0,
+                    "to": "scatter_props",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "crate",
+                    "fromOutput": 0,
+                    "to": "copytopoints1",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "scatter_props",
+                    "fromOutput": 0,
+                    "to": "copytopoints1",
+                    "toInput": 1
+                  },
+                  {
+                    "from": "copytopoints1",
+                    "fromOutput": 0,
+                    "to": "details",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "details",
+                    "fromOutput": 0,
+                    "to": "merge1",
+                    "toInput": 0
+                  },
+                  {
+                    "from": "1",
+                    "fromOutput": 0,
+                    "to": "merge1",
+                    "toInput": 1
+                  },
+                  {
+                    "from": "merge1",
+                    "fromOutput": 0,
+                    "to": "output0",
+                    "toInput": 0
+                  }
+                ],
+                "subnetInputs": [
+                  {
+                    "name": "1",
+                    "num": 0,
+                    "pos": [
+                      0.0,
+                      3.0
+                    ],
+                    "inputName": "merge1"
+                  },
+                  {
+                    "name": "2",
+                    "num": 1,
+                    "pos": [
+                      3.0,
+                      6.5
+                    ],
+                    "inputName": ""
+                  },
+                  {
+                    "name": "3",
+                    "num": 2,
+                    "pos": [
+                      6.0,
+                      7.0
+                    ],
+                    "inputName": ""
+                  },
+                  {
+                    "name": "4",
+                    "num": 3,
+                    "pos": [
+                      9.0,
+                      7.5
+                    ],
+                    "inputName": ""
+                  }
+                ],
+                "wireStyle": "default"
+              }
+            },
+            {
+              "name": "output0",
+              "type": "output",
+              "label": "Output",
+              "icon": "SOP_output",
+              "pos": [
+                0.0,
+                -4.0
+              ],
+              "size": [
+                1.1296,
+                0.2824
+              ],
+              "color": [
+                0.8,
+                0.8,
+                0.8
+              ],
+              "shape": "rect",
+              "flags": {
+                "bypass": false,
+                "display": true,
+                "render": true,
+                "template": false,
+                "selectableTemplate": false,
+                "lock": false,
+                "softLock": false
+              },
+              "maxInputs": 1,
+              "inputLabels": [
+                "Input 1"
+              ],
+              "maxOutputs": 1,
+              "outputLabels": [
+                "Output 1"
+              ],
+              "comment": "",
+              "showComment": false,
+              "isSubnetwork": false,
+              "hdaState": null,
+              "parms": [
+                {
+                  "name": "outputidx",
+                  "label": "Output Index",
+                  "type": "Int",
+                  "val": [
+                    0
+                  ],
+                  "expr": [
+                    null
+                  ],
+                  "changed": [
+                    true
+                  ],
+                  "range": [
+                    0,
+                    10
+                  ]
+                }
+              ]
+            }
+          ],
+          "dots": [],
+          "boxes": [],
+          "stickies": [
+            {
+              "name": "__stickynote1",
+              "text": "Your own assets show a padlock. Red and open: unlocked, you can go inside. Grey: locked, exported closed.",
+              "pos": [
+                -7.2,
+                1.4
+              ],
+              "size": [
+                4.2,
+                1.3
+              ],
+              "color": [
+                1.0,
+                0.97,
+                0.6
+              ],
+              "minimized": false,
+              "textColor": [
+                0.1,
+                0.1,
+                0.1
+              ],
+              "drawBackground": true
+            }
+          ],
+          "wires": [
+            {
+              "from": "1",
+              "fromOutput": 0,
+              "to": "pebble_scatter1",
+              "toInput": 0
+            },
+            {
+              "from": "rounded_brick1",
+              "fromOutput": 0,
+              "to": "bricks",
+              "toInput": 0
+            },
+            {
+              "from": "2",
+              "fromOutput": 0,
+              "to": "bricks",
+              "toInput": 1
+            },
+            {
+              "from": "bricks",
+              "fromOutput": 0,
+              "to": "tag_pieces",
+              "toInput": 0
+            },
+            {
+              "from": "pebble_scatter1",
+              "fromOutput": 0,
+              "to": "merge1",
+              "toInput": 0
+            },
+            {
+              "from": "tag_pieces",
+              "fromOutput": 0,
+              "to": "merge1",
+              "toInput": 1
+            },
+            {
+              "from": "merge1",
+              "fromOutput": 0,
+              "to": "props",
+              "toInput": 0
+            },
+            {
+              "from": "props",
+              "fromOutput": 0,
+              "to": "output0",
+              "toInput": 0
+            }
+          ],
+          "subnetInputs": [
+            {
+              "name": "1",
+              "num": 0,
+              "pos": [
+                -2.5,
+                3.2
+              ],
+              "inputName": "ground"
+            },
+            {
+              "name": "2",
+              "num": 1,
+              "pos": [
+                2.5,
+                3.2
+              ],
+              "inputName": "wall_curve"
+            },
+            {
+              "name": "3",
+              "num": 2,
+              "pos": [
+                6.0,
+                7.0
+              ],
+              "inputName": ""
+            },
+            {
+              "name": "4",
+              "num": 3,
+              "pos": [
+                9.0,
+                7.5
+              ],
+              "inputName": ""
+            }
+          ],
+          "wireStyle": "default"
+        }
+      },
+      {
+        "name": "OUT",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          0.0,
+          -1.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.6,
+          0.7,
+          0.77
+        ],
+        "shape": "null",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [
+      {
+        "name": "__stickynote1",
+        "text": "Double-click scene to go inside. It holds more subnetworks: the path bar keeps the way back.",
+        "pos": [
+          2.0,
+          0.0
+        ],
+        "size": [
+          4.5,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      }
+    ],
+    "wires": [
+      {
+        "from": "ground",
+        "fromOutput": 0,
+        "to": "scene",
+        "toInput": 0
+      },
+      {
+        "from": "wall_curve",
+        "fromOutput": 0,
+        "to": "scene",
+        "toInput": 1
+      },
+      {
+        "from": "scene",
+        "fromOutput": 0,
+        "to": "OUT",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "assets",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
+  }
+}

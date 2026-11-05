@@ -19,7 +19,7 @@ export function canDiveInto(node: HoudiniNodeData | null | undefined): boolean {
 }
 
 /**
- * Resolves a dive path (subnetwork node names from the root, e.g. `["circuit_board_fan"]`)
+ * Resolves a dive path (subnetwork node names from the root, e.g. `["scene", "props"]`)
  * into the stack of levels from the root network down to the deepest valid level.
  *
  * Names that do not exist or are not navigable subnetworks end the walk, so a stale path

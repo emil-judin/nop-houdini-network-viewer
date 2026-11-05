@@ -300,7 +300,7 @@ export type HoudiniWireStyle = 'default' | 'rounded';
  * Serialized graph data for a single Houdini network level.
  */
 export interface HoudiniNetworkGraph {
-  /** Full Houdini node path (e.g. `/obj/circuit_board/circuit_gen`). */
+  /** Full Houdini node path (e.g. `/obj/assets/scene`). */
   path: string;
   /** Operator type of the container network (e.g. `geo`, `subnet`). */
   type: string;
@@ -328,12 +328,12 @@ export interface HoudiniNetworkGraph {
 }
 
 /**
- * One node on the path to the exported network (for example `/obj` or `/obj/circuit_board`).
+ * One node on the path to the exported network (for example `/obj` or `/obj/assets`).
  */
 export interface HoudiniPathNode {
-  /** Node name (`obj`, `circuit_board`). */
+  /** Node name (`obj`, `assets`). */
   name: string;
-  /** Operator type (`obj`, `geo`, `emjud::circuit_gen::1.0`). */
+  /** Operator type (`obj`, `geo`, `emjud::pebble_scatter::1.0`). */
   type: string;
   /** Houdini icon id (`OBJ_geo`, `MISC_digital_asset`); custom asset icons are in the document's `icons`. */
   icon?: string;

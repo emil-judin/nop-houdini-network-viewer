@@ -1,0 +1,548 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportedAt": "2026-11-04T00:51:41.144297+00:00",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/vex_wrangles",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "grid1",
+        "type": "grid",
+        "label": "Grid",
+        "icon": "SOP_grid",
+        "pos": [
+          0.0,
+          3.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 0,
+        "inputLabels": [],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "rows",
+            "label": "Rows",
+            "type": "Int",
+            "val": [
+              50
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              50
+            ]
+          },
+          {
+            "name": "cols",
+            "label": "Columns",
+            "type": "Int",
+            "val": [
+              50
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              50
+            ]
+          }
+        ]
+      },
+      {
+        "name": "wrangle_noise",
+        "type": "attribwrangle",
+        "label": "Attribute Wrangle",
+        "icon": "SOP_attribwrangle",
+        "pos": [
+          0.0,
+          1.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "wave",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Geometry to Process with Wrangle",
+          "Ancillary Input, point(1, ...) to Access",
+          "Ancillary Input, point(2, ...) to Access",
+          "Ancillary Input, point(3, ...) to Access"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "snippet",
+            "label": "VEXpression",
+            "type": "String",
+            "val": [
+              "// Push the grid up and down with noise\nfloat amp = chf(\"amplitude\");\nfloat freq = chf(\"frequency\");\n@P.y += (noise(@P * freq) - 0.5) * amp;"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Code"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "amplitude",
+            "label": "Amplitude",
+            "type": "Float",
+            "val": [
+              0.3
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              1.0
+            ]
+          },
+          {
+            "name": "frequency",
+            "label": "Frequency",
+            "type": "Float",
+            "val": [
+              2.0
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "wrangle_rings",
+        "type": "attribwrangle",
+        "label": "Attribute Wrangle",
+        "icon": "SOP_attribwrangle",
+        "pos": [
+          0.0,
+          0.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "wave",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Geometry to Process with Wrangle",
+          "Ancillary Input, point(1, ...) to Access",
+          "Ancillary Input, point(2, ...) to Access",
+          "Ancillary Input, point(3, ...) to Access"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "snippet",
+            "label": "VEXpression",
+            "type": "String",
+            "val": [
+              "#include <math.h>\n\n// Sort the points into rings around the center\n// and give every ring a name and a width.\nfloat radius = length(set(@P.x, 0, @P.z));\nint   rings  = chi(\"rings\");\nfloat maxr   = 5.0;   // half the grid size\nint   ring   = int(fit(radius, 0, maxr, 0, rings));\n\ni@ring = clamp(ring, 0, rings - 1);\ns@ring_name = sprintf(\"ring_%02d\", i@ring);\n\n// Alternate wide and narrow rings\nif (i@ring % 2 == 0) {\n    f@pscale = 0.08;\n} else {\n    f@pscale = 0.04;\n}\n\n// Remember the neighbours of every point\ni[]@nbrs = neighbours(0, @ptnum);\n\n// A gentle wave along the angle\nfloat angle = atan2(@P.z, @P.x);\n@P.y += 0.05 * sin(angle * 6.0 + M_PI * 0.5);\n\n//@Cd = {1, 0, 0};  // debug color, kept for later"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Code"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "hasMenu": true
+          },
+          {
+            "name": "rings",
+            "label": "Rings",
+            "type": "Int",
+            "val": [
+              6
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              1,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "name": "wrangle_color",
+        "type": "attribwrangle",
+        "label": "Attribute Wrangle",
+        "icon": "SOP_attribwrangle",
+        "pos": [
+          0.0,
+          -0.6
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "wave",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Geometry to Process with Wrangle",
+          "Ancillary Input, point(1, ...) to Access",
+          "Ancillary Input, point(2, ...) to Access",
+          "Ancillary Input, point(3, ...) to Access"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": "locked",
+        "parms": [
+          {
+            "name": "snippet",
+            "label": "VEXpression",
+            "type": "String",
+            "val": [
+              "// Color by height: low points blue, high points orange\nfloat h = fit(@P.y, -0.15, 0.15, 0, 1);\n@Cd = lerp({0.1, 0.3, 0.9}, {1.0, 0.45, 0.1}, h);"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "folders": [
+              "Code"
+            ],
+            "folderTypes": [
+              "tabs"
+            ],
+            "hasMenu": true
+          }
+        ]
+      },
+      {
+        "name": "python_info",
+        "type": "python",
+        "label": "Python",
+        "icon": "SOP_python",
+        "pos": [
+          0.0,
+          -1.8
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 4,
+        "inputLabels": [
+          "Input 1",
+          "Input 2",
+          "Input 3",
+          "Input 4"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "python",
+            "label": "Python Code",
+            "type": "String",
+            "val": [
+              "# Store the point count on the geometry\nnode = hou.pwd()\ngeo = node.geometry()\n\ncount = len(geo.points())\ngeo.addAttrib(hou.attribType.Global, \"point_count\", 0)\ngeo.setGlobalAttribValue(\"point_count\", count)"
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "hasMenu": true
+          }
+        ]
+      },
+      {
+        "name": "OUT",
+        "type": "null",
+        "label": "Null",
+        "icon": "SOP_null",
+        "pos": [
+          0.0,
+          -3.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.6,
+          0.7,
+          0.77
+        ],
+        "shape": "null",
+        "flags": {
+          "bypass": false,
+          "display": true,
+          "render": true,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [
+      {
+        "name": "__stickynote1",
+        "text": "Click a wrangle to read its VEX code. The copy button puts the code on your clipboard.",
+        "pos": [
+          2.2,
+          1.2
+        ],
+        "size": [
+          4.2,
+          1.1
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      },
+      {
+        "name": "__stickynote2",
+        "text": "Python SOPs work too.",
+        "pos": [
+          2.2,
+          -2.0
+        ],
+        "size": [
+          2.8,
+          0.8
+        ],
+        "color": [
+          1.0,
+          0.97,
+          0.6
+        ],
+        "minimized": false,
+        "textColor": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "drawBackground": true
+      }
+    ],
+    "wires": [
+      {
+        "from": "grid1",
+        "fromOutput": 0,
+        "to": "wrangle_noise",
+        "toInput": 0
+      },
+      {
+        "from": "wrangle_noise",
+        "fromOutput": 0,
+        "to": "wrangle_rings",
+        "toInput": 0
+      },
+      {
+        "from": "wrangle_rings",
+        "fromOutput": 0,
+        "to": "wrangle_color",
+        "toInput": 0
+      },
+      {
+        "from": "wrangle_color",
+        "fromOutput": 0,
+        "to": "python_info",
+        "toInput": 0
+      },
+      {
+        "from": "python_info",
+        "fromOutput": 0,
+        "to": "OUT",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default",
+    "pathNodes": [
+      {
+        "name": "obj",
+        "type": "obj",
+        "icon": "NETWORKS_scene"
+      },
+      {
+        "name": "vex_wrangles",
+        "type": "geo",
+        "icon": "OBJ_geo"
+      }
+    ]
+  }
+}

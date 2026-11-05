@@ -12,7 +12,7 @@ export interface OperatorTypeParts {
  * Splits a Houdini operator type name into namespace and base name, dropping the version.
  *
  * Examples: `labs::thicken::1.0` gives `labs` + `thicken`; `copytopoints::2.0` gives `""` + `copytopoints`;
- * `emjud::circuit_board_fan::1.0` gives `emjud` + `circuit_board_fan`.
+ * `emjud::pebble_scatter::1.0` gives `emjud` + `pebble_scatter`.
  */
 export function parseOperatorType(type: string): OperatorTypeParts {
   const parts = type.toLowerCase().split('::');

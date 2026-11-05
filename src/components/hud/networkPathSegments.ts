@@ -10,12 +10,12 @@ import { svgToDataUri } from '../nodes/icons/svgDataUri';
 export type PathSegmentIcon = { def: OperatorIconDef } | { src: string };
 
 /**
- * One segment of the network path bar (`obj`, `circuit_board`, `circuit_gen`).
+ * One segment of the network path bar (`assets`, `scene`, `pebble_scatter1`).
  */
 export interface NetworkPathSegment {
   /** Node name shown in the bar. */
   name: string;
-  /** Full Houdini path of the segment (`/obj/circuit_board`). */
+  /** Full Houdini path of the segment (`/obj/assets/scene`). */
   path: string;
   /** Exported level (`0` is the exported root). */
   depth: number;

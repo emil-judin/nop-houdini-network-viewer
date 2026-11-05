@@ -100,9 +100,8 @@ nop-houdini-network-viewer/
 │   ├── package/                       # Houdini package: nop.json + nop/ (shelf, icon, README.txt)
 │   └── README.md                      # Install (package or manual shelf tool) and usage
 │
-├── fixtures/                          # Real Houdini 22 exports used as demos
-│   ├── circuit_board-network.json     # Small /obj/circuit_board network
-│   ├── circuit_gen-network.json       # Production network, full parameters
+├── fixtures/                          # Real Houdini 22 exports
+│   ├── examples/                      # The six guided playground examples and their build plan (README.md)
 │   └── edge-cases/                    # Small hand-written files for tests (malformed, prototype keys, ...)
 ├── schema/nop-network-1.schema.json   # JSON Schema of the export format (all 1.x fields)
 ├── tests/                             # unit/, component/ (Vitest), e2e/ (Playwright, test server, host pages)
@@ -234,7 +233,7 @@ From our live dump, Houdini uses `"shape": ""` (normalized to `"rect"`) for stan
 - Create `AGENTS.md`, `PLAN.md`, `docs/STATUS.md`, `docs/ARCHITECTURE.md`, and `docs/SCHEMA.md` enforcing the Core Pillars (5 at the time, now 6) and neutral international documentation styling.
 - Create `.agents/skills/houdini-graph-renderer/SKILL.md` and `.agents/skills/houdini-python-exporter/SKILL.md`.
 - Write the production-ready `exporter/nop_exporter.py` shelf tool (with the UI dialog for Clipboard vs. File Save and Compact vs. Full parameters) and `exporter/README.md`.
-- Process `complex-network.json` into clean, fast-loading test fixtures (now `fixtures/circuit_gen-network.json` and `fixtures/circuit_board-network.json`, re-exported from Houdini 22).
+- Process `complex-network.json` into clean, fast-loading test fixtures (later the Circuit demos, replaced on 2026-11-04 by the guided examples in `fixtures/examples/`).
 - Implement the canonical TypeScript schema (`src/schema/types.ts`) and verify `npm run check` passes.
 
 ### Milestone 2: Core Network Canvas & Authentic Houdini Nodes
