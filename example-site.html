@@ -80,9 +80,10 @@
         overflow: hidden;
         background: #242424;
       }
-      /* The embedder's network: its height follows the Height option */
+      /* The embedder's network: its height follows the Height option (600px by default, like the
+         option, so the network does not grow when the page script sets it) */
       houdini-network.preview {
-        height: var(--nop-embed-height, 480px);
+        height: var(--nop-embed-height, 600px);
       }
       .embedder {
         background: #eef2f8;
@@ -98,6 +99,45 @@
         font-size: clamp(30px, 6vw, 42px);
         line-height: 1.15;
         margin: 0 0 16px;
+      }
+      /* Space for the embed panels, which the page script adds once it has loaded: reserved from the
+         start, so the page does not jump. Heights measured per width (panel plus its 40px margins);
+         flow-root keeps the panel's margins inside the slot. */
+      .embed-slot {
+        display: flow-root;
+        min-height: 367px;
+      }
+      .embed-slot-options {
+        min-height: 673px;
+      }
+      @media (max-width: 759px) {
+        .embed-slot {
+          min-height: 388px;
+        }
+        .embed-slot-options {
+          min-height: 694px;
+        }
+      }
+      @media (max-width: 600px) {
+        .embed-slot-options {
+          min-height: 841px;
+        }
+      }
+      @media (max-width: 499px) {
+        .embed-slot {
+          min-height: 409px;
+        }
+        .embed-slot-options {
+          min-height: 910px;
+        }
+      }
+      @media (max-width: 429px) {
+        .embed-slot {
+          min-height: 430px;
+        }
+        .embed-slot-options {
+          min-height: 999px;
+        }
       }
       /* Embed code panel (src/examplePage/embedPanel.ts) */
       .embed {
@@ -240,7 +280,8 @@
       /* Phones: the viewers use the full screen width and most of its height, so the network and the
          parameter sheet have room. One finger scrolls the article, two fingers move the network. */
       @media (max-width: 600px) {
-        houdini-network {
+        houdini-network,
+        houdini-network.preview {
           margin: 0 -16px;
           border-radius: 0;
           height: 70vh;
@@ -261,8 +302,10 @@
       <a href="./">Back to the NOP Playground</a>
     </p>
 
-    <!-- Filled by the page script: one example network with the embed options and code -->
-    <section id="embedder" class="embedder" aria-labelledby="embedder-title" hidden>
+    <!-- One example network with the embed options and code. The network is in the page from the
+         start (Start Here, EMBED_PAGE_EXAMPLE in src/playground/examples.ts); the page script fills the
+         slot under it with the options and code. -->
+    <section id="embedder" class="embedder" aria-labelledby="embedder-title">
       <div>
         <h2 id="embedder-title">Embed a network on your website</h2>
         <p>
@@ -270,7 +313,10 @@
           them, and the code is ready to copy. For your own network, upload the .json file you exported from Houdini
           next to your page and put its address in the first field.
         </p>
-        <figure data-preview></figure>
+        <figure data-preview>
+          <houdini-network class="preview" src="examples/start_here-network.json"></houdini-network>
+        </figure>
+        <div class="embed-slot embed-slot-options" data-embed-slot></div>
       </div>
     </section>
 
@@ -292,6 +338,7 @@
         <houdini-network src="examples/for_each-network.json" focus-node="twist_piece" data-embed-code></houdini-network>
         <figcaption>The view starts on the node inside the loop (<code>focus-node="twist_piece"</code>); press H or double-click the background to see everything.</figcaption>
       </figure>
+      <div class="embed-slot" data-embed-slot></div>
 
       <h2>The code</h2>
       <p>
@@ -302,6 +349,7 @@
         <houdini-network src="examples/vex_wrangles-network.json" data-embed-code></houdini-network>
         <figcaption>A grid run through three Attribute Wrangles and a Python node.</figcaption>
       </figure>
+      <div class="embed-slot" data-embed-slot></div>
 
       <h2>How this page does it</h2>
       <p>
