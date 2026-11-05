@@ -7,3 +7,13 @@
 :root {
   color-scheme: dark;
 }
+
+/* The app fills the screen (h-dvh) and scrolls only inside its panes. The page itself never
+   scrolls or bounces: on mobile Chrome a page scroll hid the address bar and left a gap at the
+   bottom. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}

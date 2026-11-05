@@ -3,7 +3,7 @@ import { ClipboardPaste, FileUp, Network } from 'lucide-react';
 import { HoudiniNetwork, type HoudiniNetworkDocument } from '../api';
 import { NetworkErrorState } from '../components/hud/NetworkErrorState';
 import { NetworkLoadingState } from '../components/hud/NetworkLoadingState';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET, TOUCH_TARGET_COMPACT } from '../components/hud/touchTarget';
 import { registerLabsIcons } from '../components/nodes/icons/iconRegistry';
 import { LABS_BUILTIN_ICON_ALIASES, LABS_ICONS } from '../components/nodes/icons/labs';
 import { AboutBlock } from './AboutBlock';
@@ -106,9 +106,12 @@ function rememberWelcomeSeen(): void {
 /** Screens at least this wide show the networks panel beside the network; narrower ones fold it. */
 const WIDE_SCREEN_QUERY = '(min-width: 768px)';
 
-/** Button of the open and paste box: `primary` in Houdini's blue-grey (Open file, the main action), else its raised grey. */
+/**
+ * Button of the open and paste box: `primary` in Houdini's blue-grey (Open file, the main action),
+ * else its raised grey. 36px high on touch screens.
+ */
 const panelAction = (primary: boolean) =>
-  `min-w-0 flex items-center justify-center gap-1.5 h-7 px-3 rounded-[3px] text-[13px] transition-colors cursor-pointer ${TOUCH_TARGET} ${
+  `min-w-0 flex items-center justify-center gap-1.5 h-7 px-3 rounded-[3px] text-[13px] transition-colors cursor-pointer ${TOUCH_TARGET_COMPACT} ${
     primary ? 'bg-[#474e62] hover:bg-[#535b72] text-white' : 'bg-[#444444] hover:bg-[#4e4e4e] text-[#d6d6d6] hover:text-white'
   }`;
 
@@ -324,7 +327,13 @@ export const App: React.FC = () => {
 
       {/* Status bar in the Houdini 22 style (`#2d2d2d`) */}
       <footer className="shrink-0 flex flex-wrap items-center justify-between gap-x-4 px-2 py-0.5 bg-[#2d2d2d] text-[12px] text-[#a8a8a8]">
-        <span className="flex items-center gap-1.5">
+        {/* Phones: only the NOP icon, name and version (owner decision 2026-11-05) */}
+        <span className="flex md:hidden items-center gap-1.5">
+          <img src={LOGO_URL} alt="" width={14} height={14} className="w-3.5 h-3.5" />
+          <span className="font-bold text-[#dddddd]">NOP</span>
+          <span title="Version of this playground page">{__NOP_VERSION__}</span>
+        </span>
+        <span className="hidden md:flex items-center gap-1.5">
           {/* The pane's logo is out of sight while it is folded, so the status bar names the product */}
           {!panelOpen && (
             <>
@@ -337,7 +346,7 @@ export const App: React.FC = () => {
             <span className="hidden lg:inline"> Independent project, not endorsed by SideFX. Houdini is a trademark of Side Effects Software Inc.</span>
           </span>
         </span>
-        <span className="flex flex-wrap items-center gap-x-3">
+        <span className="hidden md:flex flex-wrap items-center gap-x-3">
           {activeDocument?.houdiniVersion && (
             <span title="Houdini version the network on screen was exported from">Houdini {activeDocument.houdiniVersion}</span>
           )}

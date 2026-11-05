@@ -159,9 +159,11 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
         </button>
       </PaneTabStrip>
 
-      {/* The pinned group follows the list directly; when space runs short, only the list scrolls */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="min-h-0 overflow-y-auto pt-1">
+      {/* Docked: the pinned group follows the list directly, and when space runs short only the list
+          scrolls. Floating (phones): the whole pane scrolls as one, footer included, and nothing is
+          pinned (owner decision 2026-11-05); the scroll never carries over to the page. */}
+      <div className={`flex-1 min-h-0 ${overlay ? 'overflow-y-auto overscroll-contain' : 'flex flex-col'}`}>
+        <div className={overlay ? 'pt-1' : 'min-h-0 overflow-y-auto pt-1'}>
           {sections
             .filter((section) => section.items.length > 0)
             .map((section) => (
@@ -183,14 +185,15 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
                 items={pinnedSection.items}
                 activeKey={activeKey}
                 onSelect={onSelect}
-                className="max-h-[132px] overflow-y-auto"
+                className={overlay ? undefined : 'max-h-[132px] overflow-y-auto'}
               />
             )}
             {pinnedContent}
           </section>
         )}
+        {overlay && footer}
       </div>
-      {footer && <div className="shrink-0">{footer}</div>}
+      {!overlay && footer && <div className="shrink-0">{footer}</div>}
     </aside>
   );
 
