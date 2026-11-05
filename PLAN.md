@@ -147,9 +147,10 @@ nop-houdini-network-viewer/
     │       ├── HoudiniWire.tsx        # Wire edge (constant on-screen width, selection highlight)
     │       └── wirePaths.ts           # Houdini's "default" and "rounded" wire routing
     └── playground/                    # Hosted web app (GitHub Pages)
-        ├── App.tsx                    # Demos, open / drop / paste a .json, header buttons
+        ├── App.tsx                    # Examples, Your Files (open / drop / paste a .json), status bar
+        ├── NetworksPanel.tsx          # Networks pane: examples, Your Files, banner and buttons
         ├── PlaygroundDialog.tsx       # Shared <dialog> frame
-        ├── EmbedDialog.tsx            # Embed code generator (web component, React, iframe)
+        ├── embedSnippets.ts           # Embed code (web component, React, iframe) for the example page
         ├── ExporterDialog.tsx         # Exporter download and install steps
         ├── FeedbackDialog.tsx         # Tester feedback form (sendFeedback.ts, Web3Forms)
         ├── EmbedView.tsx              # ?embed=true full-page viewer for iframes

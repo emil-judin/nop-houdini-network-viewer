@@ -14,8 +14,8 @@ description: >-
    `docs/SCHEMA.md`, `src/schema/types.ts` and `schema/nop-network-1.schema.json` describe the new fields.
 4. `CHANGELOG.md`: move "Unreleased" under the new version with the date.
 5. Docs: README install snippets name the new version; `docs/TESTERS.md` title and privacy text are current.
-6. npm releases only (Milestone 4): set `PUBLISHED_ON_NPM = true` in `src/playground/EmbedDialog.tsx` and drop
-   the "not on npm yet" notes from the README; build with `npm.cmd run build:lib`, then `npm.cmd run sri` and
+6. npm releases only (Milestone 4): set `PUBLISHED_ON_NPM = true` in `src/examplePage/embedPanel.ts` and drop
+   the "not on npm yet" notes from the README and `example-site.html`; build with `npm.cmd run build:lib`, then `npm.cmd run sri` and
    publish the `web-component.js` hash in the README and CHANGELOG.
 7. Tag the commit `v<version>` only when the owner says so. Publishing (`npm publish`, GitHub release) is the
    owner's step.
