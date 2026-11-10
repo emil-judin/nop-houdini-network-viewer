@@ -6,7 +6,16 @@ updates:
     schedule:
       interval: weekly
     groups:
-      # Minor and patch updates of the dev tools in one pull request; major upgrades come one by one
+      # TypeScript and ESLint move together with the lint plugins that support them, all update
+      # types in one pull request each. A new major (TypeScript 7, ESLint 10) can wait there with
+      # failing CI until the plugins catch up; every plugin release updates the pull request and
+      # reruns CI, so it turns green by itself and needs no ignore rule to remember. These groups
+      # come before dev-tools because a package joins the first group that matches it.
+      typescript:
+        patterns: [typescript, typescript-eslint]
+      eslint:
+        patterns: [eslint, "@eslint/js", "eslint-plugin-*"]
+      # Minor and patch updates of the other dev tools in one pull request; major upgrades come one by one
       dev-tools:
         dependency-type: development
         update-types: [minor, patch]
