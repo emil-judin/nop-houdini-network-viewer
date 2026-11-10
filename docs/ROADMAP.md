@@ -4,7 +4,7 @@ Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHA
 
 ## Current state
 
-- **Version:** `0.1.0-alpha.3`, a tester release. The playground is hosted on GitHub Pages; the npm package is not published yet.
+- **Version:** `0.1.0-alpha.4`, a tester release. The playground is hosted on GitHub Pages; the npm package is not published yet.
 - **Schema:** `1.4.0` ([SCHEMA.md](./SCHEMA.md), machine-readable in `schema/nop-network-1.schema.json`).
 - **Houdini:** the exporter is checked with Houdini 22.0.466. Houdini 20.5 and 21 are not checked yet.
 - **Browsers:** checked in Chromium, Firefox and WebKit with phone and tablet profiles, not on real phones yet.

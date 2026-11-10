@@ -1,4 +1,4 @@
-# Trying NOP: Tester Guide (`0.1.0-alpha.3`)
+# Trying NOP: Tester Guide (`0.1.0-alpha.4`)
 
 Thank you for trying NOP. It shows Houdini node networks on a web page, so you can put an interactive network on your portfolio or in a tutorial instead of a screenshot. Visitors can pan, zoom, open subnetworks and read parameters and VEX, but cannot change anything.
 

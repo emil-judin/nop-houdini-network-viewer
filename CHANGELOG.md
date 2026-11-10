@@ -4,6 +4,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.4 (2026-11-10, tester release)
+
 ### Fixed
 - Viewers no longer flash the network unframed for one frame before the start view appears.
 - The example page no longer jumps while it loads, and its top network keeps its height.
