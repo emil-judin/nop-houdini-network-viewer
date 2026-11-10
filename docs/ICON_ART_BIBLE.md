@@ -73,6 +73,7 @@ Use these exact values. New colors need a reason (and a line in this table).
 | Dark grey | `#3a3f47` / `#5a616b` | Panels, slots, dark parts |
 | White | `#f2f4f7` / `#ffffff` | Paper, tags, highlights |
 | Orange | `#ee8624` | Faces, planes, emphasis (core) |
+| Orange three-tone | `#ffb066` / `#ee8624` / `#c25e12` | Orange solids that sit on yellow nodes (Compile Block bricks) |
 | Red | `#e03228` | Deformation edges, arrows, deletion |
 | Yellow | `#f2c438` / `#ffe47a` / `#d49a18` | Yellow solids (three-tone) |
 | Blue | `#3672c4` / `#2e74c4` | Move arrows, bricks |

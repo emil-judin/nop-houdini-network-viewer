@@ -11,6 +11,7 @@ All notable changes to this project are documented here. Versions follow [Semant
 
 ### Viewer
 - **No jump when a network appears:** for one frame every viewer showed its network unframed (large, in the top-left corner) before it jumped into the start view. The network now stays hidden over the grey canvas until the start view is on screen.
+- **Compile Block icons:** Compile Block Begin and End have their own drawings (the For-Each bricks in orange, so they show on the yellow Compile nodes) instead of the default emblem.
 
 ## 0.1.0-alpha.3 (tester release, 2026-11-05)
 
