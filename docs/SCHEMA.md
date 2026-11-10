@@ -1,4 +1,4 @@
-# Canonical JSON Schema Specification (`SCHEMA.md`)
+# Network File Format (JSON Schema)
 
 This document defines the JSON contract produced by `exporter/nop_exporter.py` and consumed by `src/schema/types.ts`. A machine-readable version is [schema/nop-network-1.schema.json](../schema/nop-network-1.schema.json) (JSON Schema draft 2020-12, all 1.x fields); the tests check the demo exports against it.
 
@@ -83,7 +83,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
    - folders inside the project and Houdini folders become `$HIP`, `$JOB`, `$HOUDINI_USER_PREF_DIR`, `$HSITE` or `$HFS` (`$HIP/geo/a.bgeo` keeps its structure);
    - every other absolute path keeps only its file name: drive paths (`D:/Clients/Acme/rock.exr`), home folders (`C:/Users/<name>/...`, `~/...`), server shares (`\\studio-nas\acme\...`, both server and share names are removed) and POSIX mounts (`/mnt/...`, `/Volumes/...`) all become `<path>/rock.exr`;
    - absolute Houdini node paths (`/obj/geo1/OUT`) and URLs are kept.
-   - Network box comments are exported as the user wrote them (owner decision), and so are file names: rename a file if its name is confidential.
+   - Network box comments are exported as the user wrote them, and so are file names: rename a file if its name is confidential.
 8. **Locked assets:** the insides of locked digital assets that are not from SideFX or SideFX Labs (purchased, studio or colleagues' assets) are not exported unless the user confirms in the export dialog. Such a node is exported closed (`isSubnetwork: false`, no `children`, `hdaState: "locked"`), with its parameters and its icon.
 9. **Node size:** `size` is informational. The viewer always draws operator nodes in Houdini's 10:3 shape box (100 x 30 px).
 10. **Minimized Network Boxes:**

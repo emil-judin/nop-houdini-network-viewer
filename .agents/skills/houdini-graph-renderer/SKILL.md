@@ -22,7 +22,7 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
 | Wire colors and paths (both Houdini wire styles) | `src/components/edges/HoudiniWire.tsx`, `wirePaths.ts` |
 | Canvas and grid colors | `src/components/theme.ts` |
 | Parameter Pane colors | `src/components/inspector/paneStyles.ts` |
-| Fidelity decisions and their history | `docs/HISTORY.md` |
+| Fidelity decisions | `docs/decisions/` (0002 and later) and the git history |
 
 ## 2. Invariants
 
@@ -73,4 +73,5 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
   fullscreen, reduced motion) to React Flow and the HUD.
 - The Parameter Inspector and the SideFX Labs icon drawings load on demand (`React.lazy`, `loadLabsIcons`).
   Keep heavy, optional code behind such a boundary so embeds stay small.
-- Tests: `tests/unit/convertGraph.test.ts` pins the coordinate and wire rules; add a case when you change them.
+- Tests (local suite, not published yet): `tests/unit/convertGraph.test.ts` pins the coordinate and wire rules;
+  add a case when you change them.

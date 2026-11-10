@@ -1,4 +1,4 @@
-# Architecture Overview (`ARCHITECTURE.md`)
+# Architecture
 
 ## 1. Design Philosophy
 
@@ -27,7 +27,7 @@ flowchart LR
 
 Houdini and web browsers use opposite vertical axes and different unit scales:
 
-The constants live in `src/schema/convertGraph.ts` and are pinned by `tests/unit/convertGraph.test.ts`.
+The constants live in `src/schema/convertGraph.ts`.
 
 | Property | Houdini Network Space | Browser / React Flow Space | Conversion Formula (`HOUDINI_UNIT_TO_PX = 100`) |
 | :--- | :--- | :--- | :--- |

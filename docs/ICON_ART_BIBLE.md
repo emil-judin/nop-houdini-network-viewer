@@ -1,4 +1,4 @@
-# Operator Icon Art Bible (`ICON_ART_BIBLE.md`)
+# Operator Icon Art Bible
 
 > **Audience:** AI agents and human contributors who draw, redraw or review operator icons.
 > **Goal:** every icon looks like it came from the same hand, reads instantly at node size, and stays legally clean.
@@ -21,8 +21,8 @@ Every operator node in the viewer shows a small icon centered in its body. Ours 
 ## 2. Legal Rules (Non-Negotiable)
 
 1. **Draw from scratch.** Look at the reference, then write your own SVG. Never copy, trace, convert or embed SideFX path data, gradients or files.
-2. **References stay local.** Reference icons are built by `scripts/build_local_reference_icons.py` into the gitignored `local-refs/` folder and served only by the Vite dev server. Never commit them, never put them in `public/`, never bundle them.
-3. **Vendor logos are redrawn, never copied.** When the reference icon is a vendor logo or wordmark (Labs integrations such as Substance, FBX, Rokoko, Neuron, GoZ, Sketchfab, Exoside, Gaea, ZibraVDB, AliceVision, Dem Bones, and the Houdini logo itself), redraw it by hand in the house style so the integration is recognizable, and mark the description with `(vendor logo, redrawn)`. Never paste or convert the vendor's SVG data. This is a project-owner decision (2026-10-25); the trademarks remain the property of their owners.
+2. **References stay local.** Reference icons are built by a local-only script (not in the repository) into the gitignored `local-refs/` folder and served only by the Vite dev server. Never commit them, never put them in `public/`, never bundle them.
+3. **Vendor logos are redrawn, never copied.** When the reference icon is a vendor logo or wordmark (Labs integrations such as Substance, FBX, Rokoko, Neuron, GoZ, Sketchfab, Exoside, Gaea, ZibraVDB, AliceVision, Dem Bones, and the Houdini logo itself), redraw it by hand in the house style so the integration is recognizable, and mark the description with `(vendor logo, redrawn)`. Never paste or convert the vendor's SVG data. See [decision 0003](./decisions/0003-original-icons-no-sidefx-assets.md); the trademarks remain the property of their owners.
 4. **No real people.** Some Labs icons are photos of people. Never recreate a likeness; use a generic figure or head bust.
 5. Short text that appears in the reference (format names like `OBJ`, `OSM`, `FBX`, letters like `WFC`) may be reproduced as plain text.
 
@@ -164,13 +164,7 @@ Study these before drawing. They were reviewed and approved as the house style:
 
 ## 9. Workflow
 
-1. **Build local references** (once per machine, or after a Houdini/Labs update):
-
-   ```bash
-   python scripts/build_local_reference_icons.py --hfs "<Houdini install>" --labs "<SideFX Labs package>"
-   ```
-
-   Add `--write-labs-catalog` to regenerate `labs/labsNodeCatalog.ts` for a new Labs version.
+1. **Build local references** with the local-only reference script, once per machine or after a Houdini or Labs update. Its `--write-labs-catalog` option regenerates `labs/labsNodeCatalog.ts` for a new Labs version.
 2. **Find the reference**: `npm.cmd run dev`, open **Icon Overview**, search for the node.
 3. **Draw** the icon in the matching category file, following sections 3 to 8.
 4. **Verify**: `npm.cmd run check`, then compare in the gallery at both sizes on the `#cccccc` node body.

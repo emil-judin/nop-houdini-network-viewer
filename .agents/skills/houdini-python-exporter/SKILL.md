@@ -51,8 +51,8 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 - Every other absolute path (drive letters, `~/`, server shares, `/mnt`, `/Volumes`, ...) keeps only its file
   name: `<path>/rock.exr`. Server shares lose both server and share names. Absolute Houdini node paths
   (`/obj/...`, `/out/...`) are kept.
-- Owner decision: network box comments are exported as the user wrote them (not scrubbed).
-- Add a test case to `exporter/tests/test_nop_exporter.py` for every new path shape you handle.
+- Network box comments are exported as the user wrote them, not scrubbed ([decision 0004](../../../docs/decisions/0004-exports-safe-as-a-screenshot.md)).
+- Add a test case to `exporter/tests/test_nop_exporter.py` (local test suite) for every new path shape you handle.
 
 ### 3.2 Subnetwork recursion (`should_recurse_subnet`)
 
@@ -63,7 +63,7 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 - Locked assets from anyone else (purchased, studio, colleagues', the user's own finished assets) stay closed
   unless `include_locked_assets` is true. Only the interactive dialog sets it, after the user confirms
   ("Include Insides"); the default is "Export Closed". The hotkey never sets it.
-- Owner decision: the icons of locked assets are still exported (users leave a node out of the selection if they
+- The icons of locked assets are still exported ([decision 0005](../../../docs/decisions/0005-locked-assets-stay-closed.md)) (users leave a node out of the selection if they
   do not want it shown).
 
 ### 3.3 Icons (`CustomUserAssetExtractor`)
@@ -85,5 +85,5 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 
 - `exporter/package/` is the Houdini package: `nop.json` sets `$NOP_EXPORTER_ROOT` from `$HOUDINI_PACKAGE_PATH`,
   so it works in any package folder. `npm run build:exporter` builds the reproducible zip.
-- Tests: `npm.cmd run test:exporter` (standard library `unittest` with the fake `hou` in
+- Tests (local suite, not published yet): `npm.cmd run test:exporter` (standard library `unittest` with the fake `hou` in
   `exporter/tests/fake_hou.py`). Extend the fake only with what the exporter calls.
