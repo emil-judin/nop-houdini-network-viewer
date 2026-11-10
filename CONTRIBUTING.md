@@ -4,13 +4,14 @@ Thank you for helping. NOP is a small project with a few firm rules; reading the
 
 ## Before you start
 
-- Read [AGENTS.md](./AGENTS.md): the six pillars, the architectural rules and the definition of done apply to human contributors too.
-- Check [docs/STATUS.md](./docs/STATUS.md) for the current state and known follow-ups.
+- Read [AGENTS.md](./AGENTS.md): the six pillars, the architectural rules and the definition of done apply to human contributors too. The reasons behind them are in [docs/decisions/](./docs/decisions/README.md).
+- Check [docs/ROADMAP.md](./docs/ROADMAP.md) for the current state and planned work.
 - For bigger changes, open an issue first and describe the idea.
+- AI coding assistants are welcome. Most of them read [AGENTS.md](./AGENTS.md) on their own; review their output like your own code before you open a pull request.
 
 ## Setup
 
-Node.js 20 or newer (CI uses 22), Python 3.9+ for the exporter tests.
+Node.js 20 or newer (CI uses 22).
 
 ```bash
 npm install
@@ -31,20 +32,17 @@ On Windows PowerShell use `npm.cmd` if script execution is blocked.
 ## Checks (the definition of done)
 
 ```bash
-npm run check          # TypeScript (src and tests)
+npm run check          # strict TypeScript
 npm run lint           # ESLint
-npm test               # unit and component tests
-npm run test:exporter  # exporter tests (fake hou)
-npm run build && npm run build:lib
-npm run test:e2e       # browser tests, for visible changes (first run: npx playwright install)
+npm run build:lib && npm run build
 ```
 
-CI runs the same checks on every pull request. Add or update tests with your change; the scenarios in [docs/features/](./docs/features/) describe the expected behavior.
+CI runs the same checks on every pull request. An automated test suite (unit, component, exporter and browser tests) is in preparation and will be published later.
 
 ## Pull requests
 
 - One topic per pull request, with a short description of what and why.
-- Update [docs/STATUS.md](./docs/STATUS.md) and the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md) for user-visible changes.
+- Add user-visible changes to the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md), one line each.
 - Security problems go through [SECURITY.md](./SECURITY.md), not pull requests.
 
 By contributing you agree that your work is released under the [MIT License](./LICENSE).

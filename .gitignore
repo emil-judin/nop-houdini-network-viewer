@@ -4,7 +4,7 @@ dist/
 *.local
 complex-network.json
 public/__local_houdini_ref_icons.json
-# Local-only SideFX reference icons for the Icon Review Gallery (scripts/build_local_reference_icons.py)
+# Local-only SideFX reference icons for the Icon Review Gallery
 local-refs/
 
 
@@ -18,3 +18,14 @@ public/downloads/
 coverage/
 test-results/
 playwright-report/
+
+# Personal Claude Code settings
+.claude/settings.local.json
+
+# Personal scratch scripts and notes (may contain local paths)
+scratch/
+
+# Teaser (teaser/): recordings, copied assets and renders made by its scripts
+teaser/public/
+teaser/src/generated/
+teaser/out/

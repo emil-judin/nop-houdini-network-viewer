@@ -1,12 +1,12 @@
-# AGENTS.md - Agentic Engineering Guidelines
+# Agent Instructions
 
-This file provides essential context, architectural invariants, and coding conventions for AI coding agents working in NOP (npm package `nop-houdini-network-viewer`). It is the canonical copy of the project pillars: other docs link here instead of repeating them.
+Context, architectural invariants and coding conventions for AI coding agents working in NOP (npm package `nop-houdini-network-viewer`). Human contributors follow the same rules. The six pillars below are the full version; the README summarizes them, and [docs/decisions/](./docs/decisions/README.md) explains the decisions behind them.
 
 ## 1. Project Overview & Core Pillars
 
 NOP (`nop-houdini-network-viewer`) is a lightweight, embeddable interactive web viewer for SideFX Houdini node networks, inspired by Klee for Unreal Engine. Tagline: "View and share Houdini node networks on the web."
 
-**Naming:** the product name is **NOP**, always in capitals in visible text (UI, docs, exporter dialogs), never lowercase on its own. Lowercase `nop` only appears inside technical names: the npm package `nop-houdini-network-viewer`, the CSS prefix `.nop-`, the exporter file `nop_exporter.py`. Never start a package or product name with `houdini-` (it would look official). The HTML tag `<houdini-network>` and the React components `HoudiniNetwork` / `RemoteHoudiniNetwork` keep their names (owner decision). The product was called WOP until 2026-10-28 (see [docs/HISTORY.md](./docs/HISTORY.md)); do not bring the old name back.
+**Naming:** the product name is **NOP**, always in capitals in visible text (UI, docs, exporter dialogs), never lowercase on its own. Lowercase `nop` only appears inside technical names: the npm package `nop-houdini-network-viewer`, the CSS prefix `.nop-`, the exporter file `nop_exporter.py`. Never start a package or product name with `houdini-` (it would look official). The HTML tag `<houdini-network>` and the React components `HoudiniNetwork` / `RemoteHoudiniNetwork` keep their names. The product was called WOP until 2026-10-28; do not bring the old name back.
 
 Every change must strictly follow our **6 Core Pillars**:
 1. **Usability (Frictionless Workflow):** Exporting from Houdini and embedding on a website must require minimal steps (1-click Shelf export, 1-line `<houdini-network>` Web Component, `<HoudiniNetwork />` React component, or `<iframe>` embed).
@@ -28,8 +28,9 @@ Every change must strictly follow our **6 Core Pillars**:
 - **Windows PowerShell Note:** On Windows PowerShell where script execution policy blocks `npm.ps1` and `&&` is unsupported in PS 5.1, invoke `npm.cmd` and separate commands with `;`.
 - **Install Dependencies:** `npm.cmd install`
 - **Start Dev Server:** `npm.cmd run dev`
-- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/` and the tests)
+- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/`, and for the tests when they are present)
 - **Lint:** `npm.cmd run lint` (ESLint: TypeScript, React hooks, JSX accessibility)
+- **Test suite (not published yet):** `tests/`, `exporter/tests/` and their configs are kept local until they are published together with the teaser video. When they are in your checkout, run them as part of the definition of done:
 - **Unit & Component Tests:** `npm.cmd test` (Vitest, `tests/unit/`, `tests/component/`)
 - **Exporter Tests:** `npm.cmd run test:exporter` (Python `unittest` with a fake `hou`, `exporter/tests/`)
 - **Browser Tests:** `npm.cmd run test:e2e` (Playwright, `tests/e2e/`; first run `npx playwright install`)
@@ -38,7 +39,7 @@ Every change must strictly follow our **6 Core Pillars**:
 
 ### Definition of Done
 
-A task is finished only when `check`, `lint`, `test`, `test:exporter`, `build` and `build:lib` pass, the browser tests pass for anything a visitor can see or touch, no new en or em dashes were added, and [docs/STATUS.md](./docs/STATUS.md) is updated. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
+A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the local test suite passes where present (`test`, `test:exporter`, and `test:e2e` for anything a visitor can see or touch), no new en or em dashes were added, and [docs/ROADMAP.md](./docs/ROADMAP.md) and the CHANGELOG are up to date. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
 
 ## 3. Critical Architectural Rules
 
@@ -57,7 +58,7 @@ A task is finished only when `check`, `lint`, `test`, `test:exporter`, `build` a
   - Size viewer layouts with container queries (`@container`, `@2xl:`) on the viewer, not viewport breakpoints, because embeds are often narrower than the page.
 - **Operator Icons (`src/components/nodes/icons/`):**
   - Every icon is an original drawing registered as an `OperatorIconDef` (built-in SOPs in `sop/`, SideFX Labs in `labs/`). Follow [docs/ICON_ART_BIBLE.md](./docs/ICON_ART_BIBLE.md) for style, palette, legal rules and workflow.
-  - Never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (owner decision, see the art bible's legal rules). SideFX reference icons stay in the gitignored `local-refs/` folder (built by `scripts/build_local_reference_icons.py`) and are served only by the dev server, never from `public/` or a build.
+  - Never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (see the art bible's legal rules and [decision 0003](./docs/decisions/0003-original-icons-no-sidefx-assets.md)). SideFX reference icons stay in the gitignored `local-refs/` folder (built by a local-only script that is not in the repository) and are served only by the dev server, never from `public/` or a build.
 
 ## 4. Security & Privacy Rules
 
@@ -74,12 +75,12 @@ The viewer renders untrusted JSON, and the exporter writes files people publish.
 
 - Work on a branch; one topic per commit. Commit or push only when the owner asks.
 - Never commit `local-refs/`, `public/downloads/`, `complex-network.json`, build outputs or real customer exports (all gitignored).
-- Known follow-ups live in the "Next Tasks" list of [docs/STATUS.md](./docs/STATUS.md). Review reports and progress logs are working files: delete them once their findings are fixed and keep the decisions in [docs/HISTORY.md](./docs/HISTORY.md).
+- Open work lives in [docs/ROADMAP.md](./docs/ROADMAP.md). Review reports and progress logs are working files: never commit them. Record a lasting decision as a new record in [docs/decisions/](./docs/decisions/README.md).
 
 ## 6. Continuity & On-Demand Skills
 
-- **Before starting work:** Read [docs/STATUS.md](./docs/STATUS.md) to see the current state and next tasks.
-- **After completing a task:** Update [docs/STATUS.md](./docs/STATUS.md) so the next agent or human developer can continue seamlessly. History of finished work goes to [docs/HISTORY.md](./docs/HISTORY.md) and [CHANGELOG.md](./CHANGELOG.md).
+- **Before starting work:** Read [docs/ROADMAP.md](./docs/ROADMAP.md) and the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md).
+- **After completing a task:** Add user-visible changes to "Unreleased" in [CHANGELOG.md](./CHANGELOG.md) (one line each), tick or remove the item in [docs/ROADMAP.md](./docs/ROADMAP.md), and write a decision record for anything a later change should not silently undo. Do not keep a separate progress log.
 - **Specialized Skills** (in `.agents/skills/`, with pointers in `.claude/skills/` so Claude Code finds them):
   - `houdini-graph-renderer`: drawing the network, coordinates, viewer components.
   - `houdini-python-exporter`: the Houdini exporter, privacy rules, schema versioning.

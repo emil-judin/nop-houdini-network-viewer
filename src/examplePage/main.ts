@@ -5,9 +5,12 @@ import { createEmbedPanel } from './embedPanel';
  * Script of the example page (`example-site.html`). The page itself is plain HTML that shows networks
  * with the real `<houdini-network>` web component, like a visitor's own site would. This script adds:
  *
- * - The embedder at the top: one fixed example (`EMBED_PAGE_EXAMPLE`) with the embed options and
- *   code under it. The playground's Embed button opens the page; it never passes a network along.
+ * - The embed options and code under the example network at the top (`EMBED_PAGE_EXAMPLE`, already
+ *   in the HTML). The playground's Embed button opens the page; it never passes a network along.
  * - The code tabs under each network of the sample article (`data-embed-code`).
+ *
+ * Both go into `data-embed-slot` elements that the page CSS gives their height from the start, so
+ * the page does not jump when this script has loaded.
  */
 
 /** Height the page gives its viewers (`houdini-network` in the page CSS). */
@@ -32,22 +35,31 @@ async function exampleNodeNames(url: string): Promise<string[] | undefined> {
   }
 }
 
-/** Fills the embedder at the top of the page with the example, its options and its code. */
-async function showEmbedder() {
-  const section = document.getElementById('embedder');
-  const figure = section?.querySelector<HTMLElement>('[data-preview]');
-  const example = findExample(EMBED_PAGE_EXAMPLE) ?? AVAILABLE_EXAMPLES[0];
-  if (!section || !figure || !example) return;
+/** Puts a panel into the reserved slot after `anchor`, or right after `anchor` without one. */
+function placePanel(anchor: Element, panel: HTMLElement) {
+  const slot = anchor.nextElementSibling;
+  if (slot?.hasAttribute('data-embed-slot')) slot.replaceChildren(panel);
+  else anchor.after(panel);
+}
 
+/** Adds the embed options and code under the example network at the top of the page. */
+async function showEmbedder() {
+  const figure = document.querySelector<HTMLElement>('#embedder [data-preview]');
+  const example = findExample(EMBED_PAGE_EXAMPLE) ?? AVAILABLE_EXAMPLES[0];
+  if (!figure || !example) return;
+
+  // The page HTML already shows the example; this keeps it in step with `EMBED_PAGE_EXAMPLE`
   const fileUrl = `examples/${example.file.split('/').pop()}`;
-  const viewer = document.createElement('houdini-network');
-  viewer.className = 'preview';
-  viewer.setAttribute('src', fileUrl);
-  figure.append(viewer);
-  section.hidden = false;
+  let viewer = figure.querySelector<HTMLElement>('houdini-network');
+  if (!viewer) {
+    viewer = document.createElement('houdini-network');
+    viewer.className = 'preview';
+    figure.append(viewer);
+  }
+  if (viewer.getAttribute('src') !== fileUrl) viewer.setAttribute('src', fileUrl);
 
   const nodeNames = await exampleNodeNames(fileUrl);
-  figure.after(createEmbedPanel({ jsonUrl: exampleFileUrl(example), withOptions: true, preview: viewer, nodeNames }));
+  placePanel(figure, createEmbedPanel({ jsonUrl: exampleFileUrl(example), withOptions: true, preview: viewer, nodeNames }));
 }
 
 /** Adds the code tabs under each network of the sample article. */
@@ -55,7 +67,8 @@ function addArticlePanels() {
   for (const viewer of document.querySelectorAll<HTMLElement>('houdini-network[data-embed-code]')) {
     const src = viewer.getAttribute('src');
     if (!src) continue;
-    (viewer.closest('figure') ?? viewer).after(
+    placePanel(
+      viewer.closest('figure') ?? viewer,
       createEmbedPanel({
         jsonUrl: new URL(src, window.location.href).href,
         withOptions: false,

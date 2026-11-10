@@ -11,11 +11,12 @@ description: >-
    workflow are defined there.
 2. Every icon is an original drawing registered as an `OperatorIconDef` (`sop/` for built-in SOPs, `labs/` for
    SideFX Labs). Never copy SideFX or vendor SVG data, never trace their icons, never draw real people. Vendor
-   logos used by Labs integrations are redrawn by hand (owner decision).
+   logos used by Labs integrations are redrawn by hand (decision 0003 in `docs/decisions/`).
 3. SideFX reference icons stay in the gitignored `local-refs/` folder and are only served by the dev server
    (Icon Review Gallery). Never move them to `public/` or into a build.
 4. No `<image>`, `<style>`, `<filter>`, `<foreignObject>` or external `href`; gradient and clip ids use the `uid`
    prefix passed to `render`.
 5. Labs drawings load on demand (`loadLabsIcons`): keep them in the `labs/` folder and out of the SOP files.
-6. Check with `npm.cmd test` (`tests/unit/iconRegistry.test.ts`: lookups, completeness, forbidden elements) and in
+6. Check with `npm.cmd test` where the local test suite is present (`tests/unit/iconRegistry.test.ts`: lookups,
+   completeness, forbidden elements) and in
    the Icon Review Gallery (`npm.cmd run dev`, then open the playground with `?icons`).

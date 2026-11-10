@@ -96,7 +96,3 @@ Exports are meant to be as safe to share as a screenshot:
 - Paths inside `$HIP` and `$JOB` keep their folders (`$HIP/geo/a.bgeo`); Houdini folders become `$HOUDINI_USER_PREF_DIR`, `$HSITE` or `$HFS`.
 - Every other absolute path keeps only its file name: `D:/Clients/Acme/rock.exr`, `C:/Users/<you>/...`, `~/...`, `\\server\share\...` and `/mnt/...` become `<path>/rock.exr`. Houdini node paths (`/obj/geo1/OUT`) stay.
 - Network box comments are exported exactly as written. Sticky notes, node names, file names and asset type names are exported as written apart from paths. Check them before sharing.
-
-## Tests
-
-`npm run test:exporter` (from the repository root) runs `tests/test_nop_exporter.py` with a small fake `hou` module (`tests/fake_hou.py`), without Houdini.

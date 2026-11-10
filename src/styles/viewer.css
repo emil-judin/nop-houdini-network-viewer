@@ -62,6 +62,13 @@
   }
 }
 
+/* Until the start view is on screen (`useFirstFitDone`), only the canvas and grid show: the nodes
+   are measured unfitted for a frame before React Flow's fit reaches the screen. Opacity, because
+   React Flow sets `visibility: visible` on every measured node. */
+.nop-first-fit-pending .react-flow__viewport {
+  opacity: 0;
+}
+
 /* Two-finger touch mode (`useTwoFingerPan`): one finger scrolls the page past the viewer instead of
    React Flow's `touch-action: none`; the page is still never pinch-zoomed over the canvas */
 .nop-two-finger-pan .react-flow__pane {

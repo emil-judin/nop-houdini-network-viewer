@@ -18,7 +18,7 @@ nothing is traced. Earlier designs and the scripts that explored them are in the
    - ``nop-icon-transparent-white.svg``: white (#FFFFFF) square with the spiderweb cut out
    - ``nop-icon-transparent-dark.svg``: dark (#1E1E1E) square with the spiderweb cut out
    - ``safari-pinned-tab.svg``: black (#000000) square with the spiderweb cut out
-3. Writes raster PNGs, multi-size ``favicon.ico``, ``og-image.png`` (1200x630), and
+3. Writes raster PNGs, multi-size ``favicon.ico`` and
    ``site.webmanifest`` into ``design/nop-icon/pack/``.
 4. Writes the icon pack showcase page to ``design/nop-icon/web.html``.
 5. Copies the website icons into ``public/`` and writes the see-through icon as a 256px PNG for
@@ -393,18 +393,6 @@ def compose_rgba(
     return Image.fromarray(rgba, mode="RGBA")
 
 
-def build_og_image(rounded_icon_1024: Image.Image) -> Image.Image:
-    """Create a 1200x630 Open Graph social preview card with the rounded NOP icon centered."""
-    w, h = 1200, 630
-    card = Image.new("RGBA", (w, h), (30, 30, 30, 255))
-    icon_size = 360
-    icon = rounded_icon_1024.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-    x = (w - icon_size) // 2
-    y = (h - icon_size) // 2
-    card.alpha_composite(icon, (x, y))
-    return card.convert("RGB")
-
-
 def main() -> None:
     ICON_DIR.mkdir(parents=True, exist_ok=True)
     PACK_DIR.mkdir(parents=True, exist_ok=True)
@@ -476,6 +464,9 @@ def main() -> None:
     master_cutout_circle = compose_rgba(web_mask, bg_color=ORANGE, fg_color=None, shape="circle")
     master_cutout_white = compose_rgba(web_mask, bg_color=WHITE, fg_color=None, shape="square")
     master_cutout_dark = compose_rgba(web_mask, bg_color=DARK, fg_color=None, shape="square")
+    # Home screen icons cannot be see-through (iOS fills transparency with black, Android puts the icon on a
+    # white plate), so they draw the web in the dark page color: they look like the cutout icon on a dark page
+    master_dark_web = compose_rgba(web_mask, bg_color=ORANGE, fg_color=DARK, shape="square")
 
     png_specs: list[tuple[str, Image.Image, int, str]] = [
         ("favicon-16x16.png", master_cutout_square, 16, "16x16 browser tab favicon (orange square with transparent web cutout)"),
@@ -483,10 +474,10 @@ def main() -> None:
         ("favicon-48x48.png", master_cutout_square, 48, "48x48 desktop shortcut icon (orange square with transparent web cutout)"),
         ("nop-icon-64.png", master_square, 64, "64x64 UI / toolbar icon"),
         ("nop-icon-128.png", master_square, 128, "128x128 store / badge icon"),
-        ("apple-touch-icon.png", master_square, 180, "180x180 iOS / iPadOS home screen icon (solid orange + white web)"),
-        ("android-chrome-192x192.png", master_square, 192, "192x192 Android / PWA home screen icon (solid orange + white web)"),
+        ("apple-touch-icon.png", master_dark_web, 180, "180x180 iOS / iPadOS home screen icon (orange + dark web)"),
+        ("android-chrome-192x192.png", master_dark_web, 192, "192x192 Android / PWA home screen icon (orange + dark web, also maskable)"),
         ("nop-icon-256.png", master_square, 256, "256x256 desktop / documentation icon"),
-        ("android-chrome-512x512.png", master_square, 512, "512x512 Android / PWA splash & store icon (solid orange + white web)"),
+        ("android-chrome-512x512.png", master_dark_web, 512, "512x512 Android / PWA splash & store icon (orange + dark web, also maskable)"),
         ("nop-icon-512.png", master_square, 512, "512x512 standard square PNG (white web on orange)"),
         ("nop-icon-1024.png", master_square, 1024, "1024x1024 high-DPI master PNG (white web on orange)"),
         ("nop-icon-rounded-512.png", master_rounded, 512, "512x512 rounded square PNG (white web on orange)"),
@@ -514,9 +505,8 @@ def main() -> None:
     ico_48 = master_cutout_square.resize((48, 48), Image.Resampling.LANCZOS)
     ico_48.save(PACK_DIR / "favicon.ico", format="ICO", append_images=[ico_16, ico_32], sizes=[(16, 16), (32, 32), (48, 48)])
 
-    # Open Graph 1200x630 social preview image
-    og_img = build_og_image(master_rounded)
-    og_img.save(PACK_DIR / "og-image.png", format="PNG", optimize=True)
+    # The Open Graph card (pack/og-image.png and public/og-image.png, 1200x630) is a separate design with
+    # the NOP lockup over a real network, made like design/social-preview.png. It is not generated here.
 
     # Web App Manifest (with relative icon paths so subpath hosting works)
     manifest = {
@@ -525,6 +515,10 @@ def main() -> None:
         "icons": [
             {"src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png"},
             {"src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png"},
+            # The art fills the whole square and the hub sits inside the maskable safe zone (the middle 80%
+            # circle), so Android can crop the same files to its icon shape instead of using a white plate
+            {"src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+            {"src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
         ],
         "theme_color": ORANGE,
         "background_color": DARK,
@@ -543,7 +537,6 @@ def main() -> None:
             "apple-touch-icon.png",
             "android-chrome-192x192.png",
             "android-chrome-512x512.png",
-            "og-image.png",
             "site.webmanifest",
         ):
             shutil.copy2(PACK_DIR / pub_name, public_dir / pub_name)
@@ -612,7 +605,7 @@ def main() -> None:
 </body></html>
 """
     (ICON_DIR / "web.html").write_text(html, encoding="utf-8", newline="\n")
-    print(f"wrote {len(svg_variants)} SVGs, {len(png_specs)} PNGs, favicon.ico, og-image.png, and site.webmanifest to {PACK_DIR}")
+    print(f"wrote {len(svg_variants)} SVGs, {len(png_specs)} PNGs, favicon.ico and site.webmanifest to {PACK_DIR}")
 
 
 if __name__ == "__main__":

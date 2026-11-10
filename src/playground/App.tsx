@@ -327,12 +327,13 @@ export const App: React.FC = () => {
 
       {/* Status bar in the Houdini 22 style (`#2d2d2d`) */}
       <footer className="shrink-0 flex flex-wrap items-center justify-between gap-x-4 px-2 py-0.5 bg-[#2d2d2d] text-[12px] text-[#a8a8a8]">
-        {/* Phones: only the NOP icon, name and version (owner decision 2026-11-05) */}
+        {/* Phones: the NOP icon, name and version, and the SideFX disclaimer (owner decisions 2026-11-05) */}
         <span className="flex md:hidden items-center gap-1.5">
           <img src={LOGO_URL} alt="" width={14} height={14} className="w-3.5 h-3.5" />
           <span className="font-bold text-[#dddddd]">NOP</span>
           <span title="Version of this playground page">{__NOP_VERSION__}</span>
         </span>
+        <span className="md:hidden">Not affiliated with SideFX.</span>
         <span className="hidden md:flex items-center gap-1.5">
           {/* The pane's logo is out of sight while it is folded, so the status bar names the product */}
           {!panelOpen && (

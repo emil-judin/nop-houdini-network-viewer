@@ -1,10 +1,8 @@
-# Testing NOP (`0.1.0-alpha.3`)
+# Trying NOP: Tester Guide (`0.1.0-alpha.4`)
 
 Thank you for trying NOP. It shows Houdini node networks on a web page, so you can put an interactive network on your portfolio or in a tutorial instead of a screenshot. Visitors can pan, zoom, open subnetworks and read parameters and VEX, but cannot change anything.
 
 This is an early test version. Some things will be missing or broken, and that is exactly what I would like to hear about.
-
-**Tested the first version already?** The project is now called NOP (it was WOP), so the playground has a new address: use the link from this invitation. The exporter must be installed again (see step 2). New since then: a layout like Houdini's desktop with a Networks pane, six example networks that each show one part of the viewer, a fullscreen button, a screenshot button, better phone support, an example page with the embed code and a welcome card.
 
 ## 1. Open the playground
 
@@ -26,7 +24,7 @@ You need Houdini 22 (other versions are not tested yet).
 3. Copy `nop.json` and the `nop` folder from the zip into it.
 4. Restart Houdini. A **NOP** shelf tab appears at the top. If not: click the **+** next to the shelf tabs and choose **Shelves > NOP**.
 
-To remove it later, delete `nop.json` and the `nop` folder. Upgrading from the WOP exporter (before 2026-10-28): delete the old `wop.json` and the `wop` folder first, otherwise Houdini shows both shelves.
+To remove it later, delete `nop.json` and the `nop` folder.
 
 ## 3. Things to try
 
@@ -40,7 +38,7 @@ To remove it later, delete `nop.json` and the `nop` folder. Upgrading from the W
 ## 4. Known limits
 
 - Tested with Houdini 22.0.466 only.
-- Automated tests cover Chrome, Firefox and Safari's engine, plus phone and tablet profiles, but not real devices yet. Reports from real phones are welcome.
+- Checked in Chrome, Firefox and Safari's engine, plus phone and tablet profiles, but not on real devices yet. Reports from real phones are welcome.
 - Built for SOP networks. Other network types (VOP, LOP, TOP, DOP) are not supported yet and may look wrong.
 - The React and web component embeds need the npm package, which is not published yet. Use the iframe option for now.
 

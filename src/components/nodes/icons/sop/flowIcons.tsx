@@ -1,4 +1,70 @@
+import type { FC } from 'react';
 import type { OperatorIconDef } from '../iconTypes';
+
+/** Colors of a block brick: For-Each blocks are blue, Compile blocks orange. */
+interface BrickColors {
+  outline: string;
+  /** Body and the tab on top. */
+  body: string;
+  /** Shadowed right side. */
+  side: string;
+  /** Lit face (bottom of Block Begin, top of Block End). */
+  face: string;
+  /** Socket ring of Block Begin. */
+  socket: string;
+  socketRing: string;
+  /** Round stud of Block End. */
+  stud: string;
+}
+
+const FOR_EACH_BRICK: BrickColors = {
+  outline: '#182b49',
+  body: '#296ec2',
+  side: '#1f5aa3',
+  face: '#5da4f5',
+  socket: '#1f4f8a',
+  socketRing: '#a8d4ff',
+  stud: '#7ebcff',
+};
+
+/**
+ * The palette's three-tone orange with the core outline: Compile Block nodes are yellow in Houdini,
+ * where a yellow brick would disappear.
+ */
+const COMPILE_BRICK: BrickColors = {
+  outline: '#262626',
+  body: '#ee8624',
+  side: '#c25e12',
+  face: '#ffb066',
+  socket: '#c25e12',
+  socketRing: '#262626',
+  stud: '#ffb066',
+};
+
+/** Brick seen from below: body, lighter bottom face with a socket ring, small square tab on top. */
+const BlockBeginBrick: FC<{ colors: BrickColors; tab: string }> = ({ colors: c, tab }) => (
+  <>
+    {/* Top tab */}
+    <rect x="9" y="3" width="6" height="4.5" fill={tab} stroke={c.outline} strokeWidth="1.1" />
+    {/* Brick body */}
+    <polygon points="4.5,17 12,20.5 19.5,17 19.5,9.5 12,6 4.5,9.5" fill={c.body} stroke={c.outline} strokeWidth="1.2" strokeLinejoin="round" />
+    <polygon points="19.5,9.5 12,6 12,13.5 19.5,17" fill={c.side} />
+    <line x1="12" y1="6" x2="12" y2="13.5" stroke={c.outline} strokeWidth="1" />
+    {/* Bottom face with socket ring */}
+    <polygon points="4.5,17 12,13.5 19.5,17 12,20.5" fill={c.face} stroke={c.outline} strokeWidth="1.1" strokeLinejoin="round" />
+    <ellipse cx="12" cy="17" rx="3.8" ry="1.7" fill={c.socket} stroke={c.socketRing} strokeWidth="1.1" />
+  </>
+);
+
+/** Brick seen from above with a round stud on top (light top face, darker sides). */
+const BlockEndBrick: FC<{ colors: BrickColors }> = ({ colors: c }) => (
+  <>
+    <polygon points="4.5,10 12,6.5 19.5,10 19.5,17.5 12,21 4.5,17.5" fill={c.body} stroke={c.outline} strokeWidth="1.2" />
+    <polygon points="4.5,10 12,13.5 19.5,10 12,6.5" fill={c.face} />
+    <line x1="12" y1="13.5" x2="12" y2="21" stroke={c.outline} strokeWidth="1" />
+    <ellipse cx="12" cy="6.5" rx="3.8" ry="2" fill={c.stud} stroke={c.outline} strokeWidth="1.1" />
+  </>
+);
 
 /**
  * Built-in SOP icons for network flow, copying, transforming and containers.
@@ -33,19 +99,7 @@ export const SOP_FLOW_ICONS: OperatorIconDef[] = [
       'Blue brick seen from below: dark blue body, lighter bottom face with a socket ring, and a small square tab on top.',
     types: ['block_begin'],
     refKey: 'SOP_block_begin',
-    render: () => (
-      <>
-        {/* Top tab */}
-        <rect x="9" y="3" width="6" height="4.5" fill="#2e74c4" stroke="#182b49" strokeWidth="1.1" />
-        {/* Brick body */}
-        <polygon points="4.5,17 12,20.5 19.5,17 19.5,9.5 12,6 4.5,9.5" fill="#296ec2" stroke="#182b49" strokeWidth="1.2" strokeLinejoin="round" />
-        <polygon points="19.5,9.5 12,6 12,13.5 19.5,17" fill="#1f5aa3" />
-        <line x1="12" y1="6" x2="12" y2="13.5" stroke="#182b49" strokeWidth="1" />
-        {/* Bottom face with socket ring */}
-        <polygon points="4.5,17 12,13.5 19.5,17 12,20.5" fill="#5da4f5" stroke="#182b49" strokeWidth="1.1" strokeLinejoin="round" />
-        <ellipse cx="12" cy="17" rx="3.8" ry="1.7" fill="#1f4f8a" stroke="#a8d4ff" strokeWidth="1.1" />
-      </>
-    ),
+    render: () => <BlockBeginBrick colors={FOR_EACH_BRICK} tab="#2e74c4" />,
   },
   {
     id: 'sop.block_end',
@@ -55,14 +109,26 @@ export const SOP_FLOW_ICONS: OperatorIconDef[] = [
       'Blue toy brick seen from above with a round stud on top (light top face, darker sides).',
     types: ['block_end'],
     refKey: 'SOP_block_end',
-    render: () => (
-      <>
-        <polygon points="4.5,10 12,6.5 19.5,10 19.5,17.5 12,21 4.5,17.5" fill="#296ec2" stroke="#182b49" strokeWidth="1.2" />
-        <polygon points="4.5,10 12,13.5 19.5,10 12,6.5" fill="#5da4f5" />
-        <line x1="12" y1="13.5" x2="12" y2="21" stroke="#182b49" strokeWidth="1" />
-        <ellipse cx="12" cy="6.5" rx="3.8" ry="2" fill="#7ebcff" stroke="#182b49" strokeWidth="1.1" />
-      </>
-    ),
+    render: () => <BlockEndBrick colors={FOR_EACH_BRICK} />,
+  },
+  {
+    id: 'sop.compile_begin',
+    label: 'Compile Block Begin',
+    family: 'sop',
+    description:
+      'The Block Begin brick in orange: brick seen from below with a lighter bottom face, a socket ring and a small square tab on top.',
+    types: ['compile_begin'],
+    refKey: 'SOP_compile_begin',
+    render: () => <BlockBeginBrick colors={COMPILE_BRICK} tab={COMPILE_BRICK.body} />,
+  },
+  {
+    id: 'sop.compile_end',
+    label: 'Compile Block End',
+    family: 'sop',
+    description: 'The Block End brick in orange: brick seen from above with a round stud on top (light top face, darker sides).',
+    types: ['compile_end'],
+    refKey: 'SOP_compile_end',
+    render: () => <BlockEndBrick colors={COMPILE_BRICK} />,
   },
   {
     id: 'sop.copytopoints',

@@ -26,6 +26,7 @@ import { HoudiniWire } from './edges/HoudiniWire';
 import { useFullscreen } from './hooks/useFullscreen';
 import { useLabsIcons } from './hooks/useLabsIcons';
 import { isPathPrefix, useNavigationHistory, type BeforeNavigate } from './hooks/useNavigationHistory';
+import { useFirstFitDone } from './hooks/useFirstFitDone';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { useViewerHotkeys, type HotkeyMode } from './hooks/useViewerHotkeys';
 import { useTwoFingerPan, type TouchPanMode } from './hooks/useTwoFingerPan';
@@ -400,6 +401,9 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
 
   // The start view frames `focusNode` when it names a node of the top level, else fits everything
   const startFocus = focusNodeName && normalizedDoc.root.nodes.some((n) => n.name === focusNodeName) ? focusNodeName : null;
+  const fitsOnStart = fitView || startFocus !== null;
+  // The network stays hidden (canvas and grid show) until the start view is on screen
+  const firstFitDone = useFirstFitDone(fitsOnStart);
   const startFitOptions = useMemo(
     () =>
       startFocus
@@ -712,8 +716,9 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
                 zoomOnDoubleClick={false}
                 minZoom={0.08}
                 maxZoom={3.5}
-                fitView={fitView || startFocus !== null}
+                fitView={fitsOnStart}
                 fitViewOptions={startFitOptions}
+                className={firstFitDone ? undefined : 'nop-first-fit-pending'}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background variant={BackgroundVariant.Lines} gap={50} size={1} color={GRID_LINE_COLOR} />
