@@ -1,43 +1,29 @@
+<a href="https://emil-judin.github.io/nop-houdini-network-viewer/"><img src="docs/assets/nop-banner.jpg" alt="NOP: Houdini network viewer for the web" width="100%"></a>
+
 # NOP
 
 **View and share Houdini node networks on the web.**
 
+**[Open the live playground](https://emil-judin.github.io/nop-houdini-network-viewer/)** | [See it embedded on a web page](https://emil-judin.github.io/nop-houdini-network-viewer/example-site.html) | [Changelog](./CHANGELOG.md)
+
 NOP (Net OPerator) is an interactive, strictly view-only viewer for **SideFX Houdini** node networks on portfolio websites, technical blogs, and documentation, inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
+
+<img src="docs/assets/nop-demo.gif" alt="A Houdini network embedded in an example portfolio website, shown in Chrome: clicking a node shows its parameters, double-clicking a subnetwork dives inside, a wrangle shows its VEX code, and the path bar leads back up." width="100%">
 
 ---
 
 ## What It Does
 
-One click in Houdini exports a network; one tag shows it on your site, looking like Houdini's Network Editor. Visitors can pan, zoom, dive into subnetworks and read parameters and VEX code, on desktop and on phones, but never edit anything. The six design pillars behind this are defined in [`AGENTS.md`](./AGENTS.md).
+One click in Houdini exports a network; one tag shows it on your site, looking like Houdini's Network Editor. Visitors can pan, zoom, dive into subnetworks and read parameters and VEX code, on desktop and on phones, but never edit anything.
 
----
+Six principles guide every change:
 
-## Quick Start (Development)
-
-Needs Node.js 20 or newer (CI uses Node 22, see `.nvmrc`) and Python 3.9+ for the exporter tests.
-
-```bash
-# Install dependencies
-npm install
-
-# Start the interactive development playground
-npm run dev
-
-# Checks: strict TypeScript, lint, unit and component tests, exporter tests
-npm run check
-npm run lint
-npm test
-npm run test:exporter
-
-# Browser tests in Chromium, Firefox, WebKit and phone profiles (first run: npx playwright install)
-npm run test:e2e
-
-# Build the playground with the exporter download (dist-playground/) and the npm package + web component (dist/)
-npm run build
-npm run build:lib
-```
-
-On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked. [`CONTRIBUTING.md`](./CONTRIBUTING.md) has the rules for changes, [`docs/TESTING.md`](./docs/TESTING.md) the test strategy.
+1. **Frictionless:** a one-click export in Houdini and a one-line embed on the web.
+2. **Authentic:** node shapes, flags, wires and colors match Houdini's Network Editor, checked against Houdini 22 screenshots.
+3. **View-only:** visitors explore the network; they cannot change it.
+4. **Small, typed modules:** strict TypeScript, React and React Flow, one job per file.
+5. **Documented:** public APIs carry TSDoc; lasting decisions are recorded in [`docs/decisions/`](./docs/decisions/README.md).
+6. **Works everywhere:** current desktop and mobile browsers, touch-friendly, no experimental web features.
 
 ---
 
@@ -153,8 +139,43 @@ Keyboard: `Tab` reaches every node (top to bottom), `Enter` opens its parameters
 
 **Alpha.** The JSON schema and the component API can still change between `0.x` releases (see [`CHANGELOG.md`](./CHANGELOG.md)).
 
-- **Houdini:** the exporter is tested with Houdini 22.0.466. Houdini 20.5 and 21 are not tested yet.
-- **Browsers:** automated tests run in Chromium, Firefox and WebKit, plus Pixel 7, iPhone 14 and iPad device profiles. Safari and Chrome on real phones are targeted but not tested on real devices yet.
+- **Houdini:** the exporter is checked with Houdini 22.0.466. Houdini 20.5 and 21 are not checked yet.
+- **Browsers:** checked in Chromium, Firefox and WebKit, plus Pixel 7, iPhone 14 and iPad device profiles. Safari and Chrome on real phones are targeted but not checked on real devices yet.
+
+---
+
+## Development
+
+Needs Node.js 20 or newer (CI uses Node 22, see `.nvmrc`).
+
+```bash
+npm install          # install dependencies
+npm run dev          # interactive playground on http://localhost:5173
+npm run check        # strict TypeScript
+npm run lint         # ESLint (TypeScript, React hooks, accessibility)
+npm run build        # playground with the exporter download (dist-playground/)
+npm run build:lib    # npm package and web component (dist/)
+```
+
+On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution is blocked.
+
+| Read next | |
+| :--- | :--- |
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | Data flow, coordinate conversion, packaging, style isolation |
+| [`docs/SCHEMA.md`](./docs/SCHEMA.md) | The JSON format the exporter writes and the viewer reads |
+| [`docs/decisions/`](./docs/decisions/README.md) | Architecture decision records |
+| [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Current state and what comes next |
+| [`CONTRIBUTING.md`](./CONTRIBUTING.md) | Rules for changes |
+
+---
+
+## How It's Built
+
+NOP is built with AI-assisted development, openly. AI coding agents write much of the code; I (Emil Judin) do the work that needs a Houdini artist and a product owner: deciding what NOP should and should not be, making every design and Houdini fidelity call against Houdini 22 screenshots, building and exporting the example networks in Houdini, trying it with real exports and on a phone, and reviewing the changes before they land.
+
+The agents follow written rules that are part of the repository, the same ones a human contributor follows: [`AGENTS.md`](./AGENTS.md) (commands, invariants, security and privacy rules, definition of done), task-specific instructions in [`.agents/skills/`](./.agents/skills/), and the reasons behind the rules in [`docs/decisions/`](./docs/decisions/README.md).
+
+**Contributing with an AI assistant is welcome.** Most coding agents read `AGENTS.md` on their own. Review what your assistant produces as you would your own code: the same checks and the same privacy and "no SideFX assets" rules apply.
 
 ---
 
