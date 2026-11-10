@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
- * Local-only SideFX reference icons (built by `scripts/build_local_reference_icons.py`, gitignored).
+ * Local-only SideFX reference icons (built by a local script that is not in the repository, gitignored).
  */
 const LOCAL_REFERENCE_ICONS = fileURLToPath(new URL('./local-refs/houdini_ref_icons.json', import.meta.url));
 

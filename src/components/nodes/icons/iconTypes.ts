@@ -40,7 +40,7 @@ export interface OperatorIconDef {
   icons?: string[];
   /** Optional custom matcher for operator families that cannot be listed exhaustively. */
   matches?: (query: OperatorIconQuery) => boolean;
-  /** Key of the local-only Houdini reference image (see `scripts/build_local_reference_icons.py`). */
+  /** Key of the local-only Houdini reference image (built by a local-only script). */
   refKey?: string;
   /** Rendered icon size in pixels inside the node body. Defaults to `21`. */
   sizePx?: number;
