@@ -11,6 +11,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ### Changed
 - The phone status bar shows "Not affiliated with SideFX." again.
+- New link preview image for the playground: the NOP lockup next to a real network.
+- Home screen icons (iOS, Android) draw the web in dark lines on orange, like the see-through icon on a dark page, and Android shows the full icon in its own shape instead of a small square on a white plate.
 - Shorter welcome card text in the playground.
 
 ## 0.1.0-alpha.3 (2026-11-05, tester release)
