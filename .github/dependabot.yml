@@ -6,8 +6,20 @@ updates:
     schedule:
       interval: weekly
     groups:
+      # Minor and patch updates of the dev tools in one pull request; major upgrades come one by one
       dev-tools:
         dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # React 19 is a planned step of its own (docs/ROADMAP.md, "Before the public release")
+      - dependency-name: react
+        update-types: [version-update:semver-major]
+      - dependency-name: react-dom
+        update-types: [version-update:semver-major]
+      - dependency-name: "@types/react"
+        update-types: [version-update:semver-major]
+      - dependency-name: "@types/react-dom"
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
