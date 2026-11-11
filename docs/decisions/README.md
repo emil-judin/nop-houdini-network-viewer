@@ -1,9 +1,9 @@
-# Architecture Decision Records
+# Architecture decision records
 
-Short records of decisions that shape NOP and would be expensive to reverse. Each record says what was decided, why, and what follows from it. Smaller choices live in the code, the [CHANGELOG](../../CHANGELOG.md) and the git history.
+Short records of decisions that shape NOP and would be expensive to reverse. Each record states what was decided, why, and what follows from it. Smaller choices live in the code, the [CHANGELOG](../../CHANGELOG.md) and the git history.
 
 | # | Decision | Status |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | [0001](./0001-view-only-viewer.md) | The viewer is strictly view-only | Accepted |
 | [0002](./0002-houdini-fidelity-from-references.md) | Match Houdini's Network Editor, measured from screenshots | Accepted |
 | [0003](./0003-original-icons-no-sidefx-assets.md) | Original operator icons, no SideFX assets | Accepted |
@@ -15,6 +15,9 @@ Short records of decisions that shape NOP and would be expensive to reverse. Eac
 | [0009](./0009-touch-and-fullscreen.md) | Touch: two fingers move the network, fullscreen replaces Fit | Accepted |
 | [0010](./0010-one-repository-public-api.md) | One repository, the playground uses only the public API | Accepted |
 
-## Writing a record
+## Add a record
 
-Copy the shape of an existing record: **Context** (the problem and the forces), **Decision** (what we do), **Consequences** (what gets easier, what gets harder, what stays open). Number records in order and never reuse a number. When a decision changes, add a new record and mark the old one "Superseded by NNNN".
+1. Copy the shape of an existing record: **Context** (the problem and the forces), **Decision** (what we do), **Consequences** (what gets easier, what gets harder, what stays open).
+2. Number it after the last record. Never reuse a number.
+3. Add it to the table above.
+4. When a decision changes, add a new record and mark the old one "Superseded by NNNN".

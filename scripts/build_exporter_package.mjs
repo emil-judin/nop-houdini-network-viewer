@@ -1,9 +1,7 @@
 /**
- * Builds the downloadable NOP exporter for the playground (`public/downloads/`, gitignored):
- *
- * - `nop-exporter.zip`: the Houdini package. Unzipped into the Houdini `packages` folder, it gives
- *   `packages/nop.json` and `packages/nop/` (shelf, icon, `scripts/python/nop_exporter.py`).
- * - `nop_exporter.py`: the plain script, for the manual shelf tool setup in `exporter/README.md`.
+ * Builds the downloadable NOP exporter for the playground, `public/downloads/nop-exporter.zip`
+ * (gitignored): the Houdini package. Unzipped into the Houdini `packages` folder, it gives
+ * `packages/nop.json` and `packages/nop/` (shelf, icon, `scripts/python/nop_exporter.py`).
  *
  * Runs before `npm.cmd run dev` and `npm.cmd run build`. Plain Node, no dependencies: the zip is
  * written by hand (deflate from `node:zlib`).
@@ -121,5 +119,4 @@ entries.push(['nop/scripts/python/nop_exporter.py', exporterScript]);
 
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(join(OUT_DIR, 'nop-exporter.zip'), buildZip(entries, buildTime()));
-writeFileSync(join(OUT_DIR, 'nop_exporter.py'), exporterScript);
 console.log(`NOP exporter ${version}: ${entries.length} files -> public/downloads/nop-exporter.zip`);

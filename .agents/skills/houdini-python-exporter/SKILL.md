@@ -21,8 +21,8 @@ The code is the source of truth: read the function named in each rule before cha
 - Both build the document with `build_document(parent, export_mode, include_locked_assets)`, which returns
   `(document, selected_only, state)`. `ExportState` carries the settings, the icon extractor, the warning count
   and the locked assets that stayed closed. Keep both entry points going through `build_document`.
-- The module must never run an export on import: the guard at the bottom only runs for shelf tools
-  (`kwargs` in globals) or `__main__`.
+- The module must never run an export on import. The package's shelf tools import it and call
+  `run_interactive_export` or `copy_selection_for_web`; there is no manual setup that pastes the file into a tool.
 
 ## 2. HOM safety rules (Houdini 20 to 22+)
 

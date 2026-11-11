@@ -1,98 +1,73 @@
-# NOP Shelf Exporter for Houdini
+# NOP exporter for Houdini
 
-This folder contains the Python exporter (`nop_exporter.py`) that exports your Houdini node networks into a self-contained JSON format for `nop-houdini-network-viewer`, and the Houdini package (`package/`) that installs it as a ready-made **NOP** shelf.
+A Houdini shelf that exports node networks as JSON files for the NOP viewer. This folder holds the exporter (`nop_exporter.py`) and the Houdini package that installs it (`package/`).
 
-Tested with Houdini 22.0.466; Houdini 20.5 and 21 are not tested yet.
+Supported Houdini versions: see [Compatibility](../README.md#compatibility).
 
-## Install as a Houdini Package (recommended)
+## Install
 
-Download `nop-exporter.zip` from the playground (**Exporter** button). It is built from this folder by `npm run build:exporter` (`scripts/build_exporter_package.mjs`) and contains:
-
-```text
-nop.json                            # package file: sets $NOP_EXPORTER_ROOT and adds the nop folder to HOUDINI_PATH
-nop/
-├── scripts/python/nop_exporter.py  # the exporter (importable as `nop_exporter`)
-├── toolbar/nop.shelf               # NOP shelf: "Export for NOP" and "Copy for NOP"
-├── icons/nop.png                   # shelf icon (see-through NOP icon)
-└── README.txt                      # install steps
-```
-
-1. Open the `packages` folder in your Houdini preferences (create it if it does not exist):
+1. In the [playground](https://emil-judin.github.io/nop-houdini-network-viewer/), click **Get the exporter** at the bottom of the Networks pane to download `nop-exporter.zip`. Every [release](https://github.com/emil-judin/nop-houdini-network-viewer/releases) also has the zip attached, including older versions.
+2. Open the `packages` folder in your Houdini preferences. Create it if it does not exist.
    - Windows: `Documents\houdini22.0\packages`
    - macOS: `~/Library/Preferences/houdini/22.0/packages`
    - Linux: `~/houdini22.0/packages`
-2. Copy `nop.json` and the `nop` folder from the zip into it.
-3. Restart Houdini. The **NOP** shelf tab appears at the top. If it does not, click the **+** next to the shelf tabs and choose **Shelves > NOP**.
+3. Copy `nop.json` and the `nop` folder from the zip into it.
+4. Restart Houdini. The **NOP** shelf tab appears at the top. If it does not, click the **+** next to the shelf tabs and choose **Shelves > NOP**.
 
-Studios can also put both into any folder listed in `HOUDINI_PACKAGE_DIR`: `nop.json` finds the `nop` folder next to itself (`$HOUDINI_PACKAGE_PATH`).
+- **Update:** replace the `nop` folder and restart Houdini.
+- **Uninstall:** delete `nop.json` and the `nop` folder.
 
-Update by replacing the `nop` folder; uninstall by deleting `nop.json` and the `nop` folder. The hotkey for **Copy for NOP** is still set by hand (see below). Upgrading from the WOP exporter (before 2026-10-28): delete the old `wop.json` and the `wop` folder first, otherwise Houdini shows both shelves.
+## Export a network
 
-## Manual Setup (Shelf Tool)
+1. Open a SOP network in the Network Editor. Select the nodes to export, or nothing to export the whole network.
+2. Click **Export for NOP** on the NOP shelf and choose an action. All three export the same nodes, wires, boxes and notes. They differ in where the JSON goes and which parameters it keeps:
 
-1. Open **SideFX Houdini**.
-2. Click the **`+`** icon on any Shelf at the top of your workspace and select **New Tool...**.
-3. Under the **Options** tab:
-   - **Name:** `nop_export`
-   - **Label:** `Export for NOP`
-4. Under the **Script** tab:
-   - Paste the contents of [`nop_exporter.py`](./nop_exporter.py).
-5. Click **Accept**.
+   | Action | Output | Parameters | Use it for |
+   | :--- | :--- | :--- | :--- |
+   | **Copy to Clipboard (Compact Parms)** | Clipboard | Changed values, VEX and Python code | A quick look: paste into the playground with `Ctrl+V` |
+   | **Save .json File (Compact Parms)** | `.json` file | Changed values, VEX and Python code | Publishing on your page: a small file that shows what you changed |
+   | **Save .json File (Full Parms)** | `.json` file, larger | Every visible parameter, changes in bold | Showing complete parameter panes, like Houdini's Parameter Pane |
 
-**Alternative (module install):** copy `nop_exporter.py` into a folder on your Houdini Python path (for example `$HOUDINI_USER_PREF_DIR/scripts/python`, not created automatically) and use this two-line shelf script instead:
+3. If the network uses locked assets that are not from SideFX (bought, studio or colleagues' assets), a second dialog lists them. **Export Closed** exports them as closed nodes, with their parameters and icon but without their insides. Choose **Include Insides** only for assets you made yourself.
 
-```python
-import nop_exporter
-nop_exporter.run_interactive_export(kwargs.get("pane"))
-```
+The status bar says when locked assets stayed closed or parameters could not be read.
 
-## How to Use
+## Copy hotkey
 
-1. Open any SOP network in Houdini's Network Editor:
-   - Leave **nothing selected** to export the entire current network.
-   - Or **select specific nodes** to export only that selection.
-2. Click the **Export for NOP** shelf button.
-3. Choose your preferred action in the dialog:
-   - **Copy to Clipboard (Compact Parms):** Immediately copies the JSON to your system clipboard so you can press `Ctrl+V` in the web playground (just like Klee).
-   - **Save .json File (Compact Parms):** Saves a lightweight `.json` file containing modified parameters and VEX/Python snippets, ready to drop into your portfolio repository.
-   - **Save .json File (Full Parms):** Saves a `.json` file containing all visible parameters on every node.
-4. If the network uses locked assets that are not from SideFX (bought, studio or colleagues' assets), a second dialog lists them. **Export Closed** (the default) exports them as closed nodes, with their parameters and icon but without their insides. Choose **Include Insides** only for assets you made yourself.
+**Copy for NOP** copies the selected nodes of the Network Editor under the mouse (or the whole network when nothing is selected) as compact JSON, without a dialog. To bind it to a key:
 
-The status bar says when locked assets stayed closed or when parameters could not be read.
+1. Hold **Ctrl+Alt+Shift** and click **Copy for NOP** on the shelf, or open **Edit > Hotkeys** and search for `Copy for NOP`.
+2. Add a key, for example **Ctrl+Shift+Alt+C**. If Houdini reports that the key is used, pick another.
+3. Select nodes, press the key with the mouse over the Network Editor, and paste into the playground with `Ctrl+V`.
 
+The hotkey always uses compact parameters and never includes the insides of locked third-party assets. Use **Export for NOP** for files, full parameters, or the insides of your own locked assets.
 
-## Copy for Web Hotkey (for example Ctrl+Shift+Alt+C)
+## What gets exported
 
-For a copy-and-paste workflow without any dialog, bind `copy_selection_for_web()` to a hotkey. It copies the selected nodes of the Network Editor under the mouse (or the whole network when nothing is selected there) as compact JSON, then shows a status bar message. Paste it into the playground with `Ctrl+V`.
-
-With the package installed, the **Copy for NOP** tool already exists: skip to step 2. With the manual setup, this needs the **module install** above (the exporter file on your Houdini Python path).
-
-1. Create a second shelf tool (**New Tool...**):
-   - **Name:** `nop_copy`
-   - **Label:** `Copy for NOP`
-   - **Script:**
-
-     ```python
-     import nop_exporter
-     nop_exporter.copy_selection_for_web(kwargs.get("pane"))
-     ```
-
-2. Assign the hotkey: hold **Ctrl+Alt+Shift** and click the new shelf button (or open **Edit > Hotkeys**, search for `Copy for NOP`), then add a key, for example **Ctrl+Shift+Alt+C**. If Houdini reports that the key is already used, pick another free combination.
-3. Select nodes in the Network Editor, press the hotkey with the mouse over the editor, and paste in the browser.
-
-The hotkey always uses the compact parameter mode (changed parameters plus VEX / Python code) and never includes the insides of locked third-party assets. Use the dialog shelf tool when you need a `.json` file, all parameters, or the insides of your own locked assets.
-
-## What Gets Exported
-
-- Nodes, wires, dots, network boxes, sticky notes and subnetwork inputs with their exact positions, colors and flags.
-- Parameters: changed values (compact) or all visible values (full), with channel expressions, menu labels, folder (tab) names and keyframe markers for the web Parameter Inspector.
-- Children of subnets and unlocked HDAs, so visitors can dive into them. Built-in SideFX and Labs nodes are never expanded. Locked HDAs from anyone else stay closed unless you choose **Include Insides**.
-- Custom SVG icons of HDAs outside the Houdini install and SideFX Labs, with editor metadata removed. Built-in SideFX icons are referenced by name and drawn by the web viewer, never copied.
+- Nodes, wires, dots, network boxes, sticky notes and subnetwork inputs, with their positions, colors and flags.
+- Parameters: changed values (compact) or all visible values (full), with channel expressions, menu labels, folder (tab) names and keyframe markers.
+- The insides of subnetworks and unlocked digital assets, so visitors can dive into them. Built-in SideFX and SideFX Labs nodes are never expanded. Locked assets from anyone else stay closed unless you choose **Include Insides**.
+- Custom SVG icons of assets outside the Houdini install and SideFX Labs, without editor metadata. Built-in SideFX icons are referenced by name and drawn by the viewer, never copied.
 
 ## Privacy
 
-Exports are meant to be as safe to share as a screenshot:
+Exports are meant to be as safe to share as a screenshot.
 
-- Paths inside `$HIP` and `$JOB` keep their folders (`$HIP/geo/a.bgeo`); Houdini folders become `$HOUDINI_USER_PREF_DIR`, `$HSITE` or `$HFS`.
+- Paths inside `$HIP` and `$JOB` keep their folders (`$HIP/geo/a.bgeo`). Houdini folders become `$HOUDINI_USER_PREF_DIR`, `$HSITE` or `$HFS`.
 - Every other absolute path keeps only its file name: `D:/Clients/Acme/rock.exr`, `C:/Users/<you>/...`, `~/...`, `\\server\share\...` and `/mnt/...` become `<path>/rock.exr`. Houdini node paths (`/obj/geo1/OUT`) stay.
 - Network box comments are exported exactly as written. Sticky notes, node names, file names and asset type names are exported as written apart from paths. Check them before sharing.
+
+The exact rules are rule 7 in [`docs/SCHEMA.md`](../docs/SCHEMA.md); the reasons are in [decision 0004](../docs/decisions/0004-exports-safe-as-a-screenshot.md).
+
+## Package contents
+
+`npm run build:exporter` (`scripts/build_exporter_package.mjs`) builds `nop-exporter.zip` from this folder:
+
+```text
+nop.json                            # package file: sets $NOP_EXPORTER_ROOT, adds the nop folder to HOUDINI_PATH
+nop/
+├── scripts/python/nop_exporter.py  # the exporter (importable as `nop_exporter`)
+├── toolbar/nop.shelf               # NOP shelf: "Export for NOP" and "Copy for NOP"
+├── icons/nop.png                   # shelf icon
+└── README.txt                      # install steps, with the package version filled in
+```

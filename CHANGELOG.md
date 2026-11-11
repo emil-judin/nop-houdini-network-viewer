@@ -4,6 +4,12 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- Every GitHub release has the exporter (`nop-exporter.zip`) attached, from 0.1.0-alpha.3 on.
+
+### Removed
+- The plain `nop_exporter.py` download and the manual shelf tool setup. Install the exporter as a Houdini package from `nop-exporter.zip`.
+
 ## 0.1.0-alpha.4 (2026-11-10, tester release)
 
 ### Fixed

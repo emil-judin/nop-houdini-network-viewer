@@ -13,10 +13,14 @@ description: >-
    Houdini package and the feedback form read it from there.
 3. Schema: if the export format changed, `SCHEMA_VERSION` in `exporter/nop_exporter.py` was bumped, and
    `docs/SCHEMA.md`, `src/schema/types.ts` and `schema/nop-network-1.schema.json` describe the new fields.
-4. `CHANGELOG.md`: move "Unreleased" under the new version with the date.
-5. Docs: README install snippets name the new version; `docs/TESTERS.md` title and privacy text are current.
+4. `CHANGELOG.md`: move "Unreleased" under `## <version> (<date>, ...)`. This section becomes the release notes.
+5. Docs: README install snippets name the new version.
 6. npm releases only (Milestone 4): set `PUBLISHED_ON_NPM = true` in `src/examplePage/embedPanel.ts` and drop
    the "not on npm yet" notes from the README and `example-site.html`; build with `npm.cmd run build:lib`, then `npm.cmd run sri` and
    publish the `web-component.js` hash in the README and CHANGELOG.
-7. Tag the commit `v<version>` only when the owner says so. Publishing (`npm publish`, GitHub release) is the
+7. Release: commit steps 2 to 6 on main, then push the tag `v<version>`, only when the owner says so. The
+   workflow `.github/workflows/release.yml` publishes the GitHub release: notes from the CHANGELOG section,
+   `nop-exporter.zip` attached, pre-release for versions with a suffix. It stops if the tag does not match the
+   `package.json` version or the CHANGELOG has no section for it; then fix main, delete the tag
+   (`git push --delete origin v<version>`, `git tag -d v<version>`) and tag again. `npm publish` stays the
    owner's step.

@@ -999,9 +999,3 @@ def run_interactive_export(pane=None):
                 f"Saved {len(root_net['nodes'])} nodes to {expanded_path}" + (" " + notes if notes else ""),
                 severity=severity,
             )
-
-
-# Run only when executed as a shelf tool (Houdini passes a `kwargs` dict to shelf scripts) or as a
-# script, never when imported as a module (`import nop_exporter`).
-if __name__ == "__main__" or "kwargs" in globals():
-    run_interactive_export(globals().get("kwargs", {}).get("pane"))

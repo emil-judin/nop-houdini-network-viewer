@@ -1,0 +1,58 @@
+# Publishes a GitHub release when a version tag (v0.1.0-alpha.5) is pushed: release notes from the version's
+# CHANGELOG section, and the Houdini exporter (nop-exporter.zip) built from the tagged commit.
+# Versions with a suffix (-alpha.n) become pre-releases.
+# Actions are pinned to full commit SHAs (Dependabot keeps them current, see .github/dependabot.yml).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+
+      # The zip, its README and the feedback form read the version from package.json
+      - name: Check the tag against package.json
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "v$version" != "$TAG" ]; then
+            echo "::error::Tag $TAG does not match package.json version $version. Bump the version, then tag again."
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Write the release notes from CHANGELOG.md
+        run: |
+          section="$(awk -v v="$VERSION" 'f && /^## /{exit} f{print} index($0, "## " v " ")==1 || $0=="## " v {f=1}' CHANGELOG.md)"
+          if [ -z "$(printf '%s' "$section" | tr -d '[:space:]')" ]; then
+            echo "::error::CHANGELOG.md has no section '## $VERSION'. Move the Unreleased entries under it, then tag again."
+            exit 1
+          fi
+          {
+            echo "Try it in the [hosted playground](https://emil-judin.github.io/nop-houdini-network-viewer/). The Houdini exporter is attached below."
+            printf '%s\n\n' "$section"
+            echo "See the [changelog](https://github.com/emil-judin/nop-houdini-network-viewer/blob/main/CHANGELOG.md) for earlier versions."
+          } > "$RUNNER_TEMP/notes.md"
+
+      # Plain Node, no dependencies to install
+      - run: npm run build:exporter
+
+      - name: Publish the release
+        run: |
+          prerelease=""
+          case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$TAG" public/downloads/nop-exporter.zip \
+            --repo "$GITHUB_REPOSITORY" --verify-tag $prerelease \
+            --title "NOP $VERSION" --notes-file "$RUNNER_TEMP/notes.md"
