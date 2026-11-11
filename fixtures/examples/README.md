@@ -1,24 +1,32 @@
-# Playground Examples
+# Playground examples
 
-Six small networks built in Houdini 22 for the playground, each showing one part of the viewer to a new visitor. Their scene is `nop_examples.hip`, with the two example assets in `otls/`. They are listed in `src/playground/examples.ts`, and the build publishes every `*-network.json` here at `examples/<file name>` next to the playground, so the embed code for an example works as it is.
+The six example networks of the playground, exported from `nop_examples.hip` in Houdini 22. The two example assets are in `otls/`. This file is for re-exporting or changing them.
 
-## Overview
+Where they are used:
 
-Six files, ordered from "first contact" to "power user". Each one teaches one idea, so a visitor can click through them in order.
+- `src/playground/examples.ts` lists them. Its keys appear in links such as `?example=start`.
+- The build publishes every `*-network.json` at `examples/<file name>` next to the playground, so the embed code of an example works as it is.
+- `example-site.html` uses some node names.
 
-| # | File | Object | What it teaches | Export |
-|---|------|--------|-----------------|--------|
-| 1 | `start_here-network.json` | `/obj/start_here` | Moving around, clicking nodes, diving into a subnetwork | Save .json File (Compact Parms) |
-| 2 | `vex_wrangles-network.json` | `/obj/vex_wrangles` | Reading VEX and Python code | Save .json File (Compact Parms) |
-| 3 | `for_each-network.json` | `/obj/for_each` | Loop and compile blocks, dotted Copy to Points wire | Save .json File (Compact Parms) |
-| 4 | `parameters-network.json` | `/obj/parameters` | Every kind of parameter widget, expressions, keyframes | Save .json File (**Full** Parms) |
-| 5 | `node_looks-network.json` | `/obj/node_looks` | Flags, node colors and shapes, boxes, notes, dots, multi-input nodes | Save .json File (Compact Parms) |
-| 6 | `assets-network.json` | `/obj/assets` | Nested subnetworks, subnet inputs, your own assets (unlocked and locked) | Save .json File (Compact Parms), then **Export Closed** |
+## Files
 
-Feature coverage, so nothing is shown twice and nothing is missing:
+Ordered from first contact to power user. Each file teaches one idea.
+
+| # | File | Object | What it teaches | Export mode |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `start_here-network.json` | `/obj/start_here` | Moving around, clicking nodes, diving into a subnetwork | Compact Parms |
+| 2 | `vex_wrangles-network.json` | `/obj/vex_wrangles` | Reading VEX and Python code | Compact Parms |
+| 3 | `for_each-network.json` | `/obj/for_each` | Loop and compile blocks | Compact Parms |
+| 4 | `parameters-network.json` | `/obj/parameters` | Every kind of parameter widget, expressions, keyframes | **Full** Parms |
+| 5 | `node_looks-network.json` | `/obj/node_looks` | Node colors and shapes, boxes, notes, dots, multi-input nodes | Compact Parms |
+| 6 | `assets-network.json` | `/obj/assets` | Nested subnetworks, subnet inputs, your own assets (unlocked and locked) | Compact Parms, then **Export Closed** |
+
+## Feature coverage
+
+Each feature is shown in the examples marked with x.
 
 | Feature | 1 | 2 | 3 | 4 | 5 | 6 |
-|---------|---|---|---|---|---|---|
+| :--- | :-: | :-: | :-: | :-: | :-: | :-: |
 | Pan, zoom, H / F hotkeys, fit on load | x | | | | | |
 | Inspector: changed parameters, compact note | x | x | x | | x | x |
 | Inspector: full parameter pane (defaults in normal weight, changes in bold) | | | | x | | |
@@ -43,23 +51,30 @@ Feature coverage, so nothing is shown twice and nothing is missing:
 | Asset padlocks (red open, grey locked), custom SVG icon | | | | | | x |
 | Locked asset exported closed (privacy dialog) | | | | | | x |
 
-Not shown on purpose: rounded wires (SOP networks export the straight "default" style; visitors can still switch with Shift+S), VOP / LOP / TOP / DOP networks (not supported yet), path scrubbing of private folders (checked separately with a throwaway export that is never published).
+Not shown on purpose:
 
-## Rules for every file
+- VOP, LOP, TOP and DOP networks: not supported yet.
+
+## Rules
 
 - **Houdini 22, SOP networks only**, each inside its own Geometry object (`/obj/<name>`).
-- **Built-in nodes only**, except example 6, which uses two small assets made in the same scene with original icons. No SideFX Labs nodes, no third-party or paid assets.
-- **Everything cooks**, with no error or warning badges.
-- **Small and readable:** about 15 nodes per level at most, laid out top to bottom, well under 200 KB per file, and sticky notes readable when the network is fitted on a laptop screen.
-- **Sticky notes** are shown to every visitor exactly as written: short English sentences, nothing private, no file paths.
+- **Built-in nodes only**, except example 6, which uses the two assets in `otls/` with original icons. No SideFX Labs nodes, no third-party or paid assets.
+- **Everything cooks**, without error or warning badges.
+- **Small and readable:** at most about 15 nodes per level, laid out top to bottom. Sticky notes are readable when the network is fitted on a laptop screen.
+- **Sticky notes** are shown to every visitor in English
 - **Every node shows something in the inspector:** one to three changed parameters per node.
 
-## Re-exporting
+## Re-export
 
-Go inside the object (the Network Editor shows `/obj/<name>`), select nothing, click **Export for NOP** on the NOP shelf, pick the mode from the table above, and save as `<name>-network.json` into this folder.
+1. Go inside the object, so the Network Editor shows `/obj/<name>`, and select nothing.
+2. Click **Export for NOP** on the NOP shelf and pick the export mode from the Files table.
+3. Save as `<name>-network.json` into this folder.
+4. Open every changed file in the playground (`npm run dev`) and compare it with its row in the coverage table.
+5. Check for private paths. Both commands must find nothing (Git Bash):
 
-After exporting:
+   ```bash
+   grep "<path>" fixtures/examples/*.json
+   grep -i "users" fixtures/examples/*.json
+   ```
 
-- Open every file in the playground (`npm run dev`) and check it against its row in the coverage table.
-- `grep "<path>" fixtures/examples/*.json` must find nothing, and `grep -i "users" fixtures/examples/*.json` must find no home folder.
-- `example-site.html` uses some node names (for example `twist_piece`, `scene`), so a renamed node needs a change there too. Renaming a key in `examples.ts` changes links like `?example=start`.
+6. If a node was renamed, update `example-site.html`. Renaming a key in `examples.ts` changes links such as `?example=start`.

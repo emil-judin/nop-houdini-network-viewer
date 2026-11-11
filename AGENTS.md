@@ -1,6 +1,6 @@
 # Agent Instructions
 
-Context, architectural invariants and coding conventions for AI coding agents working in NOP (npm package `nop-houdini-network-viewer`). Human contributors follow the same rules. The six pillars below are the full version; the README summarizes them, and [docs/decisions/](./docs/decisions/README.md) explains the decisions behind them.
+Context, architectural invariants and coding conventions for AI coding agents working in NOP (npm package `nop-houdini-network-viewer`). Human contributors follow the same rules. The six pillars below are their only full list, and [docs/decisions/](./docs/decisions/README.md) explains the decisions behind them.
 
 ## 1. Project Overview & Core Pillars
 

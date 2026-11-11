@@ -1,7 +1,7 @@
 {
   "name": "nop-houdini-network-viewer",
   "version": "0.1.0-alpha.4",
-  "description": "NOP: View and share Houdini node networks on the web. Interactive, view-only viewer for SideFX Houdini node networks on portfolio websites and technical documentation. Not affiliated with SideFX.",
+  "description": "Interactive viewer for SideFX Houdini node networks on the web. Export networks from Houdini, embed them on any page and inspect them on desktop and mobile.",
   "author": "Emil Judin",
   "license": "MIT",
   "repository": {
