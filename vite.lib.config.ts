@@ -59,7 +59,8 @@ function emitFontFiles(): Plugin {
       for (const match of code.matchAll(FONT_DATA_URI)) {
         output.overwrite(match.index, match.index + match[0].length, `./${fontFile(this, match[0])}`);
       }
-      return { code: output.toString(), map: output.generateMap({ hires: 'boundary' }) };
+      // As a JSON string: magic-string 1.x types `sourcesContent` as `(string | null)[]`, which Rollup's map type rejects
+      return { code: output.toString(), map: output.generateMap({ hires: 'boundary' }).toString() };
     },
     generateBundle(_options, bundle) {
       for (const file of Object.values(bundle)) {
