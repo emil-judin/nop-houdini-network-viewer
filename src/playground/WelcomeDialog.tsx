@@ -4,7 +4,6 @@ import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import { AVAILABLE_EXAMPLES, EXAMPLE_SITE_PAGE, exampleNodeCount, type PlaygroundExample } from './examples';
 import { PlaygroundBanner } from './PlaygroundBanner';
 import { PlaygroundDialog } from './PlaygroundDialog';
-import { useMediaQuery } from './useMediaQuery';
 
 /** Props for {@link WelcomeDialog}. */
 export interface WelcomeDialogProps {
@@ -118,8 +117,7 @@ const ExampleRow: React.FC<{ example: PlaygroundExample; active: boolean; onSele
  * Start screen on the first visit (and from the Help button), like a desktop app's splash: the
  * banner on top, then on the left the links for the visitor's own networks (exporter, open a file,
  * embed on a site) and to the docs and GitHub, and on the right the examples as a compact list with
- * thumbnails, each opening its network. On phones the columns stack, links first. The controls line follows the
- * device: mouse words on desktops, touch words on phones and tablets.
+ * thumbnails, each opening its network. On phones the columns stack, links first.
  */
 export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
   open,
@@ -129,8 +127,6 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
   onSelectExample,
   activeKey,
 }) => {
-  const touch = useMediaQuery('(pointer: coarse)');
-
   return (
     <PlaygroundDialog open={open} onClose={onClose} title="Welcome" maxWidthPx={760}>
       {/* Like Houdini's Start Here window; left out on short screens so the examples keep their room */}
@@ -210,11 +206,6 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
                 />
               ))}
             </ul>
-            <p className="mt-2.5 px-2 text-[12px] leading-[1.4] text-[#a8a8a8]">
-              {touch
-                ? 'Drag to move, pinch to zoom, double-tap a subnetwork to go inside and tap a node to see its parameters.'
-                : 'Drag to move, scroll to zoom, double-click a subnetwork to go inside and click a node to see its parameters.'}
-            </p>
           </section>
         </div>
       </div>
