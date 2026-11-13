@@ -63,7 +63,7 @@ The playground's **Embed** button opens the [example page](https://emil-judin.gi
 Upload the exported `.json` file next to your page, then add:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.4/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.5/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
