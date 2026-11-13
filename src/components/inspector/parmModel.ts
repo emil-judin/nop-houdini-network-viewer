@@ -82,6 +82,26 @@ export function getNodeParmTuples(node: HoudiniNodeData): HoudiniParmTupleData[]
   return [];
 }
 
+/** Name ending of the parameters Houdini keeps per ramp point: `1pos`, `2value`, `3c`, `1interp`, ... */
+const RAMP_POINT_SUFFIX = /^\d+(?:pos|value|interp|c|cr|cg|cb)$/;
+
+/**
+ * Names of a node's ramp point parameters (`thicknessramp1pos`, `thicknessramp1value`, ...). Older
+ * exports list them next to their Ramp parameter, which already holds the points. Only names that
+ * extend the name of a Ramp parameter of the same node count.
+ */
+function rampPointNames(parms: HoudiniParmTupleData[]): Set<string> {
+  const ramps = parms.filter((p) => p.type === 'Ramp').map((p) => p.name);
+  const names = new Set<string>();
+  if (ramps.length === 0) return names;
+  for (const parm of parms) {
+    if (ramps.some((ramp) => parm.name.startsWith(ramp) && RAMP_POINT_SUFFIX.test(parm.name.slice(ramp.length)))) {
+      names.add(parm.name);
+    }
+  }
+  return names;
+}
+
 /**
  * Returns `true` for Houdini toggle values that mean "on" (`"on"`, `1`, `"1"`, `true`).
  */
@@ -235,12 +255,15 @@ function buildLevel(rows: ParmDisplayRow[], depth: number, keyPrefix: string): P
 }
 
 /**
- * Prepares a node's parameters for the inspector: drops structural entries (folder parameters)
- * and nests the rest into the Parameter Pane layout (tabs, sections, joined lines), keeping
- * Houdini's order.
+ * Prepares a node's parameters for the inspector: drops structural entries (folder parameters) and
+ * ramp point parameters (the ramp draws its points), and nests the rest into the Parameter Pane
+ * layout (tabs, sections, joined lines), keeping Houdini's order.
  */
 export function buildParmLayout(node: HoudiniNodeData): ParmLayoutItem[] {
-  const rows = getNodeParmTuples(node)
+  const parms = getNodeParmTuples(node);
+  const rampPoints = rampPointNames(parms);
+  const rows = parms
+    .filter((parm) => !rampPoints.has(parm.name))
     .map((parm) => toDisplayRow(parm, node.type))
     .filter((row) => row.kind !== 'hidden');
   return pruneEmpty(buildLevel(rows, 0, ''));

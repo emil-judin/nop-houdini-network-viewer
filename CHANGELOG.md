@@ -7,6 +7,10 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 ### Added
 - Every GitHub release has the exporter (`nop-exporter.zip`) attached, from 0.1.0-alpha.3 on.
 
+### Fixed
+- Ramps no longer show their points as loose Position, Value and Interpolation fields in the Parameter Inspector, also in files exported before this fix.
+- The exporter marks a ramp as changed when its points differ from the default, so compact exports keep edited ramps.
+
 ### Removed
 - The plain `nop_exporter.py` download and the manual shelf tool setup. Install the exporter as a Houdini package from `nop-exporter.zip`.
 
