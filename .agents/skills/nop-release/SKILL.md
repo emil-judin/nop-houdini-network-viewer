@@ -14,7 +14,8 @@ description: >-
 3. Schema: if the export format changed, `SCHEMA_VERSION` in `exporter/nop_exporter.py` was bumped, and
    `docs/SCHEMA.md`, `src/schema/types.ts` and `schema/nop-network-1.schema.json` describe the new fields.
 4. `CHANGELOG.md`: move "Unreleased" under `## <version> (<date>, ...)`. This section becomes the release notes.
-5. Docs: README install snippets name the new version.
+5. Docs: README install snippets name the new version. After `npm.cmd run build:lib`, run
+   `node scripts/build_third_party_notices.mjs` so `THIRD_PARTY_NOTICES.md` matches what the builds bundle (CI checks it).
 6. npm releases only (Milestone 4): set `PUBLISHED_ON_NPM = true` in `src/examplePage/embedPanel.ts` and drop
    the "not on npm yet" notes from the README and `example-site.html`; build with `npm.cmd run build:lib`, then `npm.cmd run sri` and
    publish the `web-component.js` hash in the README and CHANGELOG.

@@ -132,3 +132,5 @@ NOP is an independent community project. It is **not affiliated with, endorsed b
 ## License
 
 MIT, copyright (c) 2026 Emil Judin. See [`LICENSE`](./LICENSE).
+
+The builds also ship third-party fonts (SIL Open Font License) and libraries (MIT, ISC, BSD) under their own licenses, listed in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).

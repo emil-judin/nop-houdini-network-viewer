@@ -6,6 +6,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ### Added
 - Every GitHub release has the exporter (`nop-exporter.zip`) attached, from 0.1.0-alpha.3 on.
+- `THIRD_PARTY_NOTICES.md` lists the licenses of the fonts and libraries NOP ships. It is in the npm package and next to the playground page, and `web-component.js` points to it.
 
 ### Fixed
 - Ramps no longer show their points as loose Position, Value and Interpolation fields in the Parameter Inspector, also in files exported before this fix.
