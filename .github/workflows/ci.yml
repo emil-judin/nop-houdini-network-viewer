@@ -30,4 +30,6 @@ jobs:
       - run: npm run lint
       # The library first: the playground build publishes its web component for the example site page
       - run: npm run build:lib
+      # The third-party licenses must list exactly what the web component bundles
+      - run: node scripts/build_third_party_notices.mjs --check
       - run: npm run build

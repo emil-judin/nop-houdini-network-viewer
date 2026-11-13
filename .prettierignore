@@ -9,5 +9,6 @@ test-results/
 playwright-report/
 fixtures/
 package-lock.json
+THIRD_PARTY_NOTICES.md
 src/components/nodes/shapes/houdiniShapesData.json
 src/components/nodes/icons/labs/labsNodeCatalog.ts

@@ -167,7 +167,15 @@ export default defineConfig(({ mode }) => {
         // moving everything into a second file behind a tiny entry (one request less)
         preserveEntrySignatures: 'allow-extension',
         ...(isWebComponent
-          ? { output: { chunkFileNames: 'web-component-chunks/[name]-[hash].js' } }
+          ? {
+              output: {
+                chunkFileNames: 'web-component-chunks/[name]-[hash].js',
+                // A legal comment (`/*!`), which the minifier keeps: the bundle includes React, React Flow
+                // and other third-party code, whose licenses travel with the npm package
+                banner:
+                  '/*! NOP Houdini network viewer | MIT License, (c) 2026 Emil Judin | Bundles third-party code and fonts under their own licenses: see THIRD_PARTY_NOTICES.md in the npm package */',
+              },
+            }
           : { external: [/^react($|\/)/, /^react-dom($|\/)/, /^@xyflow\/react($|\/)/, /^lucide-react($|\/)/, /^html-to-image($|\/)/] }),
       },
     },

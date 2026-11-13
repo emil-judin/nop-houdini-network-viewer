@@ -149,6 +149,25 @@ function exampleSiteFiles(): Plugin {
   };
 }
 
+/**
+ * Puts NOP's `LICENSE` and `THIRD_PARTY_NOTICES.md` next to the playground page: the site ships
+ * third-party fonts (SIL Open Font License) and libraries whose licenses must travel with them.
+ */
+function licenseFiles(): Plugin {
+  return {
+    name: 'nop-license-files',
+    generateBundle() {
+      for (const name of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
+        const file = join(ROOT, name);
+        if (!existsSync(file)) {
+          this.error(`${name} not found: run \`node scripts/build_third_party_notices.mjs\` after \`npm run build:lib\`.`);
+        }
+        this.emitFile({ type: 'asset', fileName: name === 'LICENSE' ? 'LICENSE.txt' : name, source: readFileSync(file) });
+      }
+    },
+  };
+}
+
 /** Name and version from `package.json`. Only these two values reach the browser, never the whole file. */
 const PACKAGE = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as { name: string; version: string };
 
@@ -196,6 +215,7 @@ export default defineConfig(({ mode }) => ({
     tailwindcss(),
     localReferenceIcons(),
     exampleSiteFiles(),
+    licenseFiles(),
     openGraphUrls(loadEnv(mode, process.cwd(), 'VITE_').VITE_SITE_URL),
     contentSecurityPolicy(),
   ],

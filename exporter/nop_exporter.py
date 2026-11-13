@@ -224,6 +224,92 @@ def safe_ramp(parm):
         return None
 
 
+def is_ramp_point(pt):
+    """Returns True for the parameters Houdini keeps per ramp point (`ramp1pos`, `ramp1value`, `ramp1c`,
+    `ramp1interp`, ...): they are multiparm instances of a Ramp parameter, and the ramp itself is
+    exported with its points (`safe_ramp`)."""
+    try:
+        parm = pt[0]
+        if not parm.isMultiParmInstance():
+            return False
+        parent = parm.parentMultiParm()
+        return parent is not None and parent.parmTemplate().type() == hou.parmTemplateType.Ramp
+    except Exception:
+        return False
+
+
+# One point of a ramp default tag: `1pos ( 0 )`, `1value ( 1 )`, `1c ( 0 0 0 )`, `1interp ( catmull-rom )`
+RAMP_DEFAULT_ENTRY = re.compile(r"(\d+)(pos|value|c|interp)\s*\(\s*([^)]*?)\s*\)")
+
+
+def default_ramp_points(template):
+    """Returns a ramp's default points from its `rampfloatdefault` / `rampcolordefault` tag, as
+    `(key, value, basis)` tuples sorted by key, or None when the template has no such tag.
+
+    The point parameters' own defaults do not hold the ramp default, so `isAtDefault()` on them
+    says nothing about whether the ramp was changed.
+    """
+    try:
+        tags = template.tags()
+        text = tags.get("rampfloatdefault") or tags.get("rampcolordefault")
+        if not text:
+            return None
+        points = {}
+        for index, field, value in RAMP_DEFAULT_ENTRY.findall(text):
+            points.setdefault(int(index), {})[field] = value.split()
+        result = []
+        for point in points.values():
+            raw_value = point.get("value") or point.get("c")
+            key = float(point["pos"][0])
+            value = [float(v) for v in raw_value]
+            basis = point["interp"][0] if "interp" in point else "linear"
+            result.append((key, value, basis))
+        return sorted(result, key=lambda p: p[0])
+    except Exception:
+        return None
+
+
+def _basis_id(name):
+    """`CatmullRom` (hou.rampBasis) and `catmull-rom` (ramp tags) both become `catmullrom`."""
+    return name.replace("-", "").replace("_", "").lower()
+
+
+def ramp_differs_from_default(template, ramp):
+    """Returns True when an exported ramp (`safe_ramp`) differs from the default in its template tag.
+
+    False when the template has no default tag: then only `isAtDefault()` decides.
+    """
+    default = default_ramp_points(template)
+    if default is None or not ramp:
+        return False
+    current = sorted(
+        zip(ramp["keys"], ramp["values"], ramp["basis"]),
+        key=lambda p: p[0],
+    )
+    if len(current) != len(default):
+        return True
+    for (key, value, basis), (dkey, dvalue, dbasis) in zip(current, default):
+        values = value if isinstance(value, list) else [value]
+        if abs(key - dkey) > 1e-3 or len(values) != len(dvalue):
+            return True
+        if any(abs(v - d) > 1e-3 for v, d in zip(values, dvalue)):
+            return True
+        if _basis_id(basis) != _basis_id(dbasis):
+            return True
+    return False
+
+
+def is_changed_ramp(pt):
+    """Returns True for a Ramp parameter whose points differ from its default (see `ramp_differs_from_default`)."""
+    try:
+        template = pt.parmTemplate()
+        if template.type() != hou.parmTemplateType.Ramp:
+            return False
+        return ramp_differs_from_default(template, safe_ramp(pt[0]))
+    except Exception:
+        return False
+
+
 def safe_menu_label(parm):
     """Returns the label of a menu parameter's current item (e.g. `Primitives` for `primitive`).
 
@@ -474,6 +560,9 @@ def serialize_parm_tuple(pt, layout_info=None):
         ramp = safe_ramp(parms[0])
         if ramp:
             data["ramp"] = ramp
+            # isAtDefault() on a ramp only compares the number of points (checked in Houdini 22.0.466)
+            if not any(changed) and ramp_differs_from_default(template, ramp):
+                data["changed"] = [True] * len(parms)
     if any(keyframed):
         data["keyframed"] = keyframed
     return data
@@ -705,12 +794,15 @@ def serialize_network(net, state, selected_only=False):
                     # Buttons only run actions in Houdini; the web viewer is view-only, so skip them
                     if template.isHidden() or template.type() == hou.parmTemplateType.Button:
                         continue
+                    # Ramp points are part of the ramp's own entry, not parameters of their own
+                    if is_ramp_point(pt):
+                        continue
                     is_code_parm = pt.name() in ("snippet", "python")
                     layout_info = find_parm_layout(layout, pt.name())
                     # Parameters hidden by a hide-when rule are not visible in Houdini either
                     if layout_info is not None and layout_info["hidden"] and not is_code_parm:
                         continue
-                    if export_mode == "compact" and pt.isAtDefault() and not is_code_parm:
+                    if export_mode == "compact" and pt.isAtDefault() and not is_code_parm and not is_changed_ramp(pt):
                         continue
 
                     parms.append(serialize_parm_tuple(pt, layout_info))

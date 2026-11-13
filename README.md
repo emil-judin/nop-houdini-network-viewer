@@ -4,7 +4,11 @@
 
 Interactive viewer for SideFX Houdini node networks on the web. Export networks from Houdini, embed them on any page and inspect them on desktop and mobile.
 
-**[Live playground](https://emil-judin.github.io/nop-houdini-network-viewer/)** | [Example page](https://emil-judin.github.io/nop-houdini-network-viewer/example-site.html) | [Changelog](./CHANGELOG.md)
+<p align="center">
+  <a href="https://emil-judin.github.io/nop-houdini-network-viewer/"><b>Try the live playground →</b></a>
+  <br>
+  <sub><a href="https://emil-judin.github.io/nop-houdini-network-viewer/example-site.html">Example page</a> · <a href="./CHANGELOG.md">Changelog</a></sub>
+</p>
 
 NOP (Net OPerator) is made for portfolio websites, blogs and documentation, and draws networks like Houdini's Network Editor. A shelf tool in Houdini allows exporting networks to a JSON file, and displaying them on your web page via this package. Users can pan, zoom, open subnetworks and read parameters and VEX code. NOP is inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
 
@@ -43,7 +47,7 @@ Alpha, tester release. The npm package is not published yet. The JSON format and
    | :--- | :--- | :--- | :--- |
    | **Copy to Clipboard (Compact Parms)** | Clipboard | Changed values, VEX and Python code | A quick look: paste into the playground with `Ctrl+V` |
    | **Save .json File (Compact Parms)** | `.json` file | Changed values, VEX and Python code | Publishing on your page: a small file that shows what you changed |
-   | **Save .json File (Full Parms)** | `.json` file, larger | Every visible parameter, changes in bold | Showing complete parameter panes, like Houdini's Parameter Pane |
+   | **Save .json File (Full Parms)** | `.json` file | Every visible parameter, changes in bold | Showing complete parameter panes, like Houdini's Parameter Pane |
 
 4. **Locked assets:** if the network uses locked assets that are not from SideFX, a second dialog asks. **Export Closed** keeps their parameters and icon but leaves out their insides. **Include Insides** is for assets you made yourself.
 5. **Check the result** in the playground: paste with `Ctrl+V`, or drop the `.json` file on the Networks pane. The network stays in your browser. Then embed the file as described in the next section.
@@ -132,3 +136,5 @@ NOP is an independent community project. It is **not affiliated with, endorsed b
 ## License
 
 MIT, copyright (c) 2026 Emil Judin. See [`LICENSE`](./LICENSE).
+
+The builds also ship third-party fonts (SIL Open Font License) and libraries (MIT, ISC, BSD) under their own licenses, listed in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md). The Houdini scenes in the repository are `.hip` files; scenes saved with a non-commercial Houdini license (`.hipnc`) are not included, because SideFX restricts them to non-commercial use.

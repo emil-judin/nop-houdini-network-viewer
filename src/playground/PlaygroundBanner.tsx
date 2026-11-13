@@ -39,7 +39,8 @@ export const PlaygroundBanner: React.FC<PlaygroundBannerProps> = ({ size = 'larg
           height={s.logo}
           style={{ width: s.logo, height: s.logo }}
         />
-        <div className="flex flex-col">
+        {/* Noto Sans like the README banner; the rest of the playground keeps Houdini's Source Sans Pro */}
+        <div className="flex flex-col font-banner">
           <p className={`${s.name} font-bold tracking-tight text-white`}>NOP</p>
           <p className={`${s.label} font-semibold uppercase leading-none tracking-[0.2em] text-[#cfcfcf]`}>Playground</p>
         </div>

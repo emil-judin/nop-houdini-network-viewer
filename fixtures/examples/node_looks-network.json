@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.4.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-11-03T04:53:38.321929+00:00",
+  "exportedAt": "2026-11-12T06:20:26.967673+00:00",
   "exportMode": "compact",
   "icons": {},
   "customShapes": {},
@@ -152,98 +152,6 @@
               0.0,
               1.0
             ]
-          },
-          {
-            "name": "profileramp1value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              0.5
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Fillet",
-              "Profile Control"
-            ]
-          },
-          {
-            "name": "profileramp1interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "catmull-rom"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Fillet",
-              "Profile Control"
-            ],
-            "menuLabel": "Catmull-Rom"
-          },
-          {
-            "name": "profileramp2pos",
-            "label": "Position",
-            "type": "Float",
-            "val": [
-              1.0
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Fillet",
-              "Profile Control"
-            ]
-          },
-          {
-            "name": "profileramp2value",
-            "label": "Value",
-            "type": "Float",
-            "val": [
-              0.5
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Fillet",
-              "Profile Control"
-            ]
-          },
-          {
-            "name": "profileramp2interp",
-            "label": "Interpolation",
-            "type": "Menu",
-            "val": [
-              "catmull-rom"
-            ],
-            "expr": [
-              null
-            ],
-            "changed": [
-              true
-            ],
-            "folders": [
-              "Fillet",
-              "Profile Control"
-            ],
-            "menuLabel": "Catmull-Rom"
           }
         ]
       },
