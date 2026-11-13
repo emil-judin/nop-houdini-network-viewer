@@ -3,6 +3,30 @@
 @import "../styles/fonts.css";
 @import "../styles/viewer.css";
 
+/*
+ * Noto Sans (SIL Open Font License) for the NOP banner only, so the playground banner matches the
+ * README banner. Playground only: the library and the web component keep Houdini's Source Sans Pro.
+ */
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("../../node_modules/@fontsource/noto-sans/files/noto-sans-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("../../node_modules/@fontsource/noto-sans/files/noto-sans-latin-700-normal.woff2") format("woff2");
+}
+
+@theme {
+  --font-banner: "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
 /* Dark native scrollbars and form controls on the whole playground page */
 :root {
   color-scheme: dark;
