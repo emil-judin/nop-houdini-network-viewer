@@ -12,7 +12,6 @@ Install
      macOS:   ~/Library/Preferences/houdini/22.0/packages
      Linux:   ~/houdini22.0/packages
 2. Copy nop.json and the nop folder from this download into it.
-   Studios can instead use any folder listed in HOUDINI_PACKAGE_DIR.
 3. Restart Houdini. The "NOP" shelf tab has two tools:
      Export for NOP   copy to the clipboard or save a .json file
      Copy for NOP     copy the selection as JSON without a dialog

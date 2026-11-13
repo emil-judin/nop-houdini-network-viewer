@@ -2,6 +2,8 @@
 
 The six example networks of the playground, exported from `nop_examples.hip` in Houdini 22. The two example assets are in `otls/`. This file is for re-exporting or changing them.
 
+Save and export the scene with a commercial Houdini license (FX or Core), so it stays `.hip`. A non-commercial save (`nop_examples.hipnc`, Apprentice or Education) is restricted by SideFX to non-commercial use, so it cannot be shared under NOP's MIT License: `.gitignore` keeps `*.hipnc` out of the repository.
+
 Where they are used:
 
 - `src/playground/examples.ts` lists them. Its keys appear in links such as `?example=start`.
