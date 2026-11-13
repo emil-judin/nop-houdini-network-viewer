@@ -143,7 +143,7 @@ export const NetworksPanel: React.FC<NetworksPanelProps> = ({
         if (overlay && event.key === 'Escape') onToggleCollapsed();
       }}
       // Wider beside the network on desktops; narrower where it floats over the network on phones
-      className={`flex flex-col bg-[#383838] ${overlay ? 'w-60 absolute inset-y-0 left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]' : 'w-80 shrink-0'}`}
+      className={`flex flex-col bg-[#383838] ${overlay ? 'w-60 absolute inset-y-0 left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]' : 'w-90 shrink-0'}`}
     >
       <PaneTabStrip label="Networks">
         <button

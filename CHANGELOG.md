@@ -14,6 +14,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ### Changed
 - New NOP banner on the README and in the playground, and a matching link preview image: an orb web seen head-on, like the NOP icon. The playground banner's name is set in Noto Sans, like the README banner.
+- The playground's Networks pane is wider (360 instead of 320 pixels) beside the network.
 
 ### Removed
 - The plain `nop_exporter.py` download and the manual shelf tool setup. Install the exporter as a Houdini package from `nop-exporter.zip`.
