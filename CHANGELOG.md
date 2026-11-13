@@ -13,6 +13,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 - The exporter marks a ramp as changed when its points differ from the default, so compact exports keep edited ramps.
 
 ### Changed
+- The playground's welcome card is a start screen: links for your own networks (exporter, open a file, embed) and to the docs and GitHub on the left, and the examples as a compact list with thumbnails on the right. A new script, `scripts/capture_example_thumbnails.mjs`, makes the thumbnails from the real viewer.
 - New NOP banner on the README and in the playground, and a matching link preview image: an orb web seen head-on, like the NOP icon. The playground banner's name is set in Noto Sans, like the README banner.
 - The playground's Networks pane is wider (360 instead of 320 pixels) beside the network.
 
