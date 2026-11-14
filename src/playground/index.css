@@ -25,6 +25,23 @@
 
 @theme {
   --font-banner: "Noto Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* The embed tip slides in from below: the card on the network, the strip grows under it */
+  --animate-embed-card-in: embed-card-in 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-embed-strip-in: embed-strip-in 450ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes embed-card-in {
+    from {
+      transform: translateY(calc(100% + 24px));
+      opacity: 0;
+    }
+  }
+
+  @keyframes embed-strip-in {
+    from {
+      height: 0;
+    }
+  }
 }
 
 /* Dark native scrollbars and form controls on the whole playground page */

@@ -7,6 +7,7 @@ import { TOUCH_TARGET, TOUCH_TARGET_COMPACT } from '../components/hud/touchTarge
 import { registerLabsIcons } from '../components/nodes/icons/iconRegistry';
 import { LABS_BUILTIN_ICON_ALIASES, LABS_ICONS } from '../components/nodes/icons/labs';
 import { AboutBlock } from './AboutBlock';
+import { EmbedHintCard, EmbedHintStrip, useEmbedHint } from './EmbedHint';
 import { AVAILABLE_EXAMPLES, exampleNodeCount, findExample, loadExample, type PlaygroundExample } from './examples';
 import { ExporterDialog } from './ExporterDialog';
 import { FeedbackDialog } from './FeedbackDialog';
@@ -137,7 +138,8 @@ const nodeCountText = (count: number) => `${count} nodes`;
  * desktop: a collapsible networks pane beside the network view, and a status bar. The pane holds
  * the examples, the visitor's own networks with the open and paste buttons, the exporter download and
  * Embed (the example page with an example network and its code, in a new tab). A welcome card
- * introduces the playground on the first visit.
+ * introduces the playground on the first visit, and an embed tip on or under the network points to
+ * the embed code until it is closed.
  */
 export const App: React.FC = () => {
   const [tab, setTab] = useState<PlaygroundTab>(initialTab);
@@ -148,6 +150,8 @@ export const App: React.FC = () => {
   const [exporterOpen, setExporterOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(() => !welcomeSeen());
+  // Exploring starts once the welcome card is closed (or at once when it was seen before)
+  const [embedHintDue, closeEmbedHint] = useEmbedHint(!welcomeOpen);
   const wideScreen = useMediaQuery(WIDE_SCREEN_QUERY);
   // The panel starts open on wide screens and folded on phones, and follows the screen when it changes
   const [panelOpen, setPanelOpen] = useState(wideScreen);
@@ -176,6 +180,10 @@ export const App: React.FC = () => {
       : null;
   const activeLabel = tab === 'icons' ? 'Icons Overview' : (activeFile?.label ?? activeExample?.label ?? '');
   const activeNetworkName = tab === 'icons' ? activeLabel : activeFile ? `own file: ${activeLabel}` : `example: ${activeLabel}`;
+  // On the first visit only, the embed tip slides in 10 seconds into exploring and shows with a
+  // network on screen until it is closed: a card on the network on wide screens (mockup C4), a strip
+  // under it on phones (mockup C6), owner decisions 2026-11-14
+  const showEmbedHint = embedHintDue && tab !== 'icons' && activeDocument !== null;
 
   const sections: NetworksPanelSection[] = [
     {
@@ -312,6 +320,8 @@ export const App: React.FC = () => {
               <NetworkLoadingState />
             )}
 
+            {showEmbedHint && wideScreen && <EmbedHintCard onClose={closeEmbedHint} />}
+
             {loader.isDragging && (
               <div className="absolute inset-0 z-40 flex items-center justify-center bg-[#1a1a1a]/80 pointer-events-none">
                 <div className="rounded-[3px] border-2 border-dashed border-[#7082b9] bg-[#2d2d2d] px-8 py-6 text-center">
@@ -322,6 +332,7 @@ export const App: React.FC = () => {
               </div>
             )}
           </main>
+          {showEmbedHint && !wideScreen && <EmbedHintStrip onClose={closeEmbedHint} />}
         </section>
       </div>
 
