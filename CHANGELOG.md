@@ -4,6 +4,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.6 (2026-11-14, tester release)
+
 ### Added
 - On the first visit, the playground points to the embed code from the network itself, 10 seconds after you start exploring: a card at the bottom left of the network on wide screens, with a screenshot of the example page, and a strip under the network on phones. Both slide in from below.
 
