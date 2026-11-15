@@ -43,6 +43,19 @@ export const MINIMIZED_STICKY_HEIGHT_PX = 22;
 export const SUBNET_INPUT_ID_PREFIX = 'input:';
 /** ID prefix of wire routing dots (see `SUBNET_INPUT_ID_PREFIX`). */
 export const DOT_ID_PREFIX = 'dot:';
+/** Most output connectors a node can have: Houdini assets allow up to 10, each drawn as its own dot. */
+export const MAX_OUTPUT_CONNECTORS = 10;
+
+/**
+ * Output connectors a node shows: its exported `maxOutputs`, at most 10. Earlier exports wrote the
+ * type's maximum there (11 for every SOP subnet) but already listed one label per output in use, so
+ * the labels limit the count when there are any.
+ */
+export function outputConnectorCount(node: HoudiniNodeData | undefined): number {
+  const exported = Math.max(0, Math.min(MAX_OUTPUT_CONNECTORS, node?.maxOutputs ?? 1));
+  const labels = node?.outputLabels?.length ?? 0;
+  return labels > 0 ? Math.min(exported, labels) : exported;
+}
 /** ID prefix of network boxes (see `SUBNET_INPUT_ID_PREFIX`). */
 export const BOX_ID_PREFIX = 'box:';
 /** ID prefix of sticky notes (see `SUBNET_INPUT_ID_PREFIX`). */
@@ -423,11 +436,15 @@ export function convertGraphToReactFlow(
 
     const sourceNode = nodeLookup.get(wire.from);
     const targetNode = nodeLookup.get(wire.to);
+    // A wire out of a node without outputs only exists in a broken file: it has no connector to start from
+    if (sourceNode && outputConnectorCount(sourceNode) === 0) {
+      continue;
+    }
 
     const sourceHandle =
       isFromSubnetInput || isFromDot
         ? 'out-0'
-        : `out-${Math.min(wire.fromOutput ?? 0, Math.max(0, (sourceNode?.maxOutputs ?? 1) - 1))}`;
+        : `out-${Math.min(wire.fromOutput ?? 0, Math.max(0, outputConnectorCount(sourceNode) - 1))}`;
 
     const isMultiInputTarget = !isToDot && (targetNode?.maxInputs ?? 1) > 4;
     let multiSlotIndex = 7;

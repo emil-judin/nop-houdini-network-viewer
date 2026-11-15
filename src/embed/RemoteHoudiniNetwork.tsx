@@ -37,7 +37,11 @@ export const RemoteHoudiniNetwork: React.FC<RemoteHoudiniNetworkProps> = ({ src,
     const controller = new AbortController();
     setState({ status: 'loading', src });
     fetchNetworkJson(src, controller.signal)
-      .then((json) => setState({ status: 'ready', src, data: json as Record<string, unknown> }))
+      .then((json) => {
+        // A download that finished after its src changed must not replace the newer network
+        if (controller.signal.aborted) return;
+        setState({ status: 'ready', src, data: json as Record<string, unknown> });
+      })
       .catch((err: unknown) => {
         if (controller.signal.aborted) return;
         setState({ status: 'error', src, message: err instanceof Error ? err.message : String(err) });

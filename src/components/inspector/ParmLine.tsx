@@ -102,7 +102,7 @@ function componentTitle(row: ParmDisplayRow, index: number, componentName: strin
 /**
  * Houdini toggle box: blue-grey when off, dark navy with a blue check mark when on.
  */
-export const ToggleBox: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
+const ToggleBox: React.FC<{ row: ParmDisplayRow }> = ({ row }) => {
   const on = isToggleOn(row.parm.val[0]);
   const disabled = Boolean(row.parm.disabled);
   const colors = row.parm.expr[0]

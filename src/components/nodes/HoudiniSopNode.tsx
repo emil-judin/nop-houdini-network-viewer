@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import { houdiniRgbToCss, type HoudiniSopFlowNodeData } from '../../schema/converter';
-import { parseOperatorType } from '../../schema/operatorType';
+import { outputConnectorCount } from '../../schema/convertGraph';
+import { defaultNodeName, parseOperatorType } from '../../schema/operatorType';
 import type { HoudiniRgbColor } from '../../schema/types';
 import { CANVAS_RGB } from '../theme';
 import { OperatorSvgIcon } from './icons/OperatorSvgIcon';
@@ -184,21 +185,24 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
   const discreteInputCount = isMultiInputBar ? 1 : Math.max(0, maxInputs);
 
   // Output connector count & layout
-  const outputCount = Math.max(1, Math.min(4, node.maxOutputs ?? 1));
+  // Every output gets its own connector, like Houdini: none for ROP Geometry Output, up to 10 for assets
+  const outputCount = outputConnectorCount(node);
 
   // Show descriptive operator type above node name when the node has an explicit descriptive label
   // (e.g. Houdini shows "Attribute Wrangle" above both `primitivewrangle2` and `assign_ram_to_prims` because its underlying type is `attribwrangle`)
   // Compare against the base operator name (namespace and version stripped: `labs::thicken::1.0` -> `thicken`)
+  // and with the name Houdini gives new nodes of the type (`transform1` for `xform`)
   const { baseType } = parseOperatorType(node.type);
+  const lowerName = node.name.toLowerCase();
   const isRenamedFromType =
-    !node.name.toLowerCase().startsWith(baseType) &&
+    !lowerName.startsWith(baseType) &&
+    !lowerName.startsWith(defaultNodeName(baseType)) &&
     node.label &&
     node.label.toLowerCase() !== node.name.toLowerCase();
 
-  // Padlock under the name: the exported asset state (schema 1.2.0); older exports fall back to a
-  // guess from the type name (namespaced and versioned types are usually assets)
-  const hdaState =
-    node.hdaState !== undefined ? node.hdaState : node.type.includes('::') ? ('locked' as const) : null;
+  // Padlock under the name: the exported asset state (schema 1.2.0). Older exports have none and show no
+  // padlock; guessing from the type name would also lock built-in versioned types such as copytopoints::2.0
+  const hdaState = node.hdaState ?? null;
 
   return (
     <div
@@ -378,6 +382,11 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
 
       {/* Bottom Output Connectors */}
       {Array.from({ length: outputCount }).map((_, idx) => {
+        // Houdini shrinks connectors that would overlap: with 10 outputs each dot is about 0.71 of the
+        // distance between dot centers (measured in Houdini 22). Whole pixels: browsers snap the edges of a
+        // half-pixel box differently, which turns some dots into ovals
+        const spacingPx = widthPx / (outputCount + 1);
+        const diameterPx = Math.min(10, Math.round(spacingPx * 0.71));
         const [normX, normY] = getConnectorShapePosition(
           shapeDef.outputs,
           idx,
@@ -400,13 +409,13 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
               top: `${centerYPx}px`,
               bottom: 'auto',
               transform: 'translate(-50%, -50%)',
-              width: '10px',
-              height: '10px',
-              minWidth: '10px',
-              minHeight: '10px',
+              width: `${diameterPx}px`,
+              height: `${diameterPx}px`,
+              minWidth: `${diameterPx}px`,
+              minHeight: `${diameterPx}px`,
               borderRadius: '9999px',
               backgroundColor: connectorBgColor,
-              border: `1.2px solid ${connectorBorderColor}`,
+              border: `${Math.round(diameterPx * 12) / 100}px solid ${connectorBorderColor}`,
               boxSizing: 'border-box',
             }}
           />

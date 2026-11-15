@@ -176,7 +176,10 @@ export interface HoudiniNodeData {
   maxInputs: number;
   /** Hover descriptions for each input connector. */
   inputLabels: string[];
-  /** Maximum number of output connectors. */
+  /**
+   * Number of outputs the node shows, one per entry of `outputLabels` (0 for ROP Geometry Output).
+   * Exports made before 2026-11-15 wrote the type's maximum here (11 for every SOP subnet).
+   */
   maxOutputs?: number;
   /** Hover descriptions for each output connector. */
   outputLabels?: string[];

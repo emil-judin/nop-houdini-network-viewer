@@ -22,8 +22,8 @@ export function canDiveInto(node: HoudiniNodeData | null | undefined): boolean {
  * Resolves a dive path (subnetwork node names from the root, e.g. `["scene", "props"]`)
  * into the stack of levels from the root network down to the deepest valid level.
  *
- * Names that do not exist or are not navigable subnetworks end the walk, so a stale path
- * (for example after loading a different file) falls back to the deepest level that still exists.
+ * Names that do not exist or are not navigable subnetworks end the walk, so the result is always the
+ * deepest level that exists. (The viewer starts at the root of every new file, so it does not pass stale paths.)
  */
 export function resolveSubnetLevels(root: HoudiniNetworkGraph, divePath: readonly string[]): SubnetLevel[] {
   const levels: SubnetLevel[] = [{ graph: root, node: null }];
