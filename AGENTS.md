@@ -28,18 +28,21 @@ Every change must strictly follow our **6 Core Pillars**:
 - **Windows PowerShell Note:** On Windows PowerShell where script execution policy blocks `npm.ps1` and `&&` is unsupported in PS 5.1, invoke `npm.cmd` and separate commands with `;`.
 - **Install Dependencies:** `npm.cmd install`
 - **Start Dev Server:** `npm.cmd run dev`
-- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/`, and for the tests when they are present)
+- **Typecheck:** `npm.cmd run check` (strict `tsc` for `src/` and the tests)
 - **Lint:** `npm.cmd run lint` (ESLint: TypeScript, React hooks, JSX accessibility)
-- **Test suite (not published yet):** `tests/`, `exporter/tests/` and their configs are kept local until they are published together with the teaser video. When they are in your checkout, run them as part of the definition of done:
+- **Test suite:** `tests/` and `exporter/tests/` (see [docs/TESTING.md](./docs/TESTING.md)). Run them as part of the definition of done:
 - **Unit & Component Tests:** `npm.cmd test` (Vitest, `tests/unit/`, `tests/component/`)
 - **Exporter Tests:** `npm.cmd run test:exporter` (Python `unittest` with a fake `hou`, `exporter/tests/`)
+- **Exporter Tests in Houdini:** `npm.cmd run test:exporter:houdini` (`exporter/tests/houdini_session.py` in a real hython, then the exports against the JSON Schema and the viewer; needs a local Houdini and its license, about 2 minutes; set `HYTHON` if Houdini is not in its default folder)
 - **Browser Tests:** `npm.cmd run test:e2e` (Playwright, `tests/e2e/`; first run `npx playwright install`)
 - **Build Playground:** `npm.cmd run build` (output: `dist-playground/`)
 - **Build Library / Web Component:** `npm.cmd run build:lib` (output: `dist/`)
 
 ### Definition of Done
 
-A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the local test suite passes where present (`test`, `test:exporter`, and `test:e2e` for anything a visitor can see or touch), no new en or em dashes were added, and [docs/ROADMAP.md](./docs/ROADMAP.md) and the CHANGELOG are up to date. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
+A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the test suite passes (`test`, `test:exporter`, and `test:e2e` for anything a visitor can see or touch), no new en or em dashes were added, and [docs/ROADMAP.md](./docs/ROADMAP.md) and the CHANGELOG are up to date. The `nop-verify` skill has the full list. Report failures with their output instead of skipping a step.
+
+**Before committing an exporter change** (anything in `exporter/` outside `exporter/tests/`), run `npm.cmd run test:exporter:houdini` locally as well and report its result. The fake `hou` cannot show how real Houdini behaves. If the machine has no Houdini, say so instead of committing as if it had passed.
 
 ## 3. Critical Architectural Rules
 

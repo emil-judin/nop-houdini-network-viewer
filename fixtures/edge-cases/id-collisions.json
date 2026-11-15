@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/geo1",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "__dot1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "__netbox1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          0,
+          -1
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [
+      {
+        "name": "__dot1",
+        "pos": [
+          2,
+          0
+        ]
+      }
+    ],
+    "boxes": [
+      {
+        "name": "__netbox1",
+        "comment": "Box",
+        "pos": [
+          3,
+          -2
+        ],
+        "size": [
+          2,
+          1
+        ],
+        "color": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      }
+    ],
+    "stickies": [],
+    "wires": [
+      {
+        "from": "__dot1",
+        "fromOutput": 0,
+        "to": "__netbox1",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": []
+  }
+}

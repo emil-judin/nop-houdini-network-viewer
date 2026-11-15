@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/labs_tools",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "lot_subdivision1",
+        "type": "labs::lot_subdivision::2.0",
+        "label": "Labs Lot Subdivision",
+        "icon": "opdef:/labs::Sop/lot_subdivision::2.0?IconSVG",
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "2D Polygon"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "pos": [
+          0.0,
+          -0.0
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "random_selection1",
+        "type": "labs::random_selection::1.1",
+        "label": "Labs Random Selection",
+        "icon": "opdef:/labs::Sop/random_selection::1.1?IconSVG",
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Geometry"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "pos": [
+          0.0,
+          -1.2
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "group_by_attribute1",
+        "type": "labs::group_by_attribute::1.0",
+        "label": "Labs Group by Attribute",
+        "icon": "SOP_groupcreate",
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": true,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input Geo"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "pos": [
+          0.0,
+          -2.4
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [],
+    "wires": [
+      {
+        "from": "lot_subdivision1",
+        "to": "random_selection1",
+        "fromOutput": 0,
+        "toInput": 0
+      },
+      {
+        "from": "random_selection1",
+        "to": "group_by_attribute1",
+        "fromOutput": 0,
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": [],
+    "wireStyle": "default"
+  }
+}

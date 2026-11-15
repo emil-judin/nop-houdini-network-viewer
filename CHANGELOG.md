@@ -4,6 +4,23 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- The automated test suite is published: unit and component tests (Vitest), exporter tests with a fake `hou` and in a real Houdini session (`npm run test:exporter:houdini`, local only), and browser tests in Chromium, Firefox, WebKit and phone and tablet profiles (Playwright). Every scenario in `docs/features/` names its test, and CI runs them on every push.
+
+### Fixed
+- When the Parameter Inspector cannot be loaded (for example on a dropped connection), its panel now says the parameters could not be shown and asks to reload the page, instead of calling the network file invalid or damaged.
+- Holding Shift while dragging the network pans it, instead of drawing a selection box that selected nothing.
+- Nodes that keep the name Houdini gave them, such as `transform1` (type `xform`) or `group1` (type `groupcreate`), no longer show their type label above the name, like Houdini.
+- Nodes without outputs, such as ROP Geometry Output, no longer show an output connector.
+- Digital assets with more than 4 outputs (up to 10) show every output connector, smaller when needed so they do not overlap, like Houdini, and wires from outputs 5 to 10 are drawn again.
+- Subnetworks show only the outputs they use. The exporter wrote Houdini's maximum (11 for every SOP subnet) as `maxOutputs` and now writes the number of outputs the node shows; for older exports the viewer counts the output labels instead.
+- The exporter uses `hou.text.expandString`, as Houdini 22 asks: `hou.expandString` is deprecated.
+- Routing dots no longer show their internal name (`__dot1`) as a tooltip.
+- When a page switches `src` quickly, a download that arrives after it was cancelled can no longer replace the newer network.
+
+### Changed
+- Exports made before schema 1.2.0 no longer get a guessed padlock under namespaced or versioned operator types. That guess would also have marked built-in operators such as Copy to Points 2.0 as assets.
+
 ## 0.1.0-alpha.6 (2026-11-14, tester release)
 
 ### Added

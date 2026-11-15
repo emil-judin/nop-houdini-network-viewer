@@ -28,7 +28,7 @@ export function isPathPrefix(prefix: readonly string[], path: readonly string[])
 }
 
 /** Subnetwork names of a level stack (the root level has none). */
-export function levelNames(levels: SubnetLevel[]): string[] {
+function levelNames(levels: SubnetLevel[]): string[] {
   return levels.slice(1).map((level) => level.node?.name ?? '');
 }
 

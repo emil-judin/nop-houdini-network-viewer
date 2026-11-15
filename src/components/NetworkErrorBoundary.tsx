@@ -16,6 +16,10 @@ export interface NetworkErrorBoundaryProps {
   onReset?: () => void;
   /** Label of the `onReset` button. */
   resetLabel?: string;
+  /** Headline of the error panel, when the default ("This Houdini network could not be displayed.") does not fit. */
+  title?: string;
+  /** Explanation under the headline, when the default ("invalid or damaged file") does not fit. */
+  hint?: string;
 }
 
 interface NetworkErrorBoundaryState {
@@ -41,10 +45,12 @@ export class NetworkErrorBoundary extends React.Component<NetworkErrorBoundaryPr
 
   render(): React.ReactNode {
     if (this.state.error) {
-      const { onReset, resetLabel } = this.props;
+      const { onReset, resetLabel, title, hint } = this.props;
       return (
         <NetworkErrorState
           message={this.state.error.message}
+          title={title}
+          hint={hint}
           action={onReset && resetLabel ? { label: resetLabel, onClick: onReset } : undefined}
         />
       );

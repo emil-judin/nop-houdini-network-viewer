@@ -579,7 +579,7 @@ def is_sidefx_or_labs_hda(node):
         return True
 
     lib_path = hda_def.libraryFilePath().replace("\\", "/").lower()
-    hfs_path = hou.expandString("$HFS").replace("\\", "/").lower()
+    hfs_path = hou.text.expandString("$HFS").replace("\\", "/").lower()
     if lib_path.startswith(hfs_path) or "sidefxlabs" in lib_path:
         return True
 
@@ -663,7 +663,7 @@ class CustomUserAssetExtractor:
     def __init__(self):
         self.icons = {}
         self.custom_shapes = {}
-        self._hfs_prefix = hou.expandString("$HFS").replace("\\", "/").lower()
+        self._hfs_prefix = hou.text.expandString("$HFS").replace("\\", "/").lower()
 
     def register_user_icon(self, node, icon_id):
         """Extracts an SVG string only if the icon belongs to a user-authored custom HDA or external file."""
@@ -809,6 +809,7 @@ def serialize_network(net, state, selected_only=False):
                 except Exception:
                     state.warnings += 1
 
+            output_labels = list(it.outputLabels())
             node_obj = {
                 "name": it.name(),
                 "type": it.type().name(),
@@ -829,8 +830,10 @@ def serialize_network(net, state, selected_only=False):
                 },
                 "maxInputs": len(it.inputConnectors()),
                 "inputLabels": list(it.inputLabels()),
-                "maxOutputs": len(it.outputConnectors()),
-                "outputLabels": list(it.outputLabels()),
+                # The outputs the node shows: `outputConnectors()` is the type's maximum (11 for every SOP
+                # subnet), `outputLabels()` lists one entry per output the Network Editor draws
+                "maxOutputs": len(output_labels),
+                "outputLabels": output_labels,
                 "comment": scrub_path(it.comment()),
                 "showComment": it.isGenericFlagSet(hou.nodeFlag.DisplayComment),
                 "isSubnetwork": should_recurse_subnet(it, state.include_locked_assets),
@@ -1071,7 +1074,7 @@ def run_interactive_export(pane=None):
             chooser_mode=hou.fileChooserMode.Write,
         )
         if file_path:
-            expanded_path = hou.expandString(file_path)
+            expanded_path = hou.text.expandString(file_path)
             if not expanded_path.lower().endswith(".json"):
                 expanded_path += ".json"
                 # The file chooser only asked about the name without `.json`

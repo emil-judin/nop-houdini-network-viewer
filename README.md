@@ -2,7 +2,7 @@
 
 # NOP
 
-Interactive viewer for SideFX Houdini node networks on the web. Export networks from Houdini, embed them on any page and inspect them on desktop and mobile.
+Interactive viewer for SideFX Houdini node networks on the web.
 
 <p align="center">
   <a href="https://emil-judin.github.io/nop-houdini-network-viewer/"><b>Try the live playground →</b></a>
@@ -10,7 +10,7 @@ Interactive viewer for SideFX Houdini node networks on the web. Export networks 
   <sub><a href="https://emil-judin.github.io/nop-houdini-network-viewer/example-site.html">Example page</a> · <a href="./CHANGELOG.md">Changelog</a></sub>
 </p>
 
-NOP (Net OPerator) is made for portfolio websites, blogs and documentation, and draws networks like Houdini's Network Editor. A shelf tool in Houdini allows exporting networks to a JSON file, and displaying them on your web page via this package. Users can pan, zoom, open subnetworks and read parameters and VEX code. NOP is inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
+NOP (Net OPerator) shows your Houdini networks on any page, styled like Houdini's Network Editor. Export a network with the NOP shelf tool in Houdini, then embed the JSON file on your page. Visitors to your portfolio, blog or documentation can pan, zoom, open subnetworks and read parameters and VEX code. NOP is built on [React Flow](https://reactflow.dev/) and inspired by [Klee](https://joined-forces.github.io/klee/) for Unreal Engine.
 
 <img src="docs/assets/nop-demo.gif" alt="A Houdini network embedded in an example portfolio website, shown in Chrome: clicking a node shows its parameters, double-clicking a subnetwork dives inside, a wrangle shows its VEX code, and the path bar leads back up." width="100%">
 
@@ -88,7 +88,7 @@ export function PortfolioBreakdown() {
 }
 ```
 
-`react` and `react-dom` 18.2 or newer are peer dependencies. React 19 is not tested yet.
+`react` and `react-dom` 18.2 or newer are peer dependencies. React 19 is not tested yet. [React Flow](https://reactflow.dev/) (`@xyflow/react` 12) renders the network and is installed with the package.
 
 ### 3. iframe (not tested yet)
 

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOP web component test page</title>
+    <!-- A hostile host page: root font size, global resets and element styles that must not reach the viewer -->
+    <style>
+      html { font-size: 62.5%; }
+      * { margin: 7px; letter-spacing: 3px; }
+      button { background: red !important; border: 5px solid lime; }
+      svg { width: 400px; }
+      .flex { display: none; }
+      .host-button { font-size: 20px; }
+    </style>
+    <script type="module" src="/lib/web-component.js"></script>
+  </head>
+  <body>
+    <h1>Blog post</h1>
+    <button class="host-button" type="button">Host button</button>
+    <houdini-network id="board" src="/fixtures/examples/start_here-network.json" style="height: 480px" minimap></houdini-network>
+    <houdini-network id="labs" src="/fixtures/edge-cases/labs-tools.json" style="height: 480px" minimap="false"></houdini-network>
+  </body>
+</html>

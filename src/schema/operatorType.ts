@@ -9,6 +9,33 @@ export interface OperatorTypeParts {
 }
 
 /**
+ * SOP types whose new nodes are not named after the type, with the name Houdini gives them (without the
+ * number). Found by creating every SOP type in Houdini 22.0.466.
+ */
+const DEFAULT_NAMES: Record<string, string> = {
+  copyxform: 'copy',
+  groupcreate: 'group',
+  softxform: 'softtransform',
+  tetrasurface: 'convertets',
+  texture: 'uvtexture',
+  topnet: 'topgeometry',
+  topnetmgr: 'topnet',
+  vdbadvectsdf: 'vdbadvect',
+  xform: 'transform',
+  xformaxis: 'transformaxis',
+  xformbyattrib: 'transformbyattrib',
+  xformpieces: 'transformpieces',
+};
+
+/**
+ * The name Houdini gives a new node of this base type, without the number: `transform` for `xform`,
+ * the base type itself for most types.
+ */
+export function defaultNodeName(baseType: string): string {
+  return Object.hasOwn(DEFAULT_NAMES, baseType) ? DEFAULT_NAMES[baseType] : baseType;
+}
+
+/**
  * Splits a Houdini operator type name into namespace and base name, dropping the version.
  *
  * Examples: `labs::thicken::1.0` gives `labs` + `thicken`; `copytopoints::2.0` gives `""` + `copytopoints`;

@@ -73,5 +73,5 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
   fullscreen, reduced motion) to React Flow and the HUD.
 - The Parameter Inspector and the SideFX Labs icon drawings load on demand (`React.lazy`, `loadLabsIcons`).
   Keep heavy, optional code behind such a boundary so embeds stay small.
-- Tests (local suite, not published yet): `tests/unit/convertGraph.test.ts` pins the coordinate and wire rules;
+- Tests: `tests/unit/convertGraph.test.ts` pins the coordinate and wire rules;
   add a case when you change them.

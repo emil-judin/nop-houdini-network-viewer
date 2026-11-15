@@ -76,16 +76,16 @@ function escapeAttribute(value: string): string {
 }
 
 /**
- * `<script>` + `<houdini-network>` snippet for plain HTML sites (WordPress, Cargo, static pages).
- *
- * @param scriptUrl URL of the published `web-component.js` bundle.
- */
-/**
  * Background of an embed's space while the viewer loads: the canvas grey (`CANVAS_COLOR` in
  * `src/components/theme.ts`), so the space looks like the network before it appears.
  */
 export const EMBED_PLACEHOLDER_COLOR = '#242424';
 
+/**
+ * `<script>` + `<houdini-network>` snippet for plain HTML sites (WordPress, Cargo, static pages).
+ *
+ * @param scriptUrl URL of the published `web-component.js` bundle.
+ */
 export function buildWebComponentSnippet(options: EmbedSnippetOptions, scriptUrl: string): string {
   const attributes = [
     `src="${escapeAttribute(options.jsonUrl)}"`,

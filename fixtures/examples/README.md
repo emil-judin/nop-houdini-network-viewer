@@ -8,7 +8,7 @@ Where they are used:
 
 - `src/playground/examples.ts` lists them. Its keys appear in links such as `?example=start`.
 - The build publishes every `*-network.json` at `examples/<file name>` next to the playground, so the embed code of an example works as it is.
-- `example-site.html` uses some node names.
+- `example-site.html` and the tests use some node names (see Fixtures in [`docs/TESTING.md`](../../docs/TESTING.md)).
 
 ## Files
 
@@ -79,4 +79,4 @@ Not shown on purpose:
    grep -i "users" fixtures/examples/*.json
    ```
 
-6. If a node was renamed, update `example-site.html`. Renaming a key in `examples.ts` changes links such as `?example=start`.
+6. If a node was renamed, update `example-site.html` and the tests that use the old name. Renaming a key in `examples.ts` changes links such as `?example=start`.

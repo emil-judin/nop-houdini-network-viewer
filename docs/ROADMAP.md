@@ -4,21 +4,20 @@ Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHA
 
 ## Current state
 
-- **Version:** `0.1.0-alpha.5`, a tester release. The playground is hosted on GitHub Pages; the npm package is not published yet.
+- **Version:** `0.1.0-alpha.6`, a tester release. The playground is hosted on GitHub Pages; the npm package is not published yet.
 - **Schema:** `1.4.0` ([SCHEMA.md](./SCHEMA.md), machine-readable in `schema/nop-network-1.schema.json`).
 - **Houdini:** the exporter is checked with Houdini 22.0.466. Houdini 20.5 and 21 are not checked yet.
-- **Browsers:** checked by the automated browser tests in Chromium, Firefox and WebKit, and in emulated phone and tablet profiles (Pixel 7, iPhone 14, iPad gen 7). Not checked on real devices or in Safari yet.
+- **Browsers:** checked by the automated browser tests in Chromium, Firefox and WebKit, and in emulated phone and tablet profiles (Pixel 7, iPhone 14, iPad gen 7), and by hand on a physical iPhone 13 and iPad 11. Not checked in Safari on macOS or on a real Android phone yet.
 - **Example networks:** six guided examples in `fixtures/examples/`, built in Houdini for the playground (scene `nop_examples.hip`).
 
 ## In progress
 
-- **Automated test suite:** unit, component, exporter and browser tests, plus their CI steps. They exist locally and will be published together with the teaser video.
 - **Teaser video:** a short video for people who do not want to explore the playground right away.
 - **Icon coverage:** drawings for more built-in SOPs. Until a node type has one, it shows the default emblem.
 
 ## Before the public release
 
-- [ ] Smoke test on real devices: Safari on macOS and iOS, Chrome on Android (two-finger panning, fullscreen fallback on iPhone, narrow path bar, settings menu, screenshot).
+- [ ] Smoke test on real devices: Safari on macOS, Chrome on Android (iPhone and iPad are checked) (two-finger panning, fullscreen fallback on iPhone, narrow path bar, settings menu, screenshot).
 - [ ] Collect and work through the tester feedback.
 - [ ] Decide the public API: close the playground exceptions listed in `eslint.config.js` (see [decision 0010](./decisions/0010-one-repository-public-api.md)).
 - [ ] React 19 check, then widen the peer range to `^18.2.0 || ^19.0.0`.

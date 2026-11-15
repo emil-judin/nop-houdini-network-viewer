@@ -39,6 +39,11 @@ jobs:
         env:
           VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}
           VITE_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
+      # After the builds: some unit tests check the built files. The exporter contract tests run the
+      # exporter with Python, which the runner has as `python3`
+      - run: npm test
+        env:
+          PYTHON: python3
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist-playground

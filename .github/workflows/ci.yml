@@ -1,5 +1,6 @@
-# Checks every push and pull request: typecheck, lint and both builds. Protect `main` with this
-# workflow once the repository is public (Settings > Branches > require the "verify" check).
+# Checks every push and pull request: typecheck, lint, unit and component tests, exporter tests,
+# both builds, and browser tests. Protect `main` with this workflow once the repository is public
+# (Settings > Branches > require the "verify" and "browser" checks).
 # Actions are pinned to full commit SHAs (Dependabot keeps them current, see .github/dependabot.yml).
 name: CI
 
@@ -25,6 +26,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
       - run: npm ci
       - run: npm run check
       - run: npm run lint
@@ -33,3 +37,25 @@ jobs:
       # The third-party licenses must list exactly what the web component bundles
       - run: node scripts/build_third_party_notices.mjs --check
       - run: npm run build
+      # After the builds: some unit tests check the built files (stylesheet scoping, no reference icons)
+      - run: npm test
+      - run: npm run test:exporter
+
+  browser:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

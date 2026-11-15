@@ -56,6 +56,13 @@ const ParameterInspector = React.lazy(() =>
 );
 
 /**
+ * Shown when the Parameter Inspector fails, most often because its code could not be downloaded
+ * (a dropped connection). The browser keeps a failed download until the page is reloaded.
+ */
+const INSPECTOR_ERROR_HINT =
+  'Check your connection and reload the page to try again. The network itself is still shown.';
+
+/**
  * Props for the `<HoudiniNetwork />` embeddable component.
  */
 export interface HoudiniNetworkProps {
@@ -708,6 +715,10 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
                 elementsSelectable={true}
                 nodesFocusable={true}
                 edgesFocusable={false}
+                // View-only: Shift-drag pans like a plain drag (there is no multiple selection to draw a box
+                // for), and no key deletes anything, whatever handlers are added later
+                selectionKeyCode={null}
+                deleteKeyCode={null}
                 onlyRenderVisibleElements={itemCount > VISIBLE_ONLY_ITEM_COUNT}
                 // Left and middle mouse button (and one finger) drag the view
                 panOnDrag={PAN_BUTTONS}
@@ -765,7 +776,11 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
             open={selectedNode !== null}
             slide={sheetSlides}
           >
-            <NetworkErrorBoundary resetKey={inspectorNode}>
+            <NetworkErrorBoundary
+              resetKey={inspectorNode}
+              title="The parameters of this node could not be shown."
+              hint={INSPECTOR_ERROR_HINT}
+            >
               <React.Suspense fallback={<NetworkLoadingState message="Loading parameters..." />}>
                 <ParameterInspector
                   node={inspectorNode}
