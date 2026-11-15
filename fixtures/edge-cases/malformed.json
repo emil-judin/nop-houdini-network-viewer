@@ -1,0 +1,198 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/geo1",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      null,
+      5,
+      "box1",
+      {
+        "type": "box"
+      },
+      {
+        "name": "box1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": [
+          {
+            "name": "size",
+            "label": "Size",
+            "val": 1,
+            "expr": null
+          },
+          {
+            "name": "ramp",
+            "label": "Ramp",
+            "type": "Ramp",
+            "val": [
+              2
+            ],
+            "ramp": {
+              "color": false
+            }
+          },
+          {
+            "name": null,
+            "val": [
+              1
+            ]
+          },
+          {
+            "name": "t",
+            "label": "Translate",
+            "val": [
+              1,
+              {
+                "x": 1
+              },
+              null
+            ],
+            "expr": "ch(\"x\")"
+          }
+        ]
+      },
+      {
+        "name": "subnet1",
+        "type": "subnet",
+        "label": "Subnet",
+        "icon": "SOP_subnet",
+        "pos": [
+          2,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": true,
+        "parms": [],
+        "children": {
+          "path": "/obj/geo1/subnet1"
+        }
+      },
+      {
+        "name": "bad_pos",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          "a",
+          null
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": "red",
+        "shape": "rect",
+        "flags": null,
+        "maxInputs": "many",
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [
+      null,
+      {
+        "pos": [
+          1,
+          1
+        ]
+      }
+    ],
+    "boxes": [
+      {
+        "name": "__netbox1",
+        "pos": null,
+        "size": "big"
+      }
+    ],
+    "stickies": [
+      {
+        "name": "__sticky1",
+        "text": 42
+      }
+    ],
+    "wires": [
+      {
+        "from": "box1",
+        "to": "missing_node",
+        "fromOutput": 0,
+        "toInput": 0
+      },
+      {
+        "from": 1
+      },
+      null
+    ],
+    "subnetInputs": []
+  }
+}

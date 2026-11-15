@@ -85,5 +85,10 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 
 - `exporter/package/` is the Houdini package: `nop.json` sets `$NOP_EXPORTER_ROOT` from `$HOUDINI_PACKAGE_PATH`,
   so it works in any package folder. `npm run build:exporter` builds the reproducible zip.
-- Tests (local suite, not published yet): `npm.cmd run test:exporter` (standard library `unittest` with the fake `hou` in
+- Tests: `npm.cmd run test:exporter` (standard library `unittest` with the fake `hou` in
   `exporter/tests/fake_hou.py`). Extend the fake only with what the exporter calls.
+- Before committing an exporter change, also run `npm.cmd run test:exporter:houdini` locally: it runs
+  `exporter/tests/houdini_session.py` in a real hython (real node types, connectors, flags, assets, every SOP type in
+  full mode) and checks the exports against the JSON Schema and the viewer. It needs Houdini and its license and takes
+  about 2 minutes; without Houdini on the machine, say so in the report. New real-Houdini checks go in that file
+  (its name does not start with `test`, so the plain `test:exporter` run never picks it up).

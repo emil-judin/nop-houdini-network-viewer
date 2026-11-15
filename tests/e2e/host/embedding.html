@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NOP embedding test page</title>
+    <!-- The same script from two URLs (a CDN copy and a local copy, say): it runs twice -->
+    <script type="module" src="/lib/web-component.js"></script>
+    <script type="module" src="/lib/web-component.js?copy=2"></script>
+  </head>
+  <body style="margin: 0">
+    <houdini-network id="plain" src="/fixtures/examples/start_here-network.json"></houdini-network>
+    <houdini-network id="second" src="/fixtures/examples/vex_wrangles-network.json" style="height: 300px"></houdini-network>
+    <houdini-network id="third" src="/fixtures/examples/assets-network.json" style="height: 300px"></houdini-network>
+  </body>
+</html>

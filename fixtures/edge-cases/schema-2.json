@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "2.0.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/geo1",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "box1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [],
+    "wires": [],
+    "subnetInputs": []
+  }
+}

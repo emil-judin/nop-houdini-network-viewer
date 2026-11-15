@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/geo1",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "constructor",
+        "type": "box",
+        "label": "Box",
+        "icon": "constructor",
+        "pos": [
+          0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "toString",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "__proto__",
+        "type": "merge",
+        "label": "Merge",
+        "icon": "__proto__",
+        "pos": [
+          0,
+          -1
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "hasOwnProperty",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [],
+    "wires": [
+      {
+        "from": "constructor",
+        "fromOutput": 0,
+        "to": "__proto__",
+        "toInput": 0
+      }
+    ],
+    "subnetInputs": []
+  }
+}

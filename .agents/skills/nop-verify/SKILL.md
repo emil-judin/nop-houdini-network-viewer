@@ -7,13 +7,15 @@ description: >-
 
 # Verify a NOP change
 
-Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands with `;`). Steps 3, 4 and 6 use
-the test suite, which is not published yet: run them whenever `tests/` and `exporter/tests/` are in your checkout.
+Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands with `;`).
 
-1. `npm.cmd run check`: strict TypeScript for `src/` (and for the tests when present).
+1. `npm.cmd run check`: strict TypeScript for `src/` and the tests.
 2. `npm.cmd run lint`: ESLint (TypeScript, React hooks, JSX accessibility).
 3. `npm.cmd test`: Vitest unit and component tests (`tests/unit`, `tests/component`).
-4. `npm.cmd run test:exporter`: exporter tests with the fake `hou` (Python 3.9+, standard library).
+4. `npm.cmd run test:exporter`: exporter tests with the fake `hou` (Python 3.9+, standard library). For a change
+   in `exporter/` (outside `exporter/tests/`), also `npm.cmd run test:exporter:houdini` before committing: the same
+   kind of checks in a real Houdini session (needs a local Houdini and its license, about 2 minutes). Without Houdini on
+   the machine, report that instead of a pass.
 5. `npm.cmd run build:lib`, then `npm.cmd run build`: library and playground builds. In this order, because the playground build publishes the web component from `dist/` for its example website (it warns when `dist/web-component.js` is missing).
 6. For changes the visitor can see or touch: `npm.cmd run test:e2e` (Playwright; first run
    `npx playwright install`). It builds and serves everything itself. On a busy machine run one browser

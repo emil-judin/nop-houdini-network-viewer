@@ -1,0 +1,234 @@
+{
+  "schemaVersion": "1.4.0",
+  "houdiniVersion": "22.0.466",
+  "exportMode": "compact",
+  "icons": {},
+  "customShapes": {},
+  "root": {
+    "path": "/obj/geo1",
+    "type": "geo",
+    "context": "Sop",
+    "nodes": [
+      {
+        "name": "src0",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          0.0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "src1",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          1.5,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "src2",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          3.0,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "src3",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          4.5,
+          0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Input 1"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      },
+      {
+        "name": "merge1",
+        "type": "merge",
+        "label": "Merge",
+        "icon": "SOP_merge",
+        "pos": [
+          1,
+          -2
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "lock": false
+        },
+        "maxInputs": 9999,
+        "inputLabels": [
+          "Input"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "isSubnetwork": false,
+        "parms": []
+      }
+    ],
+    "dots": [],
+    "boxes": [],
+    "stickies": [],
+    "wires": [
+      {
+        "from": "src3",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 3
+      },
+      {
+        "from": "src1",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 1
+      },
+      {
+        "from": "src0",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 0
+      },
+      {
+        "from": "src2",
+        "fromOutput": 0,
+        "to": "merge1",
+        "toInput": 2
+      }
+    ],
+    "subnetInputs": []
+  }
+}

@@ -21,6 +21,7 @@ function localReferenceIcons(): Plugin {
     configureServer(server) {
       server.middlewares.use('/__local_houdini_ref_icons.json', (_req, res) => {
         res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Cache-Control', 'no-cache');
         if (!existsSync(LOCAL_REFERENCE_ICONS)) {
           res.end('{}');
           return;
@@ -34,9 +35,9 @@ function localReferenceIcons(): Plugin {
 /**
  * Adds `og:url` and `og:image` to the playground page. Link previews (chat apps, social sites) need
  * absolute URLs, so the tags are only added when the hosted address is known (`VITE_SITE_URL`, set by
- * the GitHub Pages workflow).
+ * the GitHub Pages workflow). Exported for its test (`NOP-PG-037`).
  */
-function openGraphUrls(siteUrl: string | undefined): Plugin {
+export function openGraphUrls(siteUrl: string | undefined): Plugin {
   return {
     name: 'open-graph-urls',
     transformIndexHtml(_html, context) {

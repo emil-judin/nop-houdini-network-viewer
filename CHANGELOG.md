@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- The automated test suite is published: unit and component tests (Vitest), exporter tests with a fake `hou` and in a real Houdini session (`npm run test:exporter:houdini`, local only), and browser tests in Chromium, Firefox, WebKit and phone and tablet profiles (Playwright). Every scenario in `docs/features/` names its test, and CI runs them on every push.
+
 ### Fixed
 - When the Parameter Inspector cannot be loaded (for example on a dropped connection), its panel now says the parameters could not be shown and asks to reload the page, instead of calling the network file invalid or damaged.
 - Holding Shift while dragging the network pans it, instead of drawing a selection box that selected nothing.
