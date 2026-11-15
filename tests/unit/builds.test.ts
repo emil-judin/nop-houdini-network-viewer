@@ -15,8 +15,13 @@ const TEXT_FILES = new Set(['.js', '.mjs', '.cjs', '.css', '.html', '.json', '.s
 /** SideFX reference icons live in the gitignored `local-refs/` folder and are only served by the dev server. */
 const REFERENCE_MARKERS = ['local-refs/', '__local_houdini_ref_icons'];
 
-// Checks the builds when they exist (CI runs the builds after the unit tests, so locally only)
-describe.each(['dist', 'dist-playground'].filter((dir) => existsSync(dir)))('NOP-EMB-045: the %s build', (dir) => {
+// Checks the builds that exist: CI builds before it tests. Without any build (a fresh clone) the check
+// is skipped instead of leaving a file without tests, which Vitest counts as a failure.
+const BUILDS = ['dist', 'dist-playground'].filter((dir) => existsSync(dir));
+
+it.skipIf(BUILDS.length > 0)('NOP-EMB-045: no build to check (run npm run build:lib and npm run build first)', () => {});
+
+describe.each(BUILDS)('NOP-EMB-045: the %s build', (dir) => {
   it('NOP-EMB-045: contains no SideFX reference icon data', () => {
     const found = listFiles(dir)
       .filter((file) => TEXT_FILES.has(extname(file)))

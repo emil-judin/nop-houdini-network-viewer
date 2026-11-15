@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import postcss from 'postcss';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { scopeSelector } from '../../vite.lib.config';
 
 describe('scopeSelector (npm stylesheet scoping)', () => {
@@ -19,9 +19,13 @@ describe('scopeSelector (npm stylesheet scoping)', () => {
   });
 });
 
-// Checks the built file when it exists (CI runs `npm run build:lib` after the tests, so locally only)
+// Checks the built file when it exists (CI runs `npm run build:lib` before the tests). The file is read in
+// `beforeAll`: the body of a skipped `describe` still runs while Vitest collects the tests
 describe.runIf(existsSync('dist/style.css'))('built dist/style.css', () => {
-  const root = postcss.parse(readFileSync('dist/style.css', 'utf8'));
+  let root: postcss.Root;
+  beforeAll(() => {
+    root = postcss.parse(readFileSync('dist/style.css', 'utf8'));
+  });
 
   it('NOP-EMB-044: every rule outside keyframes and nested "&" rules is scoped to .nop-root', () => {
     const unscoped: string[] = [];

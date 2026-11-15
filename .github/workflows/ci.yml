@@ -32,13 +32,14 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run lint
-      - run: npm test
-      - run: npm run test:exporter
       # The library first: the playground build publishes its web component for the example site page
       - run: npm run build:lib
       # The third-party licenses must list exactly what the web component bundles
       - run: node scripts/build_third_party_notices.mjs --check
       - run: npm run build
+      # After the builds: some unit tests check the built files (stylesheet scoping, no reference icons)
+      - run: npm test
+      - run: npm run test:exporter
 
   browser:
     needs: verify
