@@ -54,9 +54,10 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
    - Every file is checked once on load (`normalizeNetworkDocument` in `src/schema/normalize.ts`): items without a name are dropped, missing or wrong values get the defaults documented here (for example `pos` `[0, 0]`, a scalar `val` becomes a one-item list), unknown extra fields are kept. Only files that are not networks at all, or that use a newer major schema, are refused with a message.
 2. **Node Shape Normalization:**
    - In Houdini, nodes with the default rectangular shape report `"shape": ""`. The converter normalizes `""` to `"rect"`.
-3. **Multi-Input Connector Cap (`maxInputs`):**
+3. **Connector counts (`maxInputs`, `maxOutputs`):**
    - Operators with variable inputs (such as `merge` and `switch`) report `"maxInputs": 9999`.
    - Any node with `maxInputs > 4` renders a single wide multi-input bar connector at the top of the node rather than discrete circular connectors.
+   - `maxOutputs` is the number of outputs the node shows, one per entry of `outputLabels`: 0 for ROP Geometry Output, 1 for a plain subnet, up to 10 for an asset. Houdini's `outputConnectors()` reports the type's maximum instead (11 for every SOP subnet), which exports before 0.1.0-alpha.7 wrote here; for those the viewer counts the output labels. Every output is drawn as its own connector, smaller when they would overlap.
 4. **Subnetwork Indirect Inputs (`subnetInputs`):**
    - Inside a Subnet or HDA, parent inputs are represented in `subnetInputs` with `"name": "1"`, `"name": "2"`, etc.
    - Wires originating from a subnet input reference `"from": "1"`. During conversion, these are mapped to synthetic node IDs (`input:1`) to prevent ID collisions and ensure clean wire routing. Boxes, sticky notes and dots get the same kind of prefix (`box:`, `sticky:`, `dot:`).

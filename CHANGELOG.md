@@ -4,6 +4,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.7 (2026-11-16, tester release)
+
 ### Added
 - The automated test suite is published: unit and component tests (Vitest), exporter tests with a fake `hou` and in a real Houdini session (`npm run test:exporter:houdini`, local only), and browser tests in Chromium, Firefox, WebKit and phone and tablet profiles (Playwright). Every scenario in `docs/features/` names its test, and CI runs them on every push.
 
