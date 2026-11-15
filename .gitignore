@@ -37,3 +37,6 @@ teaser/out/
 # NOP spiderweb 3D scene (design/nop-spiderweb-3d/): kept local until the owner reworks and releases it.
 # Remove this line to release it (see its README).
 design/nop-spiderweb-3d/
+
+# VS Code Counter extension output (line counts)
+.VSCodeCounter/
