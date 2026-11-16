@@ -6,6 +6,7 @@ import type { OperatorIconDef } from '../components/nodes/icons/iconTypes';
 import { LABS_NODE_CATALOG } from '../components/nodes/icons/labs/labsNodeCatalog';
 import { OperatorIconGlyph } from '../components/nodes/icons/OperatorSvgIcon';
 import { PATH_ICONS } from '../components/nodes/icons/path/pathIcons';
+import { APPROVED_REVIEW_IDS, REVIEW_ICONS } from '../components/nodes/icons/sop/review';
 import {
   getFlagEdgePaths,
   getNodeShapeDef,
@@ -16,13 +17,16 @@ import {
 
 type ReviewDecision = 'keep' | 'redo';
 type FamilyFilter = 'all' | 'sop' | 'labs' | 'path';
-type DecisionFilter = 'all' | 'keep' | 'redo' | 'unreviewed';
+type DecisionFilter = 'all' | 'keep' | 'redo' | 'unreviewed' | 'feedback';
 
 const FAMILY_LABELS: Record<FamilyFilter, string> = { all: 'All', sop: 'SOP', labs: 'Labs', path: 'Path bar' };
 
-// Pre-NOP key kept on purpose: renaming it would drop the review progress saved in browsers
-const STORAGE_KEY = 'houdini-visualizer-icon-review-v2';
-const ALL_ICONS: OperatorIconDef[] = [...OPERATOR_ICONS, ...PATH_ICONS, DEFAULT_OPERATOR_ICON];
+const STORAGE_KEY = 'houdini-visualizer-icon-review-v5';
+const NOTES_STORAGE_KEY = 'houdini-visualizer-icon-review-notes-v1';
+/** Node body colors used for the 21px previews: Houdini's default light grey and a dark node. */
+const PREVIEW_NODE_COLORS = ['#cccccc', '#3d3d3d'] as const;
+const ACCEPTED_ICONS: OperatorIconDef[] = [...OPERATOR_ICONS, ...PATH_ICONS, DEFAULT_OPERATOR_ICON];
+const ALL_ICONS: OperatorIconDef[] = [...REVIEW_ICONS, ...ACCEPTED_ICONS];
 
 const NODE_SHAPE = getNodeShapeDef('rect');
 const NODE_OUTLINE = pointsToSvgPath(NODE_SHAPE.outline, true);
@@ -42,16 +46,16 @@ function buildIconUsage(): Map<string, string[]> {
 }
 
 /**
- * Default rectangular node body in the default `#cccccc` node color, with a centered icon.
+ * Rectangular node body in a node color (default `#cccccc`), with a centered icon.
  */
-const NodeBodyPreview: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const NodeBodyPreview: React.FC<{ children: React.ReactNode; color?: string }> = ({ children, color = '#cccccc' }) => (
   <div className="relative w-[100px] h-[30px] shrink-0">
     <svg
       viewBox={`0 0 ${SHAPE_SVG_WIDTH} ${SHAPE_SVG_HEIGHT}`}
       className="w-full h-full overflow-visible block"
       preserveAspectRatio="none"
     >
-      <path d={NODE_OUTLINE} fill="#cccccc" stroke="#262626" strokeWidth={1.0} strokeLinejoin="round" />
+      <path d={NODE_OUTLINE} fill={color} stroke="#262626" strokeWidth={1.0} strokeLinejoin="round" />
       {NODE_FLAG_EDGES.map((ep, idx) => (
         <path key={idx} d={ep} fill="none" stroke="#555555" strokeWidth={0.85} strokeOpacity={0.7} />
       ))}
@@ -67,6 +71,7 @@ const NodeBodyPreview: React.FC<{ children: React.ReactNode }> = ({ children }) 
  */
 export const IconReviewGallery: React.FC = () => {
   const [localRefIcons, setLocalRefIcons] = useState<Record<string, string>>({});
+  const [loadingRefs, setLoadingRefs] = useState(true);
   const [familyFilter, setFamilyFilter] = useState<FamilyFilter>('all');
   const [decisionFilter, setDecisionFilter] = useState<DecisionFilter>('all');
   const [query, setQuery] = useState('');
@@ -76,19 +81,49 @@ export const IconReviewGallery: React.FC = () => {
   useEffect(() => {
     fetch('/__local_houdini_ref_icons.json')
       .then((res) => (res.ok ? res.json() : {}))
-      .then((data) => setLocalRefIcons(data))
-      .catch(() => setLocalRefIcons({}));
+      .then((data) => {
+        setLocalRefIcons(data);
+        setLoadingRefs(false);
+      })
+      .catch(() => {
+        setLocalRefIcons({});
+        setLoadingRefs(false);
+      });
   }, []);
 
   const [decisions, setDecisions] = useState<Record<string, ReviewDecision>>(() => {
+    const initial: Record<string, ReviewDecision> = Object.fromEntries([
+      ...ACCEPTED_ICONS.map((def) => [def.id, 'keep'] as const),
+      ...Array.from(APPROVED_REVIEW_IDS, (id) => [id, 'keep'] as const),
+    ]);
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) return { ...initial, ...(JSON.parse(saved) as Record<string, ReviewDecision>) };
+    } catch {
+      // Ignore storage error
+    }
+    return initial;
+  });
+
+  const [notes, setNotes] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem(NOTES_STORAGE_KEY);
+      if (saved) return JSON.parse(saved) as Record<string, string>;
     } catch {
       // Ignore storage error
     }
     return {};
   });
+
+  const setNote = (id: string, note: string) => {
+    const updated = { ...notes, [id]: note };
+    setNotes(updated);
+    try {
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updated));
+    } catch {
+      // Ignore storage error
+    }
+  };
 
   const setDecision = (id: string, decision: ReviewDecision) => {
     const updated = { ...decisions, [id]: decision };
@@ -105,6 +140,7 @@ export const IconReviewGallery: React.FC = () => {
     if (familyFilter !== 'all' && def.family !== familyFilter) return false;
     const decision = decisions[def.id];
     if (decisionFilter === 'unreviewed' && decision) return false;
+    if (decisionFilter === 'feedback' && !notes[def.id]?.trim()) return false;
     if ((decisionFilter === 'keep' || decisionFilter === 'redo') && decision !== decisionFilter) return false;
     if (!normalizedQuery) return true;
     const haystack = [def.id, def.label, def.description, ...(usage.get(def.id) ?? [])].join(' ').toLowerCase();
@@ -114,11 +150,31 @@ export const IconReviewGallery: React.FC = () => {
   const keepList = ALL_ICONS.filter((def) => decisions[def.id] === 'keep');
   const redoList = ALL_ICONS.filter((def) => decisions[def.id] === 'redo');
   const unreviewedCount = ALL_ICONS.length - keepList.length - redoList.length;
+  // Icons that are not Redo but carry feedback: small manual tweaks to an otherwise good drawing.
+  const adjustList = ALL_ICONS.filter((def) => decisions[def.id] !== 'redo' && notes[def.id]?.trim());
+  const feedbackCount = ALL_ICONS.filter((def) => notes[def.id]?.trim()).length;
 
   const handleCopySummary = async () => {
     const keepStr = keepList.map((def) => `${def.id} | ${def.label}`).join('\n');
-    const redoStr = redoList.map((def) => `${def.id} | ${def.label}: ${def.description}`).join('\n');
-    const summary = `KEEP (${keepList.length}):\n${keepStr}\n\nREDO (${redoList.length}):\n${redoStr}\n\nUNREVIEWED: ${unreviewedCount}`;
+    const adjustStr = adjustList
+      .map((def) => `${def.id} | ${def.label}\n  adjust: ${notes[def.id].trim()}`)
+      .join('\n');
+    // Redo entries lead with the reviewer's correction; the old description is marked as possibly
+    // wrong so a redraw starts from the Houdini reference instead of anchoring on it.
+    const redoStr = redoList
+      .map((def) => {
+        const note = notes[def.id]?.trim();
+        return [
+          `${def.id} | ${def.label}`,
+          `  correction: ${note || '(no note: compare with the Houdini reference)'}`,
+          `  old description (may be wrong, do not reuse): ${def.description}`,
+        ].join('\n');
+      })
+      .join('\n');
+    const adjustSection = adjustList.length
+      ? `\n\nADJUST (${adjustList.length}): keep the drawing and change only what each note says.\n${adjustStr}`
+      : '';
+    const summary = `KEEP (${keepList.length}):\n${keepStr}${adjustSection}\n\nREDO (${redoList.length}): redraw each from its Houdini reference (local-refs), not from the old description.\n${redoStr}\n\nUNREVIEWED: ${unreviewedCount}`;
     try {
       await navigator.clipboard.writeText(summary);
       setCopiedSummary(true);
@@ -139,12 +195,21 @@ export const IconReviewGallery: React.FC = () => {
         {/* Header & Review Controls */}
         <div className="mb-5 border-b border-[#333333] pb-4 flex flex-col gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-white">Operator Icon Review ({ALL_ICONS.length} drawings)</h2>
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-lg font-semibold text-white">Operator Icon Review ({ALL_ICONS.length} drawings)</h2>
+              {loadingRefs && (
+                <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                  Loading Houdini references...
+                </span>
+              )}
+            </div>
             <p className="text-xs text-[#9e9e9e] mt-1">
               Each card shows the icon id, a description of the drawing, and every node type that uses it. Mark cards{' '}
               <span className="text-emerald-400 font-medium">Keep</span> or <span className="text-amber-400 font-medium">Redo</span>,
-              then <span className="text-white font-medium">Copy Review Selection</span> and paste it into chat (you can refer to
-              icons by id, e.g. &quot;make labs.flowmap more like sop.normal&quot;). Rules for drawings live in{' '}
+              and use the feedback field on any card: a correction for a Redo, or a small manual adjustment (for example
+              &quot;move the ball 1px left&quot;) for an icon that should otherwise stay. Then{' '}
+              <span className="text-white font-medium">Copy Review Selection</span> and
+              paste it into chat (you can refer to icons by id, e.g. &quot;make labs.flowmap more like sop.normal&quot;). Rules for drawings live in{' '}
               <code className="text-[#c8c8c8]">docs/ICON_ART_BIBLE.md</code>.
             </p>
           </div>
@@ -158,7 +223,7 @@ export const IconReviewGallery: React.FC = () => {
               ))}
             </div>
             <div className="flex items-center rounded bg-[#262626] border border-[#3a3a3a] p-0.5">
-              {(['all', 'unreviewed', 'keep', 'redo'] as const).map((f) => (
+              {(['all', 'unreviewed', 'keep', 'redo', 'feedback'] as const).map((f) => (
                 <button key={f} type="button" onClick={() => setDecisionFilter(f)} className={filterButton(decisionFilter === f)}>
                   {f === 'all'
                     ? 'Any'
@@ -166,7 +231,9 @@ export const IconReviewGallery: React.FC = () => {
                       ? `Unreviewed (${unreviewedCount})`
                       : f === 'keep'
                         ? `Keep (${keepList.length})`
-                        : `Redo (${redoList.length})`}
+                        : f === 'redo'
+                          ? `Redo (${redoList.length})`
+                          : `Feedback (${feedbackCount})`}
                 </button>
               ))}
             </div>
@@ -255,7 +322,24 @@ export const IconReviewGallery: React.FC = () => {
                 {/* Plain-language description of the drawing */}
                 <p className="text-[12px] leading-snug text-[#c8c8c8]">{def.description}</p>
 
-                {/* Side-by-side comparison on the default node color */}
+                {/* Feedback on every card: a correction for a Redo (copied ahead of the old description),
+                    otherwise a manual adjustment copied into the ADJUST section */}
+                <textarea
+                  value={notes[def.id] ?? ''}
+                  onChange={(e) => setNote(def.id, e.target.value)}
+                  aria-label={`Feedback for ${def.id}`}
+                  placeholder={
+                    decision === 'redo'
+                      ? 'What is wrong? (for example: should be a tilted 3/4 torus, not a flat ring)'
+                      : 'Feedback or manual adjustment (for example: ball 1px left, thicker outline on the cursor)'
+                  }
+                  rows={2}
+                  className={`w-full rounded bg-[#1b1b1b] border px-2 py-1.5 text-[12px] text-[#e8e8e8] placeholder:text-[#6e6e6e] outline-none ${
+                    decision === 'redo' ? 'border-amber-500/35 focus:border-amber-400' : 'border-[#3a3a3a] focus:border-sky-400'
+                  }`}
+                />
+
+                {/* Side-by-side comparison: 40px on the default node color, 21px on a light and a dark node */}
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     {
@@ -272,9 +356,19 @@ export const IconReviewGallery: React.FC = () => {
                     <div key={title} className="rounded bg-[#1e1e1e] border border-[#303030] p-2.5 flex flex-col items-center gap-2">
                       <span className="text-[10px] uppercase tracking-wider text-[#888888] font-medium">{title}</span>
                       <div className="w-14 h-14 rounded bg-[#cccccc] border border-[#3c3c3c] flex items-center justify-center">
-                        {big ?? <span className="text-[10px] text-[#555555] font-mono">n/a</span>}
+                        {big ?? (
+                          <span className="text-[10px] text-[#555555] font-mono">
+                            {loadingRefs && def.refKey ? 'loading...' : 'n/a'}
+                          </span>
+                        )}
                       </div>
-                      <NodeBodyPreview>{small}</NodeBodyPreview>
+                      <div className="flex flex-col gap-1.5">
+                        {PREVIEW_NODE_COLORS.map((color) => (
+                          <NodeBodyPreview key={color} color={color}>
+                            {small}
+                          </NodeBodyPreview>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

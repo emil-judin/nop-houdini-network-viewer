@@ -20,7 +20,7 @@ Every operator node in the viewer shows a small icon centered in its body. Ours 
 
 ## 2. Legal Rules (Non-Negotiable)
 
-1. **Draw from scratch.** Look at the reference, then write your own SVG. Never copy, trace, convert or embed SideFX path data, gradients or files.
+1. **Draw from scratch.** You may inspect the reference SVGs and rendered images to understand their composition, proportions and shapes, then write your own SVG. Never copy, trace, convert or embed SideFX path data, gradients or files.
 2. **References stay local.** Reference icons are built by a local-only script (not in the repository) into the gitignored `local-refs/` folder and served only by the Vite dev server. Never commit them, never put them in `public/`, never bundle them.
 3. **Vendor logos are redrawn, never copied.** When the reference icon is a vendor logo or wordmark (Labs integrations such as Substance, FBX, Rokoko, Neuron, GoZ, Sketchfab, Exoside, Gaea, ZibraVDB, AliceVision, Dem Bones, and the Houdini logo itself), redraw it by hand in the house style so the integration is recognizable, and mark the description with `(vendor logo, redrawn)`. Never paste or convert the vendor's SVG data. See [decision 0003](./decisions/0003-original-icons-no-sidefx-assets.md); the trademarks remain the property of their owners.
 4. **No real people.** Some Labs icons are photos of people. Never recreate a likeness; use a generic figure or head bust.
@@ -73,8 +73,9 @@ Use these exact values. New colors need a reason (and a line in this table).
 | Dark grey | `#3a3f47` / `#5a616b` | Panels, slots, dark parts |
 | White | `#f2f4f7` / `#ffffff` | Paper, tags, highlights |
 | Orange | `#ee8624` | Faces, planes, emphasis (core) |
-| Orange three-tone | `#ffb066` / `#ee8624` / `#c25e12` | Orange solids that sit on yellow nodes (Compile Block bricks) |
+| Orange three-tone | `#ffb066` / `#ee8624` / `#c25e12` | Orange three-tone solids and warm copper highlights |
 | Red | `#e03228` | Deformation edges, arrows, deletion |
+| Red three-tone | `#ff7066` / `#e03228` / `#a81f18` | Red solids that sit on yellow nodes (Compile Block bricks) |
 | Yellow | `#f2c438` / `#ffe47a` / `#d49a18` | Yellow solids (three-tone) |
 | Blue | `#3672c4` / `#2e74c4` | Move arrows, bricks |
 | Light blue | `#5aa2f2` / `#8fc2ff` | Curves, lenses |
@@ -164,11 +165,41 @@ Study these before drawing. They were reviewed and approved as the house style:
 
 ## 9. Workflow
 
-1. **Build local references** with the local-only reference script, once per machine or after a Houdini or Labs update. Its `--write-labs-catalog` option regenerates `labs/labsNodeCatalog.ts` for a new Labs version.
-2. **Find the reference**: `npm.cmd run dev`, open **Icon Overview**, search for the node.
-3. **Draw** the icon in the matching category file, following sections 3 to 8.
-4. **Verify**: `npm.cmd run check`, then compare in the gallery at both sizes on the `#cccccc` node body.
-5. **Review loop**: mark cards Keep/Redo, click **Copy Review Selection**, and paste it into chat. Redo lines include each icon's description so feedback can point at specific parts.
+Icons are drawn in **family micro-batches** through four stages. Why: Batch 2 drew 100 mixed icons blind and 54 came back as Redo ([decision 0011](./decisions/0011-icon-workflow-family-micro-batches.md)).
+
+**Setup.** Build the local references with the local-only reference script, once per machine or after a Houdini or Labs update (its `--write-labs-catalog` option regenerates `labs/labsNodeCatalog.ts`). They land in the gitignored `local-refs/`.
+
+**0. Pick a family micro-batch (5 to 12 icons).** Cluster the next icons by what their references look like (shared base object, badge or projection: `pack*`, `attribadjust*`, `remesh*`), never by alphabet. One family per file (for example `review/b03/famUnpack.tsx`). Write the family's shared kit first and reuse it unchanged in every member.
+
+**1. Vision-first spec, before any SVG.** Open each reference image (`npm.cmd run icons:prescreen -- --ids sop.a,sop.b` renders them, or the gallery) and write a short spec per icon:
+
+| Field | Example (`sop.remesh`) |
+| --- | --- |
+| Metaphor | Amber torus covered in triangle facets |
+| Projection | 3/4 tilted (not flat, not 2:1 isometric) |
+| Layers (3 to 12 primitives, back to front) | torus body, far inner wall, facet lines, outline |
+| Palette tokens | orange three-tone, outline |
+| Shared kit and badge slot | `tiltedTorus` helper, no badge |
+| Casing plan | dark facet lines on the fill, no light strokes on the node |
+
+Describe the reference pixels, not the operator name, and never start from an old description (old descriptions in Redo exports are marked as possibly wrong). Check every spec against the image before coding.
+
+**2. Draw with deterministic geometry.** Compute projections and recurring shapes with the helpers instead of typing coordinates:
+
+- `src/components/nodes/icons/geoHelpers.ts`: `isoBoxFaces`, `arrowHead`, `ellipsePt` and `ellipsePath`, `tiltedTorus`, `gearPath`, `quadPt` and `quadGridPath`, `cubicAt`, `spiralPath`, `roundedRectPath`.
+- `src/components/nodes/icons/geoKits.tsx`: `CasedStroke`, `ShadedSphere` (upper-left lighting), `CornerBadge` (slots `br`, `tr`, `tl`, `bl`), `CursorArrow`, `GenericFigure`, `StraightArrow`.
+- Family kits build on these (`familyKits.tsx`, `review/b02/sharedElements.tsx`).
+
+**3. Render and pre-screen.** Run `npm.cmd run icons:prescreen -- --ids sop.a,sop.b` (or `--set pilot`, `--set review`). It renders the drawings from the real registry and writes `test-results/icon-prescreen/sheet-N.png` and `report.md`: Houdini reference, ours at 48px on `#cccccc` and `#3d3d3d`, and 21px on `#cccccc`, `#3d3d3d` and a saturated node color.
+
+- **Fails:** forbidden elements, ids without the `uid` prefix or duplicated, painted bounds outside the 1.5..22.5 margin, strokes thinner than 0.6, less than 6% contrasting ink at 21px on any of the three node colors (a warning below 10%), en or em dashes in the description.
+- **Warns:** light strokes without a dark casing (fine only on a saturated fill), overfill (a 21px blob), silhouette IoU below 0.35 or hue overlap below 0.25 against the reference (a likely wrong metaphor or palette).
+
+Fix every fail and look at every warning before going on. `--strict` exits non-zero on a fail.
+
+**4. Independent critic.** A reviewer that did not draw the batch (a fresh-context agent, or another person) compares the contact sheet with the references and this bible and rejects icons with a wrong metaphor, wrong tilt or proportions, unreadable 21px details or a missing shared kit. Patch, re-run step 3, and repeat until the critic accepts.
+
+**5. Human review.** Add the batch to `REVIEW_ICONS` (`sop/review/index.ts`), open the gallery (`npm.cmd run dev`, then `?icons`), mark Keep or Redo, write a short correction note on every Redo (or a small manual adjustment on any other card), and click **Copy Review Selection**. The export leads each Redo with the note and marks the old description as possibly wrong; notes on icons that are not Redo go to an ADJUST section that asks for only the noted change.
 
 ### Done Checklist
 
@@ -179,4 +210,5 @@ Study these before drawing. They were reviewed and approved as the house style:
 - [ ] No real people and no copied SideFX or vendor SVG data; redrawn vendor logos are marked `(vendor logo, redrawn)`.
 - [ ] `id`, `label`, `types`, `refKey` and an accurate `description` filled in.
 - [ ] Gradient and clip ids use `uid`.
+- [ ] `npm.cmd run icons:prescreen` reports no fail, and the critic accepted the icon.
 - [ ] `npm.cmd run check` passes.

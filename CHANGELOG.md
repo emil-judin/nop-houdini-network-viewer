@@ -19,6 +19,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 - When a page switches `src` quickly, a download that arrives after it was cancelled can no longer replace the newer network.
 
 ### Changed
+- Batch 2 built-in SOP icons refined, and the 50 icons flagged in review redrawn from their Houdini references (for example a 3/4 torus for Remesh, an open suitcase for Pack, Pack Points, Packed Properties and Repack, an axis gizmo tile for Shape Difference), with shared drawings for sibling icons (Implicit Surface sphere and core, Pose-Space arm and badge, suitcase, tiger-striped cube, packed tray, metallic gear, scissors, `VolumeCloudBase`, `KinefxMannequinBase`) and clearer shapes at node size on light and dark nodes.
+- Operator icons are now drawn in family micro-batches with shared geometry helpers, an automated pre-screen (`npm run icons:prescreen`: contact sheet, bounds, stroke, contrast and reference checks) and an independent critic pass ([decision 0011](docs/decisions/0011-icon-workflow-family-micro-batches.md)). The Icon Review Gallery previews 21px icons on a light and a dark node and lets reviewers add a correction note to each Redo. A first Batch 3 pilot (Attribute Adjust and Unpack families, 10 icons) is in the gallery.
+- Compile Block Begin and End icons now use red bricks to match Houdini instead of orange.
 - Exports made before schema 1.2.0 no longer get a guessed padlock under namespaced or versioned operator types. That guess would also have marked built-in operators such as Copy to Points 2.0 as assets.
 
 ## 0.1.0-alpha.6 (2026-11-14, tester release)

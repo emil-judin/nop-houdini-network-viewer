@@ -61,7 +61,7 @@ A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the 
   - Size viewer layouts with container queries (`@container`, `@2xl:`) on the viewer, not viewport breakpoints, because embeds are often narrower than the page.
 - **Operator Icons (`src/components/nodes/icons/`):**
   - Every icon is an original drawing registered as an `OperatorIconDef` (built-in SOPs in `sop/`, SideFX Labs in `labs/`). Follow [docs/ICON_ART_BIBLE.md](./docs/ICON_ART_BIBLE.md) for style, palette, legal rules and workflow.
-  - Never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (see the art bible's legal rules and [decision 0003](./docs/decisions/0003-original-icons-no-sidefx-assets.md)). SideFX reference icons stay in the gitignored `local-refs/` folder (built by a local-only script that is not in the repository) and are served only by the dev server, never from `public/` or a build.
+  - You may inspect reference SVGs to understand their composition and shapes, but never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (see the art bible's legal rules and [decision 0003](./docs/decisions/0003-original-icons-no-sidefx-assets.md)). SideFX reference icons stay in the gitignored `local-refs/` folder (built by a local-only script that is not in the repository) and are served only by the dev server, never from `public/` or a build.
 
 ## 4. Security & Privacy Rules
 
@@ -90,3 +90,4 @@ The viewer renders untrusted JSON, and the exporter writes files people publish.
   - `nop-icon-drawing`: operator icon drawings and their legal rules.
   - `nop-verify`: the definition of done.
   - `nop-release`: release checklist.
+  - `nop-teaser`: the teaser video in `teaser/` (method, guardrails, efficient workflow; its plan is `teaser/BRIEF.md`).

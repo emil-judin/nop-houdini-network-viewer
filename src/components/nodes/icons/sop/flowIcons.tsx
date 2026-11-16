@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import type { OperatorIconDef } from '../iconTypes';
 
-/** Colors of a block brick: For-Each blocks are blue, Compile blocks orange. */
+/** Colors of a block brick: For-Each blocks are blue, Compile blocks red. */
 interface BrickColors {
   outline: string;
   /** Body and the tab on top. */
@@ -28,17 +28,17 @@ const FOR_EACH_BRICK: BrickColors = {
 };
 
 /**
- * The palette's three-tone orange with the core outline: Compile Block nodes are yellow in Houdini,
- * where a yellow brick would disappear.
+ * The palette's three-tone red with the core outline, matching Houdini's Compile Block bricks
+ * so they stand out cleanly against yellow Compile Block nodes.
  */
 const COMPILE_BRICK: BrickColors = {
   outline: '#262626',
-  body: '#ee8624',
-  side: '#c25e12',
-  face: '#ffb066',
-  socket: '#c25e12',
+  body: '#e03228',
+  side: '#a81f18',
+  face: '#ff7066',
+  socket: '#a81f18',
   socketRing: '#262626',
-  stud: '#ffb066',
+  stud: '#ff7066',
 };
 
 /** Brick seen from below: body, lighter bottom face with a socket ring, small square tab on top. */
@@ -116,7 +116,7 @@ export const SOP_FLOW_ICONS: OperatorIconDef[] = [
     label: 'Compile Block Begin',
     family: 'sop',
     description:
-      'The Block Begin brick in orange: brick seen from below with a lighter bottom face, a socket ring and a small square tab on top.',
+      'The Block Begin brick in red: brick seen from below with a lighter bottom face, a socket ring and a small square tab on top.',
     types: ['compile_begin'],
     refKey: 'SOP_compile_begin',
     render: () => <BlockBeginBrick colors={COMPILE_BRICK} tab={COMPILE_BRICK.body} />,
@@ -125,7 +125,7 @@ export const SOP_FLOW_ICONS: OperatorIconDef[] = [
     id: 'sop.compile_end',
     label: 'Compile Block End',
     family: 'sop',
-    description: 'The Block End brick in orange: brick seen from above with a round stud on top (light top face, darker sides).',
+    description: 'The Block End brick in red: brick seen from above with a round stud on top (light top face, darker sides).',
     types: ['compile_end'],
     refKey: 'SOP_compile_end',
     render: () => <BlockEndBrick colors={COMPILE_BRICK} />,
