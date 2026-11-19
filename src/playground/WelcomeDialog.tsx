@@ -209,11 +209,14 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
           </section>
         </div>
       </div>
-      <div className="flex justify-end px-4 py-3 border-t-2 border-[#1f1f1f]">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-t-2 border-[#1f1f1f]">
+        <p className="text-[12px] leading-[1.4] text-[#a8a8a8]">
+          Not affiliated with or endorsed by SideFX. Houdini is a trademark of Side Effects Software Inc.
+        </p>
         <button
           type="button"
           onClick={onClose}
-          className={`h-7 px-3 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-[13px] text-white cursor-pointer ${TOUCH_TARGET}`}
+          className={`shrink-0 ml-auto h-7 px-3 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-[13px] text-white cursor-pointer ${TOUCH_TARGET}`}
         >
           Start exploring
         </button>

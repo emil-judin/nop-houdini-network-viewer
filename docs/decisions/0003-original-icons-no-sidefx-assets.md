@@ -9,7 +9,7 @@ Houdini shows an icon on every node, and a network without them is hard to read.
 
 ## Decision
 
-- Every icon is an original SVG drawing in one house style, defined in the [Icon Art Bible](../ICON_ART_BIBLE.md).
+- Every icon is an original SVG drawing in one house style, defined in the icon art bible of the nop-icon-pipeline repository ([docs/ICONS.md](../ICONS.md), [0013](./0013-icon-pipeline-in-its-own-repository.md)).
 - The exporter only names the built-in icon a node uses. It never reads or embeds SideFX or Labs icon files. Only icons of the user's own assets are embedded.
 - Houdini's icons may be looked at for composition while drawing, but they stay on the developer's machine and never enter the repository or a build.
 - Vendor logos used by SideFX Labs integrations (Substance, FBX, Python, ...) are redrawn by hand so the integration stays recognizable. No likenesses of real people.

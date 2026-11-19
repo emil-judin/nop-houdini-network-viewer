@@ -24,7 +24,7 @@ import type { HoudiniNetworkDocument, HoudiniNodeData, HoudiniWireStyle } from '
 import { Maximize2 } from 'lucide-react';
 import { HoudiniWire } from './edges/HoudiniWire';
 import { useFullscreen } from './hooks/useFullscreen';
-import { useLabsIcons } from './hooks/useLabsIcons';
+import { useOperatorIcons } from './hooks/useOperatorIcons';
 import { isPathPrefix, useNavigationHistory, type BeforeNavigate } from './hooks/useNavigationHistory';
 import { useFirstFitDone } from './hooks/useFirstFitDone';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
@@ -817,7 +817,7 @@ export const HoudiniNetwork: React.FC<HoudiniNetworkProps> = (props) => {
       return { doc: null, error: err instanceof Error ? err.message : 'Unknown error while reading the network.' };
     }
   }, [props.data]);
-  const iconsReady = useLabsIcons(parsed.doc);
+  const iconsReady = useOperatorIcons(parsed.doc);
 
   return (
     <div

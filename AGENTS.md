@@ -60,8 +60,9 @@ A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the 
   - Use `px` for sizes in viewer components (arbitrary values like `text-[11px]`, or the px-pinned theme tokens), never raw `rem`: `rem` follows the host page's root font size, even inside a Shadow DOM.
   - Size viewer layouts with container queries (`@container`, `@2xl:`) on the viewer, not viewport breakpoints, because embeds are often narrower than the page.
 - **Operator Icons (`src/components/nodes/icons/`):**
-  - Every icon is an original drawing registered as an `OperatorIconDef` (built-in SOPs in `sop/`, SideFX Labs in `labs/`). Follow [docs/ICON_ART_BIBLE.md](./docs/ICON_ART_BIBLE.md) for style, palette, legal rules and workflow.
-  - Never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (see the art bible's legal rules and [decision 0003](./docs/decisions/0003-original-icons-no-sidefx-assets.md)). SideFX reference icons stay in the gitignored `local-refs/` folder (built by a local-only script that is not in the repository) and are served only by the dev server, never from `public/` or a build.
+  - Every icon is an original drawing registered as an `OperatorIconDef` (built-in SOPs in `sop/`, SideFX Labs in `labs/`). This repository holds only finished drawings: new drawings and redraws are made in the nop-icon-pipeline repository, which has the art bible (style, palette, workflow). Layout and legal rules: [docs/ICONS.md](./docs/ICONS.md).
+  - SOP drawings load per domain through a generated index: after changing a drawing's `types` or `icons`, or adding or removing a drawing, run `npm run icons:index` ([decision 0014](./docs/decisions/0014-sop-icons-load-per-domain.md)).
+  - You may inspect reference SVGs to understand their composition and shapes, but never copy SideFX or vendor SVG data and never draw likenesses of real people. Vendor logos used by Labs integrations are redrawn by hand (see [decision 0003](./docs/decisions/0003-original-icons-no-sidefx-assets.md)). SideFX reference icons stay in the icon pipeline's gitignored `local-refs/` folder: never copy them into this repository, `public/` or a build.
 
 ## 4. Security & Privacy Rules
 
@@ -87,6 +88,7 @@ The viewer renders untrusted JSON, and the exporter writes files people publish.
 - **Specialized Skills** (in `.agents/skills/`, with pointers in `.claude/skills/` so Claude Code finds them):
   - `houdini-graph-renderer`: drawing the network, coordinates, viewer components.
   - `houdini-python-exporter`: the Houdini exporter, privacy rules, schema versioning.
-  - `nop-icon-drawing`: operator icon drawings and their legal rules.
+  - `nop-icon-drawing`: where the operator icons live, their legal rules, and small fixes to live drawings.
   - `nop-verify`: the definition of done.
   - `nop-release`: release checklist.
+  - `nop-teaser`: the teaser video in `teaser/` (method, guardrails, efficient workflow; its plan is `teaser/BRIEF.md`).

@@ -326,13 +326,10 @@ Feature: Playground web app
     Then the honeypot checkbox is not visible, not focusable and hidden from screen readers
 
   @NOP-PG-036
-  Scenario: The icon gallery is only in the dev server, behind a ?icons link
-    Given the production build
-    Then a "?icons" link opens the first example, and there is no request to "__local_houdini_ref_icons.json"
-    Given the dev server
-    Then the Networks pane has no Development section or icon gallery row
+  Scenario: The playground has no icon gallery (it lives in the nop-icon-pipeline repository)
     When the visitor opens the playground with "?icons"
-    Then "Icons Overview" lists every registered drawing, and choosing a network in the pane leaves it
+    Then the first example opens, the Networks pane has no Development section or icon gallery row
+    And there is no request to "__local_houdini_ref_icons.json"
 
   @NOP-PG-037
   Scenario: Search engines are kept out during testing

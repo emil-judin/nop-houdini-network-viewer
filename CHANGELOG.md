@@ -4,6 +4,23 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.8 (2026-11-19, tester release)
+
+### Added
+- Built-in SOP operator icons for all 44 family batches and the approved modeling batches (825 icons total) are now live: Group, Attribute, Edge and Curve, Poly, USD, Pack and Unpack, File and IO, DOP/LOP and other Networks, NURBS, UV, Material, Heightfield, Cloud and Sky, Volume, Pyro, FLIP, Ocean, MPM, Vellum, RBD, Tet/FEM, Muscle, Tissue, Pose-Space Arms, Bone/Capture, Feathers, Groom, Agents, KineFX, APEX, ML, Points, Remesh, Deformers, Topo, Test Geometry, and SOP utilities.
+
+### Fixed
+- Bake ODE, Cache, Control, Match Topology, Starburst, Superquad and Wire Transfer show the Sort gear, and Python Snippet and Table Import the Python icon, like in Houdini, instead of the default emblem.
+
+### Changed
+- The web component is back to about 180 KB gzipped (from 390 KB): the built-in SOP icons load per domain, only the domains a network uses (59 to 78 KB for the example networks), found through a small index (decision 0014). Shared drawing parts load in small files of their own. The npm package splits them the same way. After changing a SOP drawing's types or icon ids, run `npm run icons:index`.
+- Added an independent-project disclaimer to the top of the README and to the Playground's Welcome dialog.
+- Operator icons are drawn in a separate repository, nop-icon-pipeline, one visual family at a time (large families in rounds), with Houdini references built from the local install, a reference sheet, an automated pre-screen (bounds, stroke, contrast and reference checks), an independent critic pass and a review gallery ([decision 0011](docs/decisions/0011-icon-workflow-family-micro-batches.md), [decision 0013](docs/decisions/0013-icon-pipeline-in-its-own-repository.md)). The playground's dev-only Icon Review Gallery (`?icons`) moved there; this repository keeps only the finished drawings ([docs/ICONS.md](docs/ICONS.md)). Icon drafts that were not approved in review were removed and redrawn.
+- The built-in SOP icon drawings are organized in domain folders (attributes, modeling, IO, textures, terrain, volume, simulation, characters, ML, utility) with one file per visual family and shared drawings in `kits/`, instead of numbered batch files ([decision 0012](docs/decisions/0012-icons-organized-by-domain-and-family.md)).
+- Compile Block Begin and End icons now use red bricks to match Houdini instead of orange.
+- The NOP logo (favicons, home screen icons, Houdini shelf icon, icon pack, README banner and link preview image) and the playground's embed tip use the brand orange `#FF6600` (PMS 172) instead of `#FE4703`.
+- The link preview image uses the same lockup as the README banner: the tagline sits under the name and the icon is as tall as both. It is now built by `scripts/build_og_image.py`.
+
 ## 0.1.0-alpha.7 (2026-11-16, tester release)
 
 ### Added

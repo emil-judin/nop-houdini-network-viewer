@@ -4,6 +4,8 @@
 
 Interactive viewer for SideFX Houdini node networks on the web.
 
+> NOP is not affiliated with, endorsed by, or sponsored by SideFX. Houdini and SideFX are trademarks of Side Effects Software Inc.
+
 <p align="center">
   <a href="https://emil-judin.github.io/nop-houdini-network-viewer/"><b>Try the live playground →</b></a>
   <br>
@@ -63,7 +65,7 @@ The playground's **Embed** button opens the [example page](https://emil-judin.gi
 Upload the exported `.json` file next to your page, then add:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.7/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.8/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```

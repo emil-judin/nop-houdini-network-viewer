@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ClipboardPaste, FileUp, Network } from 'lucide-react';
 import { HoudiniNetwork, type HoudiniNetworkDocument } from '../api';
 import { NetworkErrorState } from '../components/hud/NetworkErrorState';
@@ -18,16 +18,7 @@ import { useMediaQuery } from './useMediaQuery';
 import { useNetworkFileLoader, type LoadedNetwork } from './useNetworkFileLoader';
 import { WelcomeDialog } from './WelcomeDialog';
 
-/**
- * Icon Review Gallery: an internal tool for the icon artwork, only in the dev server (`npm.cmd run dev`)
- * and only through a `?icons` link, so the Networks pane lists networks only. The production check
- * removes the import, so the gallery is not part of the hosted playground.
- */
-const IconReviewGallery = import.meta.env.DEV
-  ? React.lazy(() => import('./IconReviewGallery').then((module) => ({ default: module.IconReviewGallery })))
-  : null;
-
-// The playground shows Labs tools in its examples and in the icon gallery, so it bundles their
+// The playground shows Labs tools in its examples, so it bundles their
 // drawings up front (embeds load them on demand, see `loadLabsIcons`)
 registerLabsIcons(LABS_ICONS, LABS_BUILTIN_ICON_ALIASES);
 
@@ -52,7 +43,7 @@ function useExampleNetworks(active: PlaygroundExample | undefined): Partial<Reco
   return examples;
 }
 
-/** An example key, the key of one of the visitor's own files (`file-1`) or `icons` (the dev-only icon gallery). */
+/** An example key, or the key of one of the visitor's own files (`file-1`). */
 type PlaygroundTab = string;
 
 /** One of the visitor's own networks (opened, dropped or pasted), kept for this visit only. */
@@ -73,12 +64,10 @@ function ownFileLabel({ doc, sourceName }: LoadedNetwork): string {
 }
 
 /**
- * First thing on screen: the icon gallery for a `?icons` link in the dev server, else the example a
- * `?example=<key>` link names, else the first example.
+ * First thing on screen: the example a `?example=<key>` link names, else the first example.
  */
 function initialTab(): PlaygroundTab {
   const params = new URLSearchParams(window.location.search);
-  if (IconReviewGallery && params.has('icons')) return 'icons';
   const requested = findExample(params.get('example'));
   return (requested ?? AVAILABLE_EXAMPLES[0])?.key ?? '';
 }
@@ -178,12 +167,12 @@ export const App: React.FC = () => {
     : exampleState?.status === 'ready'
       ? exampleState.doc
       : null;
-  const activeLabel = tab === 'icons' ? 'Icons Overview' : (activeFile?.label ?? activeExample?.label ?? '');
-  const activeNetworkName = tab === 'icons' ? activeLabel : activeFile ? `own file: ${activeLabel}` : `example: ${activeLabel}`;
+  const activeLabel = activeFile?.label ?? activeExample?.label ?? '';
+  const activeNetworkName = activeFile ? `own file: ${activeLabel}` : `example: ${activeLabel}`;
   // On the first visit only, the embed tip slides in 10 seconds into exploring and shows with a
   // network on screen until it is closed: a card on the network on wide screens (mockup C4), a strip
   // under it on phones (mockup C6), owner decisions 2026-11-14
-  const showEmbedHint = embedHintDue && tab !== 'icons' && activeDocument !== null;
+  const showEmbedHint = embedHintDue && activeDocument !== null;
 
   const sections: NetworksPanelSection[] = [
     {
@@ -306,13 +295,9 @@ export const App: React.FC = () => {
 
         <section aria-label="Network view" className="flex-1 min-w-0 flex flex-col bg-[#383838]">
           <PaneTabStrip label={activeLabel} />
-          {/* Main Canvas or Icon Overview Area */}
+          {/* Main Canvas */}
           <main id="playground-main" className="flex-1 min-h-0 relative overflow-hidden flex flex-col">
-            {tab === 'icons' && IconReviewGallery ? (
-              <Suspense fallback={null}>
-                <IconReviewGallery />
-              </Suspense>
-            ) : activeDocument ? (
+            {activeDocument ? (
               <HoudiniNetwork data={activeDocument} fitView showToolbar showDebugActions hotkeys="hover" touchPan="one-finger" />
             ) : exampleState?.status === 'error' ? (
               <NetworkErrorState message={exampleState.message} hint="The example network could not be loaded. Reload the page to try again." />

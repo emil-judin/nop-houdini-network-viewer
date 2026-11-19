@@ -8,7 +8,7 @@ nothing is traced. Earlier designs and the scripts that explored them are in the
 1. Writes the master SVGs to ``design/nop-icon/``: ``nop-icon.svg`` (white web on orange) and
    ``nop-icon-cutout.svg`` (orange with the web cut out).
 2. Writes vector SVG variants to ``design/nop-icon/pack/``:
-   - ``nop-icon.svg``: 512x512 square icon (Houdini orange #FE4703 + white web)
+   - ``nop-icon.svg``: 512x512 square icon (NOP orange, see ``ORANGE``, + white web)
    - ``favicon.svg``: 512x512 orange square with the spiderweb cut out (transparent web)
    - ``nop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
    - ``nop-icon-circle.svg``: 512x512 circular badge (white web on orange)
@@ -48,7 +48,7 @@ SHELF_ICON_PX = 256  # sharp on high-DPI screens; Houdini scales it down for the
 FINAL_NAME = "nop-icon"
 
 SIZE = 512
-ORANGE = "#FE4703"  # sampled from the Houdini app icon background
+ORANGE = "#FF6600"  # brand orange: the web value of PMS 172 (was #FE4703, sampled from the Houdini app icon)
 WHITE = "#FFFFFF"
 DARK = "#1E1E1E"
 
@@ -403,7 +403,7 @@ def main() -> None:
     (ICON_DIR / f"{FINAL_NAME}-cutout.svg").write_text(cutout_svg, encoding="utf-8", newline="\n")
 
     svg_variants = [
-        ("nop-icon.svg", "Standard 512x512 square icon (Houdini orange #FE4703 + white web)", final_svg),
+        ("nop-icon.svg", f"Standard 512x512 square icon (NOP orange {ORANGE} + white web)", final_svg),
         ("favicon.svg", "Scalable SVG favicon (512x512 orange square with transparent web cutout)", cutout_svg),
         (
             "nop-icon-rounded.svg",
@@ -417,22 +417,22 @@ def main() -> None:
         ),
         (
             "nop-icon-transparent.svg",
-            "Transparent cutout square: Houdini orange (#FE4703) square with the spiderweb cut out",
+            f"Transparent cutout square: NOP orange ({ORANGE}) square with the spiderweb cut out",
             cutout_svg,
         ),
         (
             "nop-icon-cutout.svg",
-            "Transparent cutout square alias: Houdini orange (#FE4703) square with the spiderweb cut out",
+            f"Transparent cutout square alias: NOP orange ({ORANGE}) square with the spiderweb cut out",
             cutout_svg,
         ),
         (
             "nop-icon-rounded-transparent.svg",
-            "Transparent cutout rounded square (rx=96): Houdini orange (#FE4703) with the spiderweb cut out",
+            f"Transparent cutout rounded square (rx=96): NOP orange ({ORANGE}) with the spiderweb cut out",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="rounded"),
         ),
         (
             "nop-icon-circle-transparent.svg",
-            "Transparent cutout circle: Houdini orange (#FE4703) circle with the spiderweb cut out",
+            f"Transparent cutout circle: NOP orange ({ORANGE}) circle with the spiderweb cut out",
             build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="circle"),
         ),
         (
@@ -506,7 +506,7 @@ def main() -> None:
     ico_48.save(PACK_DIR / "favicon.ico", format="ICO", append_images=[ico_16, ico_32], sizes=[(16, 16), (32, 32), (48, 48)])
 
     # The Open Graph card (pack/og-image.png and public/og-image.png, 1200x630) is a separate design with
-    # the NOP lockup over a real network, made like design/social-preview.png. It is not generated here.
+    # the NOP lockup over the orb web render. scripts/build_og_image.py builds it; run it after this script.
 
     # Web App Manifest (with relative icon paths so subpath hosting works)
     manifest = {
@@ -542,12 +542,12 @@ def main() -> None:
             shutil.copy2(PACK_DIR / pub_name, public_dir / pub_name)
 
     # Generate web.html showcase page
-    head_snippet = """&lt;link rel="icon" href="/favicon.ico" sizes="32x32"&gt;
+    head_snippet = f"""&lt;link rel="icon" href="/favicon.ico" sizes="32x32"&gt;
 &lt;link rel="icon" href="/favicon.svg" type="image/svg+xml"&gt;
 &lt;link rel="apple-touch-icon" href="/apple-touch-icon.png"&gt;
-&lt;link rel="mask-icon" href="/safari-pinned-tab.svg" color="#FE4703"&gt;
+&lt;link rel="mask-icon" href="/safari-pinned-tab.svg" color="{ORANGE}"&gt;
 &lt;link rel="manifest" href="/site.webmanifest"&gt;
-&lt;meta name="theme-color" content="#FE4703"&gt;
+&lt;meta name="theme-color" content="{ORANGE}"&gt;
 &lt;meta property="og:image" content="/og-image.png"&gt;"""
 
     svg_cards = []
@@ -577,7 +577,7 @@ def main() -> None:
   h1 {{ font-size: 20px; margin: 0 0 4px; }}
   h2 {{ font-size: 16px; margin: 32px 0 6px; }}
   p {{ margin: 0 0 12px; color: #999; }}
-  a {{ color: #fe4703; }}
+  a {{ color: {ORANGE}; }}
   .row {{ display: flex; flex-wrap: wrap; gap: 16px; }}
   .card {{ background: #2b2b2b; border-radius: 8px; padding: 12px; max-width: 360px; }}
   .card code {{ display: block; margin-bottom: 4px; color: #eee; font-weight: 600; }}

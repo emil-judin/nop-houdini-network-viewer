@@ -4,7 +4,7 @@ dist/
 *.local
 complex-network.json
 public/__local_houdini_ref_icons.json
-# Local-only SideFX reference icons for the Icon Review Gallery
+# SideFX reference icons belong to the nop-icon-pipeline repository; never add them here
 local-refs/
 
 

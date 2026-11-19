@@ -93,24 +93,30 @@ export const LABS_FLASK_ICONS: OperatorIconDef[] = [
     label: 'Labs Flask (beta)',
     family: 'labs',
     description:
-      'Beta Labs tool: the orange flask tile with a smaller flask and a white BETA label (dark outline) along the bottom.',
+      'Orange rounded Labs tile with a dark outline, holding a small white flask with three orange bubbles in the upper section and a white bottom band reading BETA in orange.',
     types: ['biome_curve_setup', 'biome_initialize', 'biome_profile'],
     refKey: 'labs::biome_initialize',
-    render: () => (
+    render: (uid) => (
       <>
-        <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="#f2711c" stroke="#262626" strokeWidth="1.2" />
-        <g transform="translate(3.6 -1.4) scale(0.7)">
+        <defs>
+          <clipPath id={`${uid}-tile`}>
+            <rect x="2.5" y="2.5" width="19" height="19" rx="4" />
+          </clipPath>
+        </defs>
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="#f2711c" />
+        <g clipPath={`url(#${uid}-tile)`}>
+          <rect x="2.5" y="15.3" width="19" height="6.2" fill="#ffffff" />
+        </g>
+        <rect x="2.5" y="2.5" width="19" height="19" rx="4" fill="none" stroke="#262626" strokeWidth="1.2" />
+        <g transform="translate(4.56 1.95) scale(0.62)">
           <Flask />
         </g>
         <text
           x="12"
-          y="19.6"
+          y="19.8"
           textAnchor="middle"
-          fill="#ffffff"
-          stroke="#262626"
-          strokeWidth="1"
-          paintOrder="stroke"
-          fontSize="5.6"
+          fill="#f2711c"
+          fontSize="5"
           fontWeight="bold"
           fontFamily="sans-serif"
         >

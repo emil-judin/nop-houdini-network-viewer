@@ -4,7 +4,7 @@ import type { OperatorIconDef } from '../iconTypes';
  * SideFX Labs icons for pipeline, import/export, caching, game engine and third-party integration tools.
  *
  * Vendor logos used by Labs integrations are redrawn by hand in the house style (owner decision,
- * see `docs/ICON_ART_BIBLE.md`, "Legal Rules"); no third-party SVG data is copied.
+ * see `docs/ICONS.md`, "Rules for every drawing"); no third-party SVG data is copied.
  */
 export const LABS_PIPELINE_ICONS: OperatorIconDef[] = [
   {
@@ -376,22 +376,22 @@ export const LABS_PIPELINE_ICONS: OperatorIconDef[] = [
     label: 'Labs Vector Field Export',
     family: 'labs',
     description:
-      'Tilted dark shield-shaped volume with a white edge and green rim, filled with short curved streamlines in orange, yellow, green, red and blue swirling toward the center.',
+      'Tilted dark cube-shaped volume in perspective with a white edge and green rim, filled with short curved streamlines in orange, yellow, green, red and blue swirling toward the center.',
     types: ['vector_field'],
     refKey: 'labs::vector_field',
     render: () => (
       <>
-        <polygon points="6.5,2.5 20.5,4 21.5,15.5 14.5,21.5 3,19 2.5,7.5" fill="#22272e" stroke="#f2f4f7" strokeWidth="2.6" strokeLinejoin="round" />
-        <polygon points="6.5,2.5 20.5,4 21.5,15.5 14.5,21.5 3,19 2.5,7.5" fill="none" stroke="#6ab42a" strokeWidth="1.3" strokeLinejoin="round" />
+        <polygon points="3.0,5.4 13.5,2.9 21.1,6.2 20.0,16.4 10.0,21.1 4.6,15.8" fill="#22272e" stroke="#f2f4f7" strokeWidth="2.6" strokeLinejoin="round" />
+        <polygon points="3.0,5.4 13.5,2.9 21.1,6.2 20.0,16.4 10.0,21.1 4.6,15.8" fill="none" stroke="#6ab42a" strokeWidth="1.3" strokeLinejoin="round" />
         <g fill="none" strokeWidth="1.1" strokeLinecap="round">
-          <path d="M5 7C8 7.5 10.5 9.5 11.5 12.5" stroke="#f5a030" />
-          <path d="M6.5 4.6C9.5 6 11.5 8.5 12.5 11" stroke="#f5d030" />
-          <path d="M18.5 5.2C15.5 6.5 13.5 9 12.8 11.5" stroke="#8cd040" />
-          <path d="M20 9C17 9.5 14.5 11 13.2 12.8" stroke="#e03228" />
-          <path d="M19.5 16.5C16.8 15.4 14.6 14 13 12.8" stroke="#4a78c8" />
-          <path d="M13.2 19.8C12.6 17.2 12.3 15 12.4 13" stroke="#f5a030" />
-          <path d="M5.2 16.4C8 15 10.2 13.8 11.6 13" stroke="#8aa0c0" />
-          <path d="M3.8 11.4C7 11 9.5 11.5 11.4 12.6" stroke="#8cd040" />
+          <path d="M5.2 7.4C8 7.8 10.5 9.5 11.5 12.5" stroke="#f5a030" />
+          <path d="M7.8 5.2C10.2 6.5 11.8 8.8 12.5 11" stroke="#f5d030" />
+          <path d="M17.8 6.0C15.2 7.2 13.5 9.4 12.8 11.5" stroke="#8cd040" />
+          <path d="M19.2 9.2C16.6 9.8 14.5 11.2 13.2 12.8" stroke="#e03228" />
+          <path d="M18.4 15.6C16.2 14.6 14.4 13.8 13 12.8" stroke="#4a78c8" />
+          <path d="M11.2 19.0C11.6 16.8 12.0 14.8 12.4 13" stroke="#f5a030" />
+          <path d="M6.0 15.4C8.4 14.4 10.2 13.6 11.6 13" stroke="#8aa0c0" />
+          <path d="M4.8 11.2C7.4 11 9.8 11.6 11.4 12.6" stroke="#8cd040" />
         </g>
       </>
     ),

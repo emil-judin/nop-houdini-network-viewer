@@ -10,7 +10,7 @@ const FLOW_WAVES =
 /**
  * SideFX Labs icons for FX (fluids, destruction, electricity, time), character, rendering and image tools.
  *
- * Original MIT-licensed drawings that follow `docs/ICON_ART_BIBLE.md` (Labs accent palette).
+ * Original MIT-licensed drawings that follow the house style (Labs accent palette, see `docs/ICONS.md`).
  */
 export const LABS_FX_ICONS: OperatorIconDef[] = [
   {

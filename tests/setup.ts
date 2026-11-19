@@ -5,6 +5,12 @@
 import { afterEach } from 'vitest';
 
 if (typeof window !== 'undefined') {
+  // Component tests render networks at once: load every SOP icon domain up front, so the viewer never
+  // waits for one (the on-demand loading itself is tested in iconRegistry.test.ts and the browser tests)
+  const { loadSopIconDomains } = await import('../src/components/nodes/icons/iconRegistry');
+  const { SOP_ICON_DOMAINS } = await import('../src/components/nodes/icons/sop/domains');
+  await loadSopIconDomains(SOP_ICON_DOMAINS);
+
   const { cleanup, configure } = await import('@testing-library/react');
   afterEach(() => cleanup());
   // findBy and waitFor wait up to 10 seconds instead of 1: with every worker busy (or coverage on),

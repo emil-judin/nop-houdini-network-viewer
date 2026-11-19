@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'dist-playground/**', 'public/**', 'local-refs/**', 'design/**', 'coverage/**', 'test-results/**', 'playwright-report/**'],
+    ignores: ['dist/**', 'dist-playground/**', 'public/**', 'local-refs/**', 'design/**', 'teaser/**', 'coverage/**', 'test-results/**', 'playwright-report/**'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -40,13 +40,12 @@ export default tseslint.config(
         {
           // Regular expressions, because `group` negations do not work with `../` paths. Allowed:
           // the tap target size shared with the viewer's buttons, the loading and error states of a
-          // network that is not on screen yet, the icons and node shapes for the Icon Review Gallery
-          // (dev server only) and for bundling the Labs icons up front, and the size limit for files
-          // a visitor opens.
+          // network that is not on screen yet, the icon registry for bundling the Labs icons up front,
+          // and the size limit for files a visitor opens.
           patterns: [
             {
               regex:
-                '^\\.\\./(schema/|index$|web-component$|components/(?!hud/(touchTarget|NetworkErrorState|NetworkLoadingState)$|nodes/icons/|nodes/shapes/nodeShapes$)|embed/(?!fetchNetwork$))',
+                '^\\.\\./(schema/|index$|web-component$|components/(?!hud/(touchTarget|NetworkErrorState|NetworkLoadingState)$|nodes/icons/)|embed/(?!fetchNetwork$))',
               message: 'The playground uses the package through its public API: import from ../api. Exceptions are listed in eslint.config.js.',
             },
           ],

@@ -32,7 +32,8 @@ export const OperatorIconGlyph: React.FC<OperatorIconGlyphProps> = ({ def, sizeP
   const uid = React.useId().replace(/:/g, '');
   const size = sizePx ?? def.sizePx ?? 21;
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+    // `data-nop-icon` names the drawing, so tests (and bug reports) can tell which one is on screen
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false" data-nop-icon={def.id}>
       {def.render(uid)}
     </svg>
   );
@@ -43,7 +44,7 @@ export const OperatorIconGlyph: React.FC<OperatorIconGlyphProps> = ({ def, sizeP
  *
  * Each icon is hand-crafted from scratch to capture the silhouette and visual metaphor of
  * Houdini's operator iconography without redistributing any SideFX SVG files. Drawings live in
- * the icon registry (`iconRegistry.ts`) and follow `docs/ICON_ART_BIBLE.md`.
+ * the icon registry (`iconRegistry.ts`) and follow `docs/ICONS.md`.
  */
 export const OperatorSvgIcon: React.FC<OperatorSvgIconProps> = ({
   type,
