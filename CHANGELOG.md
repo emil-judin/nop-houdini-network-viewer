@@ -4,6 +4,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.8 (2026-11-19, tester release)
+
 ### Added
 - Built-in SOP operator icons for all 44 family batches and the approved modeling batches (825 icons total) are now live: Group, Attribute, Edge and Curve, Poly, USD, Pack and Unpack, File and IO, DOP/LOP and other Networks, NURBS, UV, Material, Heightfield, Cloud and Sky, Volume, Pyro, FLIP, Ocean, MPM, Vellum, RBD, Tet/FEM, Muscle, Tissue, Pose-Space Arms, Bone/Capture, Feathers, Groom, Agents, KineFX, APEX, ML, Points, Remesh, Deformers, Topo, Test Geometry, and SOP utilities.
 
