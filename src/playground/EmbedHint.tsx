@@ -4,8 +4,8 @@ import { TOUCH_TARGET } from '../components/hud/touchTarget';
 import websiteScreenshot from './assets/embed-hint/website.jpg';
 import { EXAMPLE_SITE_PAGE } from './examples';
 
-/** NOP orange, from the NOP icon (`public/favicon.svg`). */
-const NOP_ORANGE = '#FE4703';
+/** NOP orange (PMS 172 web value), from the NOP icon (`public/favicon.svg`). */
+const NOP_ORANGE = '#FF6600';
 
 /** Local storage key that remembers the embed tip was shown, so it comes on the first visit only. */
 const EMBED_HINT_SEEN_KEY = 'nop-playground-embed-hint-seen';

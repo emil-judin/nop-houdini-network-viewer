@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <clipPath id="canvas"><circle cx="256" cy="256" r="256"/></clipPath>
   <g clip-path="url(#canvas)">
-    <rect width="512" height="512" fill="#FE4703"/>
+    <rect width="512" height="512" fill="#FF6600"/>
     <path d="M 182.0 316.0 Q 178.4 323.5 189.3 333.6 Q 195.3 334.4 217.1 330.5 Q 213.2 319.6 234.7 294.2 Q 221.5 281.6 211.1 245.8 Q 185.2 249.8 146.6 230.5 Z" fill="#FFFFFF"/>
     <path d="M 182.0 316.0 L 736.3 86.4 M 182.0 316.0 L 411.6 -238.3 M 182.0 316.0 L -47.6 -238.3 M 182.0 316.0 L -372.3 86.4 M 182.0 316.0 L -372.3 545.6 M 182.0 316.0 L -47.6 870.3 M 182.0 316.0 L 411.6 870.3 M 182.0 316.0 L 736.3 545.6" fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M 182.0 316.0 Q 181.4 317.2 181.2 318.6" fill="none" stroke="#FFFFFF" stroke-width="34.0" stroke-linecap="round" stroke-linejoin="round"/>

@@ -108,5 +108,5 @@
       <path d="M 352.2 8.2 Q 339.9 -14.6 329.3 -39.7" fill="none" stroke="#000000" stroke-width="33.6" stroke-linecap="round" stroke-linejoin="round"/>
     </mask>
   </defs>
-  <rect width="512" height="512" fill="#FE4703" mask="url(#web-cutout)"/>
+  <rect width="512" height="512" fill="#FF6600" mask="url(#web-cutout)"/>
 </svg>
