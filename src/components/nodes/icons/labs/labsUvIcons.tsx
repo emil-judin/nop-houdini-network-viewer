@@ -1,10 +1,10 @@
 import type { OperatorIconDef } from '../iconTypes';
-import { GEAR_PATH } from '../sop/attributeIcons';
+import { GEAR_PATH } from '../sop/kits/gear';
 
 /**
  * SideFX Labs icons for UV, texture, trim sheet, baking and material tools.
  *
- * Original MIT-licensed drawings that follow `docs/ICON_ART_BIBLE.md` (Labs accent palette).
+ * Original MIT-licensed drawings that follow the house style (Labs accent palette, see `docs/ICONS.md`).
  */
 export const LABS_UV_ICONS: OperatorIconDef[] = [
   {

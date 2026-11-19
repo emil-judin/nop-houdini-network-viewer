@@ -3,7 +3,7 @@ import type { OperatorIconDef } from '../iconTypes';
 /**
  * SideFX Labs icons for mesh modeling, cutting, conversion, deformation and curve tools.
  *
- * Original MIT-licensed drawings that follow `docs/ICON_ART_BIBLE.md` (Labs accent palette).
+ * Original MIT-licensed drawings that follow the house style (Labs accent palette, see `docs/ICONS.md`).
  */
 export const LABS_MODELING_ICONS: OperatorIconDef[] = [
   {
@@ -104,14 +104,14 @@ export const LABS_MODELING_ICONS: OperatorIconDef[] = [
     id: 'labs.curve_sweep',
     label: 'Labs Curve Sweep',
     family: 'labs',
-    description: 'Thick orange S-shaped tube swept along a curve, with a dark outline.',
+    description: 'Thick orange S-shaped tube swept along an upright N-like wave curve, with a dark outline.',
     types: ['curve_sweep'],
     refKey: 'labs::curve_sweep',
     render: () => (
       <>
-        <path d="M18 5.5C15 2.5 9 2.5 8 6.5C7 10.5 17 11 16.5 16C16 20 9.5 21 6 18.5" fill="none" stroke="#262626" strokeWidth="5.4" strokeLinecap="round" />
-        <path d="M18 5.5C15 2.5 9 2.5 8 6.5C7 10.5 17 11 16.5 16C16 20 9.5 21 6 18.5" fill="none" stroke="#f2711c" strokeWidth="3.4" strokeLinecap="round" />
-        <path d="M16.6 4.6C14.5 3.4 10.5 3.4 9.6 6" fill="none" stroke="#ffb066" strokeWidth="1" strokeLinecap="round" />
+        <path d="M6.5 5.5C4.2 9 4.2 18 8 18.5C12 19 12.5 6 16.5 6.2C20 6.4 20 15 17.5 18.5" fill="none" stroke="#262626" strokeWidth="5.2" strokeLinecap="round" />
+        <path d="M6.5 5.5C4.2 9 4.2 18 8 18.5C12 19 12.5 6 16.5 6.2C20 6.4 20 15 17.5 18.5" fill="none" stroke="#f2711c" strokeWidth="3.2" strokeLinecap="round" />
+        <path d="M14.2 7.4C15.4 6.2 17.2 6.3 18 8" fill="none" stroke="#ffb066" strokeWidth="1" strokeLinecap="round" />
       </>
     ),
   },
@@ -532,17 +532,21 @@ export const LABS_MODELING_ICONS: OperatorIconDef[] = [
     label: 'Labs Straight Skeleton 3D',
     family: 'labs',
     description:
-      'Orange ball on top of a thick orange arch with two legs (like a rounded M), a thin white line running along the inside of the arch.',
+      'Orange sphere merged behind a thin arched orange ribbon crossing halfway up the sphere with two curved legs and a continuous dark outer silhouette, traced by a thin white stripe along the upper half of the ribbon.',
     types: ['straight_skeleton_3d'],
     refKey: 'labs::straight_skeleton_3d',
     render: () => {
-      const arch = 'M5 21C5 16 3.2 11 7 10.4C9.6 10 10 12.2 12 12.2C14 12.2 14.4 10 17 10.4C20.8 11 19 16 19 21';
+      const arch =
+        'M6.2 20.5C3.6 15.5 3.6 8.2 6.8 7.6C8.8 7.2 10.2 9.6 12 9.6C13.8 9.6 15.2 7.2 17.2 7.6C20.4 8.2 20.4 15.5 17.8 20.5';
+      const stripe =
+        'M5.95 20.0C3.6 15.15 3.6 7.85 6.8 7.25C8.8 6.85 10.2 9.25 12 9.25C13.8 9.25 15.2 6.85 17.2 7.25C20.4 7.85 20.4 15.15 18.05 20.0';
       return (
         <>
-          <circle cx="12" cy="7" r="4.6" fill="#f2711c" stroke="#262626" strokeWidth="1" />
-          <path d={arch} fill="none" stroke="#262626" strokeWidth="5.4" strokeLinejoin="round" />
-          <path d={arch} fill="none" stroke="#f2711c" strokeWidth="3.8" strokeLinejoin="round" />
-          <path d={arch} fill="none" stroke="#ffffff" strokeWidth="0.9" strokeLinejoin="round" />
+          <circle cx="12" cy="7.6" r="4.8" fill="#262626" stroke="#262626" strokeWidth="1.6" />
+          <path d={arch} fill="none" stroke="#262626" strokeWidth="4.2" strokeLinejoin="round" />
+          <circle cx="12" cy="7.6" r="4.8" fill="#f2711c" />
+          <path d={arch} fill="none" stroke="#f2711c" strokeWidth="2.6" strokeLinejoin="round" />
+          <path d={stripe} fill="none" stroke="#ffffff" strokeWidth="0.7" strokeLinejoin="round" />
         </>
       );
     },

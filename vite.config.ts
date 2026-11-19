@@ -6,33 +6,6 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
- * Local-only SideFX reference icons (built by a local script that is not in the repository, gitignored).
- */
-const LOCAL_REFERENCE_ICONS = fileURLToPath(new URL('./local-refs/houdini_ref_icons.json', import.meta.url));
-
-/**
- * Serves the local reference icons to the Icon Review Gallery during `vite` dev only.
- * `apply: 'serve'` keeps the proprietary icons out of every production build.
- */
-function localReferenceIcons(): Plugin {
-  return {
-    name: 'local-houdini-reference-icons',
-    apply: 'serve',
-    configureServer(server) {
-      server.middlewares.use('/__local_houdini_ref_icons.json', (_req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Cache-Control', 'no-cache');
-        if (!existsSync(LOCAL_REFERENCE_ICONS)) {
-          res.end('{}');
-          return;
-        }
-        createReadStream(LOCAL_REFERENCE_ICONS).pipe(res);
-      });
-    },
-  };
-}
-
-/**
  * Adds `og:url` and `og:image` to the playground page. Link previews (chat apps, social sites) need
  * absolute URLs, so the tags are only added when the hosted address is known (`VITE_SITE_URL`, set by
  * the GitHub Pages workflow). Exported for its test (`NOP-PG-037`).
@@ -214,7 +187,6 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
-    localReferenceIcons(),
     exampleSiteFiles(),
     licenseFiles(),
     openGraphUrls(loadEnv(mode, process.cwd(), 'VITE_').VITE_SITE_URL),

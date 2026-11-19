@@ -33,7 +33,7 @@ On Windows PowerShell use `npm.cmd` if script execution is blocked.
 
 - **View-only:** the viewer never edits a network (no dragging, wiring, flag toggling or parameter editing).
 - **Looks like Houdini:** match Houdini 22's Network Editor. Attach a Houdini screenshot to visual changes.
-- **No SideFX assets:** never copy SideFX or vendor icons, SVG data or code. Operator icons are original drawings (see [docs/ICON_ART_BIBLE.md](./docs/ICON_ART_BIBLE.md)).
+- **No SideFX assets:** never copy SideFX or vendor icons, SVG data or code. Operator icons are original drawings (see [docs/ICONS.md](./docs/ICONS.md)).
 - **Privacy:** the exporter must never write private paths or the insides of locked third-party assets. Never commit real customer exports.
 - **Style:** TypeScript strict, TSDoc on public symbols, `px` sizes in viewer components, container queries for viewer layouts, no en or em dashes in docs, comments or UI text.
 - **Security:** no `innerHTML` or `dangerouslySetInnerHTML` for file content (see AGENTS.md section 4).

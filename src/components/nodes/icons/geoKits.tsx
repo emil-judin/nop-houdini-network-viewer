@@ -2,8 +2,8 @@ import React from 'react';
 import { arrowHead, pts, roundedRectPath, type Pt } from './geoHelpers';
 
 /**
- * Reusable drawing kits for operator icons (Stage 2 of the icon workflow in
- * `docs/ICON_ART_BIBLE.md`): cased strokes, shaded spheres, corner badges and the cursor badge.
+ * Reusable drawing kits for operator icons (stage 2 of the icon workflow; see
+ * `docs/ICONS.md`): cased strokes, shaded spheres, corner badges and the cursor badge.
  * Family-specific kits (suitcase, dice, trays) live next to their icons and build on these.
  */
 

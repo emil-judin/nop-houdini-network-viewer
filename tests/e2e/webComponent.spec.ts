@@ -15,6 +15,23 @@ test.describe('<houdini-network> on a hostile host page', () => {
     expect(requests.some((path) => path.startsWith('/lib/web-component-chunks/'))).toBe(true);
   });
 
+  test('NOP-ICON-012: a network downloads only the icon files it uses', async ({ page }) => {
+    const requests: string[] = [];
+    page.on('request', (request) => requests.push(new URL(request.url()).pathname));
+    await page.goto('/host/web-component.html');
+    const board = page.locator('#board');
+    await expect(board.locator('.react-flow__node[data-id="lift_tube"]')).toBeVisible();
+    await expect(page.locator('#labs .react-flow__node[data-id="lot_subdivision1"]')).toBeVisible();
+    // Both networks on the page together still need only some of the ten SOP domains
+    const domainFiles = new Set(
+      requests.flatMap((path) => /^\/lib\/web-component-chunks\/(sop-[a-z]+)-/.exec(path)?.[1] ?? []),
+    );
+    expect(domainFiles.size).toBeGreaterThan(0);
+    expect(domainFiles.size).toBeLessThan(10);
+    await expect(board.locator('.react-flow__node svg[data-nop-icon]').first()).toBeVisible();
+    await expect(board.locator('svg[data-nop-icon="default"]')).toHaveCount(0);
+  });
+
   test('NOP-HUD-015: the middle mouse button pans inside the viewer and never auto-scrolls there', async ({ page, isMobile }) => {
     test.skip(isMobile, 'no middle mouse button on touch profiles');
     await page.goto('/host/web-component.html');

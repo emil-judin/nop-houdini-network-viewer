@@ -459,7 +459,7 @@ test.describe('playground', () => {
     await expect(download).toBeVisible();
   });
 
-  test('NOP-PG-036: the icon gallery is not in the hosted playground, not even with ?icons', async ({ page }) => {
+  test('NOP-PG-036: the playground has no icon gallery, not even with ?icons', async ({ page }) => {
     const requests: string[] = [];
     page.on('request', (request) => requests.push(request.url()));
     await page.goto('/?icons');

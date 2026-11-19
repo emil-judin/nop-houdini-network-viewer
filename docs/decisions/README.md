@@ -15,6 +15,9 @@ Short records of decisions that shape NOP and would be expensive to reverse. Eac
 | [0009](./0009-touch-and-fullscreen.md) | Touch: two fingers move the network, fullscreen replaces Fit | Accepted |
 | [0010](./0010-one-repository-public-api.md) | One repository, the playground uses only the public API | Accepted |
 | [0011](./0011-icon-workflow-family-micro-batches.md) | Icons are drawn in family micro-batches with a render, measure and critic gate | Accepted |
+| [0012](./0012-icons-organized-by-domain-and-family.md) | Built-in SOP icons are organized by domain and visual family, not by batch number | Accepted |
+| [0013](./0013-icon-pipeline-in-its-own-repository.md) | The icon pipeline lives in its own repository | Accepted |
+| [0014](./0014-sop-icons-load-per-domain.md) | SOP icons load per domain | Accepted |
 
 ## Add a record
 

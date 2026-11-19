@@ -121,6 +121,40 @@ function scopeStylesheetToViewer(): Plugin {
   };
 }
 
+const ICONS_DIR = '/components/nodes/icons/';
+
+/**
+ * Name of an output file: SOP icon domains as `sop-modeling`, the SideFX Labs drawings as
+ * `labs-icons`, drawing kits that several of them share as `icon-kits` (Rollup splits those off on
+ * its own, so a domain never downloads another domain's drawings; they are small and load in
+ * parallel). Grouping the kits by hand (`manualChunks`) is no better: Rollup then also moves shared
+ * React code into that file, which the main file must load first. Anything else keeps its name.
+ */
+export function chunkName(chunk: Pick<Rollup.PreRenderedChunk, 'facadeModuleId' | 'moduleIds' | 'name'>): string {
+  const facade = chunk.facadeModuleId?.replace(/\\/g, '/') ?? '';
+  const domain = new RegExp(`${ICONS_DIR}sop/([^/]+)/index\\.ts$`).exec(facade);
+  if (domain) return `sop-${domain[1]}`;
+  if (facade.endsWith(`${ICONS_DIR}labs/index.ts`)) return 'labs-icons';
+  const onlyIcons =
+    chunk.moduleIds.length > 0 && chunk.moduleIds.every((id) => id.replace(/\\/g, '/').includes(ICONS_DIR));
+  if (!chunk.facadeModuleId && onlyIcons) return 'icon-kits';
+  return chunk.name;
+}
+
+/**
+ * Applies `chunkName` to the on-demand files, with the extension of each output format (`.cjs` for
+ * CommonJS), inside `folder` when given.
+ */
+function nameChunks(folder = ''): Plugin {
+  return {
+    name: 'name-chunks',
+    outputOptions(options) {
+      const extension = options.format === 'cjs' ? 'cjs' : 'js';
+      return { ...options, chunkFileNames: (chunk) => `${folder}${chunkName(chunk)}-[hash].${extension}` };
+    },
+  };
+}
+
 /**
  * Library builds (`npm.cmd run build:lib` runs both modes into `dist/`):
  *
@@ -137,6 +171,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       emitFontFiles(),
+      nameChunks(isWebComponent ? 'web-component-chunks/' : ''),
       ...(isWebComponent ? [minifyBrowserBundle()] : [scopeStylesheetToViewer()]),
     ],
     // The playground's `public/` folder is not part of the package
@@ -160,8 +195,8 @@ export default defineConfig(({ mode }) => {
             fileName: (format) => (format === 'es' ? 'index.js' : 'index.cjs'),
             cssFileName: 'style',
           },
-      // Parts loaded on demand (Parameter Inspector, SideFX Labs icons) are separate files in their own
-      // folder; the web component imports them relative to `web-component.js`
+      // Parts loaded on demand (Parameter Inspector, SOP icon domains, SideFX Labs icons) are separate
+      // files in their own folder; the web component imports them relative to `web-component.js`
       rollupOptions: {
         // The on-demand chunks import shared code straight from the entry file, instead of Rollup
         // moving everything into a second file behind a tiny entry (one request less)
@@ -169,7 +204,6 @@ export default defineConfig(({ mode }) => {
         ...(isWebComponent
           ? {
               output: {
-                chunkFileNames: 'web-component-chunks/[name]-[hash].js',
                 // A legal comment (`/*!`), which the minifier keeps: the bundle includes React, React Flow
                 // and other third-party code, whose licenses travel with the npm package
                 banner:

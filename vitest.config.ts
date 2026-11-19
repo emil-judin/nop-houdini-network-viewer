@@ -27,7 +27,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**'],
-      exclude: ['src/playground/IconReviewGallery.tsx', 'src/**/*.d.ts'],
+      exclude: ['src/**/*.d.ts'],
       reporter: ['text-summary', 'html'],
     },
   },

@@ -9,7 +9,7 @@ import {
   tiltedTorus,
 } from '../../src/components/nodes/icons/geoHelpers';
 
-describe('icon geometry helpers (docs/ICON_ART_BIBLE.md section 9, stage 2)', () => {
+describe('icon geometry helpers (stage 2 of the icon workflow, docs/ICONS.md)', () => {
   it('builds isometric boxes with a 2:1 top face that share edges', () => {
     const f = isoBoxFaces(12, 2, 8, 9);
     expect(f.top).toEqual([

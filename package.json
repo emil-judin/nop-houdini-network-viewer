@@ -59,10 +59,10 @@
     "test:e2e": "playwright test",
     "build": "npm run build:exporter && vite build",
     "build:exporter": "node scripts/build_exporter_package.mjs",
+    "icons:index": "node scripts/build_icon_index.mjs",
     "build:lib": "vite build -c vite.lib.config.ts --mode npm && vite build -c vite.lib.config.ts --mode web-component && tsc -p tsconfig.lib.json",
     "prepublishOnly": "npm run check && npm run lint && npm test && npm run build:lib",
-    "sri": "node scripts/print_sri.mjs",
-    "icons:prescreen": "node scripts/icon_prescreen.mjs"
+    "sri": "node scripts/print_sri.mjs"
   },
   "keywords": [
     "houdini",

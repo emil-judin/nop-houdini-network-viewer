@@ -3,7 +3,7 @@ import type { OperatorIconDef } from '../iconTypes';
 /**
  * SideFX Labs icons for attribute, color, analysis, group, partition and transform tools.
  *
- * Original MIT-licensed drawings that follow `docs/ICON_ART_BIBLE.md` (Labs accent palette).
+ * Original MIT-licensed drawings that follow the house style (Labs accent palette, see `docs/ICONS.md`).
  */
 export const LABS_GEOMETRY_ICONS: OperatorIconDef[] = [
   {

@@ -1,6 +1,6 @@
 /**
- * Deterministic geometry helpers for operator icon drawings (Stage 2 of the icon workflow in
- * `docs/ICON_ART_BIBLE.md`). They compute original point lists and path strings (isometric
+ * Deterministic geometry helpers for operator icon drawings (stage 2 of the icon workflow; see
+ * `docs/ICONS.md`). They compute original point lists and path strings (isometric
  * solids, arrowheads, ellipses, tilted tori, gears, grids, spirals, curve samples) so icons never
  * hand-guess projection math and sibling icons share exact shapes.
  */

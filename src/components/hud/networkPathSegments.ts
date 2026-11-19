@@ -1,5 +1,5 @@
 import type { SubnetLevel } from '../../schema/subnetPath';
-import type { HoudiniPathNode } from '../../schema/types';
+import type { HoudiniNetworkGraph, HoudiniPathNode } from '../../schema/types';
 import { DEFAULT_OPERATOR_ICON } from '../nodes/icons/defaultIcon';
 import { resolveOperatorIcon } from '../nodes/icons/iconRegistry';
 import type { OperatorIconDef } from '../nodes/icons/iconTypes';
@@ -28,7 +28,30 @@ export interface NetworkPathSegment {
 }
 
 /** Type and icon of a path node, as far as they are known. */
-type PathNodeInfo = Pick<HoudiniPathNode, 'type' | 'icon'>;
+export type PathNodeInfo = Pick<HoudiniPathNode, 'type' | 'icon'>;
+
+/**
+ * Type and icon the path bar shows for the exported root network: its own path node (the last one,
+ * schema 1.3.0), or else just the network type.
+ */
+export function rootPathNodeInfo(root: HoudiniNetworkGraph): PathNodeInfo {
+  const rootSegments = root.path.split('/').filter(Boolean);
+  const rootName = rootSegments[rootSegments.length - 1];
+  const rootNode = root.pathNodes?.[root.pathNodes.length - 1];
+  return rootNode?.name === rootName ? rootNode : { type: root.type };
+}
+
+/**
+ * The path bar's own icon for a node, a custom asset icon from the export or a path bar drawing
+ * (context, object), or `null` when the bar uses the operator drawing.
+ */
+export function ownPathIcon(info: PathNodeInfo, documentIcons: Record<string, string>): PathSegmentIcon | null {
+  const src = info.icon && Object.hasOwn(documentIcons, info.icon) ? svgToDataUri(documentIcons[info.icon]) : null;
+  if (src) return { src };
+  const icon = (info.icon ?? '').toLowerCase();
+  const pathDef = PATH_ICONS.find((def) => def.types.includes(info.type) || (icon && def.icons?.includes(icon)));
+  return pathDef ? { def: pathDef } : null;
+}
 
 /**
  * Icon of a path node: a custom asset icon from the export, a path bar drawing (context, object,
@@ -36,11 +59,8 @@ type PathNodeInfo = Pick<HoudiniPathNode, 'type' | 'icon'>;
  */
 function resolveSegmentIcon(info: PathNodeInfo | null, documentIcons: Record<string, string>): PathSegmentIcon | null {
   if (!info) return null;
-  const src = info.icon && Object.hasOwn(documentIcons, info.icon) ? svgToDataUri(documentIcons[info.icon]) : null;
-  if (src) return { src };
-  const icon = (info.icon ?? '').toLowerCase();
-  const pathDef = PATH_ICONS.find((def) => def.types.includes(info.type) || (icon && def.icons?.includes(icon)));
-  if (pathDef) return { def: pathDef };
+  const own = ownPathIcon(info, documentIcons);
+  if (own) return own;
   const def = resolveOperatorIcon(info.type, info.icon, true);
   // Houdini shows a cardboard box for digital assets (`ns::name::1.0`) without an icon of their own
   const isGeneric = def.id === 'sop.subnet' || def === DEFAULT_OPERATOR_ICON;
@@ -65,8 +85,7 @@ export function buildNetworkPathSegments(
   const rootSegments = root.path.split('/').filter(Boolean);
   const rootName = rootSegments[rootSegments.length - 1];
   // The last path node is the exported network itself (schema 1.3.0), with its real icon
-  const rootNode = root.pathNodes?.[root.pathNodes.length - 1];
-  const rootInfo: PathNodeInfo = rootNode?.name === rootName ? rootNode : { type: root.type };
+  const rootInfo = rootPathNodeInfo(root);
 
   return trail.map((level, depth) => {
     const info: PathNodeInfo = level.node ? { type: level.node.type, icon: level.node.icon } : rootInfo;

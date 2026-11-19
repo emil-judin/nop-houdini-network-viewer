@@ -1,11 +1,11 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_OPERATOR_ICON } from '../../src/components/nodes/icons/defaultIcon';
 import {
   areLabsIconsLoaded,
-  loadLabsIcons,
+  loadAllOperatorIcons,
   needsLabsIcon,
   OPERATOR_ICONS,
   resolveOperatorIcon,
@@ -13,6 +13,10 @@ import {
 import { LABS_BUILTIN_ICON_ALIASES } from '../../src/components/nodes/icons/labs';
 import { LABS_NODE_CATALOG } from '../../src/components/nodes/icons/labs/labsNodeCatalog';
 import { PATH_ICONS } from '../../src/components/nodes/icons/path/pathIcons';
+import { SOP_ICONS, SOP_ICONS_BY_DOMAIN } from '../../src/components/nodes/icons/sop';
+import { SOP_ICON_INDEX } from '../../src/components/nodes/icons/sop/iconIndex.generated';
+import { buildSopIconIndex } from '../../src/components/nodes/icons/sop/iconIndexBuilder';
+import type { SopIconDomain } from '../../src/components/nodes/icons/sop/domains';
 
 describe('icon registry before the Labs drawings load', () => {
   it('P-03: knows which operators need the Labs drawings', () => {
@@ -24,14 +28,19 @@ describe('icon registry before the Labs drawings load', () => {
 
 describe('icon registry', () => {
   beforeAll(async () => {
-    await loadLabsIcons();
+    await loadAllOperatorIcons();
   });
 
-  it('loads the Labs drawings once', async () => {
+  it('loads the Labs drawings and the SOP domains once', async () => {
     expect(areLabsIconsLoaded()).toBe(true);
     const count = OPERATOR_ICONS.length;
-    await loadLabsIcons();
+    expect(count).toBe(SOP_ICONS.length + OPERATOR_ICONS.filter((def) => def.family === 'labs').length);
+    await loadAllOperatorIcons();
     expect(OPERATOR_ICONS.length).toBe(count);
+  });
+
+  it('NOP-ICON-010: the icon index matches the drawings (after changing them, run npm run icons:index)', () => {
+    expect(SOP_ICON_INDEX).toEqual(buildSopIconIndex(SOP_ICONS_BY_DOMAIN));
   });
 
   it.each([
@@ -82,7 +91,7 @@ describe('icon registry', () => {
     }
   });
 
-  it('NOP-ICON-008: drawings stay inside the art bible rules', () => {
+  it('NOP-ICON-008: drawings stay inside the drawing rules', () => {
     for (const def of allDrawings()) {
       const markup = renderToStaticMarkup(React.createElement('svg', null, def.render('t')));
       expect(markup, def.id).not.toMatch(/<(image|style|filter|foreignObject)\b/i);
@@ -119,4 +128,64 @@ describe('icon registry', () => {
     }
     expect(missing).toEqual([]);
   });
+});
+
+describe('SOP icon domains on demand', () => {
+  /** A registry with no SOP domain loaded yet (module state is per import after `vi.resetModules`). */
+  async function freshRegistry(): Promise<typeof import('../../src/components/nodes/icons/iconRegistry')> {
+    vi.resetModules();
+    return import('../../src/components/nodes/icons/iconRegistry');
+  }
+
+  it(
+    'NOP-ICON-011: the domains an operator needs draw it exactly like the full set',
+    { timeout: 120_000 },
+    async () => {
+      // Every key the drawings use, plus Labs tools, aliases, matcher patterns and unknown operators
+      const queries: [type: string, icon: string][] = [];
+      for (const def of SOP_ICONS) {
+        for (const t of def.types) queries.push([t, ''], [t, `SOP_${t}`], ['nop_unknown', `SOP_${t}-2.0`]);
+        for (const icon of def.icons ?? []) queries.push(['nop_unknown', icon]);
+      }
+      for (const entry of LABS_NODE_CATALOG) queries.push([entry.type, '']);
+      for (const labsType of Object.keys(LABS_BUILTIN_ICON_ALIASES)) {
+        queries.push([`labs::${labsType}::1.0`, ''], ['emjud::x::1.0', `opdef:/labs::Sop/${labsType}::1.0?IconSVG`]);
+      }
+      queries.push(
+        ['volume_wrangle_custom', ''],
+        ['group_by_anything', ''],
+        ['emjud::pebble_scatter::1.0', 'MISC_digital_asset'],
+        ['totally_unknown', 'SOP_totally_unknown'],
+        ['Straight_Skeleton_2D', ''],
+      );
+
+      const full = await freshRegistry();
+      await full.loadAllOperatorIcons();
+      const expected = queries.map(([t, icon]) => [
+        full.resolveOperatorIcon(t, icon).id,
+        full.resolveOperatorIcon(t, icon, true).id,
+      ]);
+
+      // Group the queries by the domains they need, then check each group on a registry with only those
+      const probe = await freshRegistry();
+      await probe.loadLabsIcons();
+      const groups = new Map<string, number[]>();
+      queries.forEach(([t, icon], n) => {
+        const key = probe.sopIconDomainsFor(t, icon).sort().join(',');
+        groups.set(key, [...(groups.get(key) ?? []), n]);
+      });
+      for (const [key, members] of groups) {
+        const registry = await freshRegistry();
+        await registry.loadLabsIcons();
+        await registry.loadSopIconDomains((key ? key.split(',') : []) as SopIconDomain[]);
+        for (const n of members) {
+          const [t, icon] = queries[n];
+          const actual = [registry.resolveOperatorIcon(t, icon).id, registry.resolveOperatorIcon(t, icon, true).id];
+          expect(actual, `${t} / ${icon} with ${key || 'no domain'}`).toEqual(expected[n]);
+        }
+      }
+      // One domain per known operator: a network loads only what it uses
+      expect(probe.sopIconDomainsFor('box', 'SOP_box')).toHaveLength(1);
+    },
+  );
 });

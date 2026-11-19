@@ -23,10 +23,10 @@ export interface OperatorIconQuery {
 /**
  * One original, MIT-licensed operator icon drawing and the operators that use it.
  *
- * Every drawing lives in a `0 0 24 24` viewBox and must follow `docs/ICON_ART_BIBLE.md`.
+ * Every drawing lives in a `0 0 24 24` viewBox and must follow `docs/ICONS.md`.
  */
 export interface OperatorIconDef {
-  /** Stable registry id shown in the Icon Review Gallery (e.g. `sop.box`, `labs.thicken`). */
+  /** Stable registry id shown in the icon pipeline's review gallery (e.g. `sop.box`, `labs.thicken`). */
   id: string;
   /** Human-readable icon name (e.g. `Box`, `Labs Thicken`). */
   label: string;
@@ -40,7 +40,7 @@ export interface OperatorIconDef {
   icons?: string[];
   /** Optional custom matcher for operator families that cannot be listed exhaustively. */
   matches?: (query: OperatorIconQuery) => boolean;
-  /** Key of the local-only Houdini reference image (built by a local-only script). */
+  /** Key of the Houdini reference image in the icon pipeline's local references (`SOP_box`, `labs::thicken`). */
   refKey?: string;
   /** Rendered icon size in pixels inside the node body. Defaults to `21`. */
   sizePx?: number;

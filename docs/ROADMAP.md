@@ -13,12 +13,10 @@ Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHA
 ## In progress
 
 - **Teaser video:** a short video for people who do not want to explore the playground right away.
-- **Icon coverage:** drawings for more built-in SOPs. Until a node type has one, it shows the default emblem.
 
 ## Before the public release
 
-- [ ] Smoke test on real devices: Safari on macOS, Chrome on Android (iPhone and iPad are checked) (two-finger panning, fullscreen fallback on iPhone, narrow path bar, settings menu, screenshot).
-- [ ] Collect and work through the tester feedback.
+- [ ] Smoke test on some devices: Safari on macOS, Chrome on Android (iPhone and iPad are checked).
 - [ ] Decide the public API: close the playground exceptions listed in `eslint.config.js` (see [decision 0010](./decisions/0010-one-repository-public-api.md)).
 - [ ] React 19 check, then widen the peer range to `^18.2.0 || ^19.0.0`.
 - [ ] Publish `nop-houdini-network-viewer` on npm (and so on jsDelivr), publish the SRI hash, and drop the README's "not on npm yet" note.

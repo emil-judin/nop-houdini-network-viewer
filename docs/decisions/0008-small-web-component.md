@@ -18,4 +18,5 @@ An embed adds weight to someone else's page, often a portfolio where images alre
 
 - The web component dropped to 176 KB gzip, and a network without Labs nodes never downloads their icons.
 - The whole `dist/` folder must be hosted together (the CDN does this).
+- The built-in SOP drawings later grew it to 390 KB gzip; [0014](./0014-sop-icons-load-per-domain.md) loads them per domain and brings it back to about 180 KB.
 - Still open: measuring `preact/compat` for a smaller build, and a performance budget test with a generated 5,000-node network.
