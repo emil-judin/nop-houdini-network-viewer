@@ -4,6 +4,8 @@
 
 Interactive viewer for SideFX Houdini node networks on the web.
 
+> NOP is not affiliated with, endorsed by, or sponsored by SideFX. Houdini and SideFX are trademarks of Side Effects Software Inc.
+
 <p align="center">
   <a href="https://emil-judin.github.io/nop-houdini-network-viewer/"><b>Try the live playground →</b></a>
   <br>
