@@ -641,8 +641,13 @@ test.describe('first visit', () => {
     await page.goto('/?example=start');
     const welcome = page.getByRole('dialog', { name: 'Welcome' });
     await expect(welcome).toBeVisible();
-    // The example on screen is marked in the grid
-    await expect(welcome.getByRole('button', { name: 'Start Here' })).toHaveAttribute('aria-current', 'true');
+    // The card explains NOP in three steps instead of listing the examples
+    const how = welcome.getByRole('region', { name: 'How it works' });
+    await expect(how).toContainText('No Houdini needed', { ignoreCase: true });
+    await expect(how.getByRole('listitem')).toHaveText([/^Export from Houdini/, /^Embed on your website/, /^Explore/]);
+    await expect(how).toContainText('never leaves your browser');
+    await expect(welcome.getByRole('button', { name: 'Start Here' })).toHaveCount(0);
+    await expect(welcome).toContainText('Not affiliated with or endorsed by SideFX');
     await expect(welcome.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', /github\.com\/emil-judin\/nop-houdini-network-viewer#documentation$/);
     await expect(welcome.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/emil-judin/nop-houdini-network-viewer');
     await welcome.getByRole('button', { name: 'Start exploring' }).click();
@@ -656,16 +661,10 @@ test.describe('first visit', () => {
     await expect(welcome).toBeVisible();
   });
 
-  test('NOP-PG-019: the welcome card opens the examples, the exporter, a file and the embed code', async ({ page }) => {
+  test('NOP-PG-019: the welcome card opens the exporter, a file and the embed code', async ({ page }) => {
     await page.goto('/?example=start');
     const welcome = page.getByRole('dialog', { name: 'Welcome' });
     await expect(node(page, 'lift_tube')).toBeAttached();
-    await welcome.getByRole('button', { name: 'VEX Wrangles' }).click();
-    await expect(welcome).toBeHidden();
-    await expect(node(page, 'wrangle_rings')).toBeVisible();
-
-    if (!(await networksPanelOpen(page))) await page.getByRole('button', { name: 'Show networks panel' }).click();
-    await page.getByRole('button', { name: 'Help' }).click();
     await welcome.getByRole('button', { name: 'Get the exporter' }).click();
     await expect(welcome).toBeHidden();
     const exporter = page.getByRole('dialog', { name: 'Get the Houdini exporter' });

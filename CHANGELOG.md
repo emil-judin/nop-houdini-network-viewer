@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Changed
+- The playground's Welcome card explains NOP instead of listing the examples: what it is, then "How it works" in three steps with round icons (export from Houdini, embed on your website, explore), side by side and centered on wide screens. The examples stay in the Networks pane.
+
 ## 0.1.0-alpha.8 (2026-11-19, tester release)
 
 ### Added
