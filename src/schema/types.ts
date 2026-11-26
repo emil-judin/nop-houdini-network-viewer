@@ -293,6 +293,31 @@ export interface HoudiniWireData {
 }
 
 /**
+ * A wire between an exported selection and an item outside it (schema 1.5.0), one per wire. Like a
+ * wire with one end blanked out: it keeps where the outside item is, never its name or type.
+ * - Input: `to` and `toInput` are set (that input is wired from the item at `pos`).
+ * - Output: `from` and `fromOutput` are set (that output feeds the item at `pos`).
+ */
+export interface HoudiniOutsideWireData {
+  /** Item whose input is wired from outside (node or dot name). */
+  to?: string;
+  /** Zero-based input connector index on `to`. */
+  toInput?: number;
+  /** Item whose output feeds items outside (node or dot name). */
+  from?: string;
+  /** Zero-based output connector index on `from`. */
+  fromOutput?: number;
+  /**
+   * Position of the item outside, in network units like `pos` of nodes and dots (a node's lower left
+   * corner, a dot's center). Missing in files written before it was added: the viewer then draws a
+   * straight stub.
+   */
+  pos?: [number, number];
+  /** Whether the item outside is a dot. */
+  dot?: boolean;
+}
+
+/**
  * Houdini Network Editor wire style (`hou.NodeTypeCategory.defaultWireStyle()`).
  * - `default`: straight lines with short vertical stubs at connectors and rounded bends.
  * - `rounded`: orthogonal routing (short drop, horizontal run, vertical drop) with rounded corners.
@@ -319,6 +344,11 @@ export interface HoudiniNetworkGraph {
   stickies: HoudiniStickyNoteData[];
   /** Directed wire connections between nodes, dots, and subnet inputs. */
   wires: HoudiniWireData[];
+  /**
+   * Connectors wired to items outside an exported selection (schema 1.5.0, selection exports only,
+   * missing when there are none). The viewer draws a short stub on each.
+   */
+  outsideWires?: HoudiniOutsideWireData[];
   /** Indirect parent input connectors at the top of a subnetwork. */
   subnetInputs?: HoudiniSubnetInputData[];
   /** Wire style of this network in Houdini (missing in older exports, which means `default`). */

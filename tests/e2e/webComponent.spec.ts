@@ -70,6 +70,8 @@ test.describe('<houdini-network> on a hostile host page', () => {
     await page.goto('/host/web-component.html');
     const board = page.locator('#board');
     await expect(board.locator('.react-flow__node[data-id="lift_tube"]')).toBeVisible();
+    // The start view is final once the network shows (it waits invisible, opacity 0, for its fits)
+    await expect(board.locator('.react-flow')).not.toHaveClass(/nop-first-fit-pending/);
     const viewer = board.locator('.nop-root');
     const viewportTransform = () => board.locator('.react-flow__viewport').evaluate((el) => (el as HTMLElement).style.transform);
     const before = await viewportTransform();

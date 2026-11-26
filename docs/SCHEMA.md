@@ -8,7 +8,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 ```json
 {
-  "schemaVersion": "1.4.0",
+  "schemaVersion": "1.5.0",
   "houdiniVersion": "22.0.466",
   "exportedAt": "2026-10-23T15:00:00Z",
   "exportMode": "compact",
@@ -42,6 +42,16 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 `icons` only ever holds custom SVG icons of assets outside the Houdini install and SideFX Labs (cleaned of editor metadata). Built-in SideFX icons are never embedded: nodes reference them by id (`SOP_box`) and the viewer draws its own original icons.
 
 `exportWarnings` (schema 1.4.0, optional) counts parameters the exporter could not read and left out. It is missing when there were none.
+
+`outsideWires` (schema 1.5.0, optional, exported root only) lists the wires between an exported selection and items outside it, one entry per wire, so the viewer can draw the start of each wire as a short stub toward the outside item. An input entry is `{ "to": "noise1", "toInput": 0, "pos": [-2, 3] }`: that input is wired from the item at `pos`. An output entry is `{ "from": "copy1", "fromOutput": 0, "pos": [1, -2], "dot": true }`: that output feeds the dot at `pos`. `pos` is in network units like the `pos` of nodes (lower left corner) and dots (center); `dot` is only written for dots. Like a wire with one end blanked out, it never names the item outside or says what it is. Without `pos` the viewer draws a straight stub. Whole-network exports and older exports omit `outsideWires`, and the viewer then draws no stubs.
+
+```json
+"outsideWires": [
+  { "to": "noise1", "toInput": 0, "pos": [-2, 3] },
+  { "from": "copy1", "fromOutput": 0, "pos": [-1, -2] },
+  { "from": "copy1", "fromOutput": 0, "pos": [1, -2], "dot": true }
+]
+```
 
 `wireStyle` is the Network Editor wire style of the network's node category (`hou.NodeTypeCategory.defaultWireStyle()`): `"default"` draws straight wires with short vertical stubs and rounded bends, `"rounded"` draws orthogonal wires (a short drop below the output, a horizontal run shared by all wires of that output, then a vertical drop into the input) with rounded corners. Older exports without the field render as `"default"`; the viewer's `wireStyle` prop and its settings menu can override it.
 

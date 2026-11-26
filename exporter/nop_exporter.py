@@ -24,7 +24,7 @@ import re
 import hou
 
 
-SCHEMA_VERSION = "1.4.0"
+SCHEMA_VERSION = "1.5.0"
 
 # Keyframe segment functions: an animated parameter reports the function of its current segment
 # as its "expression". Houdini stores a real expression (ch(), $F, ...) as one keyframe holding it.
@@ -750,6 +750,8 @@ def serialize_network(net, state, selected_only=False):
         "boxes": [],
         "stickies": [],
         "wires": [],
+        # Selection exports only: connectors wired to items outside the selection (removed when empty)
+        "outsideWires": [],
         "subnetInputs": [],
         # Network Editor wire style for this network type: "default" (straight) or "rounded"
         "wireStyle": "default",
@@ -889,8 +891,39 @@ def serialize_network(net, state, selected_only=False):
                         "to": it.name(),
                         "toInput": conn.inputIndex(),
                     })
+                else:
+                    out["outsideWires"].append({"to": it.name(), "toInput": conn.inputIndex(), **outside_end(in_item)})
+            if selected_only:
+                out["outsideWires"].extend(outside_outputs(it, item_names))
 
+    if not out["outsideWires"]:
+        del out["outsideWires"]
     return out
+
+
+def outside_end(item):
+    """Where the far end of a wire to an item outside the selection is: its position, and whether it is a dot.
+
+    Never its name, type or anything else: the viewer only needs to know which way the wire leaves
+    (schema 1.5.0).
+    """
+    end = {"pos": [round(x, 4) for x in item.position()]}
+    if item.networkItemType() == hou.networkItemType.NetworkDot:
+        end["dot"] = True
+    return end
+
+
+def outside_outputs(item, item_names):
+    """Wires from outputs of `item` to items outside the selection, one entry per wire, in wire order."""
+    try:
+        connections = item.outputConnections()
+    except (AttributeError, hou.Error):
+        return []
+    return [
+        {"from": item.name(), "fromOutput": conn.outputIndex(), **outside_end(conn.outputItem())}
+        for conn in connections
+        if conn.outputItem().name() not in item_names
+    ]
 
 
 def find_network_editor(pane=None):

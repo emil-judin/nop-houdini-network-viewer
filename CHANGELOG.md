@@ -4,6 +4,15 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- Exporting a selection now shows where it connects to the rest of the network: each wire to an unselected node is drawn as a short dashed stub that starts like the real wire and fades out toward that node. The file keeps where the outside nodes are, never their names or types (schema 1.5.0, `outsideWires`, [decision 0015](docs/decisions/0015-stubs-for-wires-outside-a-selection.md)). Re-export a selection to get the stubs. A new playground example, Shared Selection, shows them.
+
+### Fixed
+- Fitting the view (on load, H, F, double-click, fullscreen and resize) now frames the node names too, so a node at the right edge no longer loses its name.
+
+### Changed
+- The Houdini scenes (the examples scene and the logo scene) and the two example assets are no longer in the repository: they were saved with a non-commercial Houdini license, which SideFX restricts to non-commercial use, so they cannot be shared under the MIT License. The example networks stay as JSON exports.
+
 ## 0.1.0-alpha.8 (2026-11-19, tester release)
 
 ### Added

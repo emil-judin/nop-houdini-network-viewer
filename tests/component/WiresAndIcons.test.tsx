@@ -109,6 +109,39 @@ describe('wires', () => {
     expect(pressed?.getAttribute('aria-label')).toMatch(/^Default wires/);
   });
 
+  it('NOP-WIRE-023: connectors wired outside an exported selection show stubs, never names or counts', async () => {
+    const doc: HoudiniNetworkDocument = {
+      ...documentOf([node({ name: 'noise1', pos: [0, 0] }), node({ name: 'copy1', pos: [0, -2], maxInputs: 2 })]),
+    };
+    doc.root.wires = [wire('noise1', 'copy1', 0, 1)];
+    doc.root.outsideWires = [
+      { to: 'noise1', toInput: 0, pos: [-3, 1] },
+      { to: 'copy1', toInput: 0, pos: [3, 0] },
+      { from: 'copy1', fromOutput: 0, pos: [-2, -4] },
+      { from: 'copy1', fromOutput: 0, pos: [2, -4], dot: true },
+    ];
+    await renderNetwork(doc);
+    // Stubs are drawn by a node of their own, under the wires: one dashed, fading path per outside wire
+    const stubsOf = (name: string) =>
+      document.querySelector(`.react-flow__node[data-id="stubs:${name}"] [data-testid="outside-wire-stubs"]`);
+    await waitFor(() => expect(stubsOf('copy1')?.querySelectorAll('path')).toHaveLength(3));
+    expect(stubsOf('noise1')?.querySelectorAll('path')).toHaveLength(1);
+    const path = stubsOf('copy1')?.querySelector('path');
+    expect(path?.getAttribute('stroke-dasharray')).toBe('3 2.5');
+    expect(path?.getAttribute('mask')).toMatch(/^url\(#stubs[\w-]+-mask-0\)$/);
+    expect(stubsOf('copy1')?.getAttribute('aria-hidden')).toBe('true');
+    // Nothing in them names or counts the items outside
+    expect(stubsOf('copy1')?.textContent).toBe('');
+    // Stubs are not wires: the only edge is the real one
+    expect(wires()).toHaveLength(1);
+    expect(nodeElement('copy1')?.closest('.react-flow__node')?.getAttribute('aria-label')).toMatch(/wired to nodes outside this export/);
+  });
+
+  it('NOP-WIRE-023: a whole-network export draws no stubs', async () => {
+    await renderNetwork(loadExample('for_each'), {}, 'copytopoints1');
+    expect(document.querySelector('[data-testid="outside-wire-stubs"]')).toBeNull();
+  });
+
   it('NOP-WIRE-005: the wire into the target points input of Copy to Points is dotted', async () => {
     await renderNetwork(loadExample('for_each'), {}, 'copytopoints1');
     const dotted = wires().filter(({ path }) => path.style.strokeDasharray !== '');

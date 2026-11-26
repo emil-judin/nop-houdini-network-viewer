@@ -14,7 +14,7 @@ Feature: Playground web app
   Scenario: The playground opens on the first example
     When the playground loads
     Then the first example of the Networks pane ("Start Here") is current and its network is shown
-    And the examples are the six guided networks of fixtures/examples/
+    And the examples are the seven guided networks of fixtures/examples/
     And each example row has a short description of what it shows, and every row has room for two description lines, so all are the same height (trial)
     And the Networks pane is 360 pixels wide beside the network (240 where it floats over it on phones)
 
@@ -25,6 +25,12 @@ Feature: Playground web app
     And the counts are read from the example files when the playground is built, so no other example is downloaded for them
     And the browser tab says "NOP Playground", and so does the page heading for screen readers
     And all icons, the favicon and the manifest load from the sub-path
+
+  @NOP-PG-051
+  Scenario: The Shared Selection example shows where the selection continues
+    When the "Shared Selection" example is opened
+    Then "scatter_trees" shows one stub toward the node that feeds it, and "place_trees" shows three: one per wire in and out
+    And every stub is inside the framed view, and no node outside the selection is named
 
   @NOP-PG-002
   Scenario: Switching examples and linking to one

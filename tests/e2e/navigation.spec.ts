@@ -30,6 +30,27 @@ test.describe('Navigation', () => {
     }
   });
 
+  test('NOP-NAV-001: the fit frames the node names, not only the node boxes', async ({ page, hasTouch }) => {
+    await page.goto('/host/fit.html');
+    const viewer = page.locator('#fit');
+    await expect(viewer.locator('.react-flow')).not.toHaveClass(/nop-first-fit-pending/);
+    const canvas = (await viewer.locator('.react-flow').boundingBox())!;
+    // The long name sticks out far to the right of the boxes, so a fit of the boxes alone cuts it off
+    const names = viewer.locator('[data-nop-fit-extent]');
+    await expect(names).toHaveCount(2);
+    const rightEdgeOfNames = async () =>
+      Math.max(...(await Promise.all((await names.all()).map(async (name) => (await name.boundingBox())!))).map((box) => box.x + box.width));
+    expect(await rightEdgeOfNames()).toBeLessThan(canvas.x + canvas.width);
+    for (const name of await names.all()) expect((await name.boundingBox())!.y).toBeGreaterThan(canvas.y);
+    // The same after H, which fits again from a zoomed-in view (wheel and keys: desktop only)
+    if (hasTouch) return;
+    await viewer.locator('.react-flow__pane').click({ position: { x: 20, y: 20 } });
+    await page.mouse.wheel(0, -600);
+    await expect.poll(rightEdgeOfNames).toBeGreaterThan(canvas.x + canvas.width);
+    await page.keyboard.press('h');
+    await expect.poll(rightEdgeOfNames).toBeLessThan(canvas.x + canvas.width);
+  });
+
   test('NOP-NAV-004: with touch-pan "one-finger", one finger pans, two fingers zoom and the page stays', async ({ page, hasTouch }) => {
     test.skip(!hasTouch, 'touch profiles only');
     const viewer = await openAssets(page);

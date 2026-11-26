@@ -1,12 +1,8 @@
 import React from 'react';
 import { BaseEdge, type EdgeProps } from '@xyflow/react';
 import type { HoudiniWireFlowEdgeData } from '../../schema/converter';
+import { WIRE_COLOR } from '../theme';
 import { getHoudiniWirePath } from './wirePaths';
-
-/**
- * Houdini 22 default wire color (sampled from the Network Editor).
- */
-const WIRE_COLOR = '#7082b8';
 
 /**
  * Houdini 22 wire color for wires attached to the selected node (sampled from the Network Editor).

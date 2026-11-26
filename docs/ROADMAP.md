@@ -5,10 +5,10 @@ Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHA
 ## Current state
 
 - **Version:** `0.1.0-alpha.8`, a tester release. The playground is hosted on GitHub Pages; the npm package is not published yet.
-- **Schema:** `1.4.0` ([SCHEMA.md](./SCHEMA.md), machine-readable in `schema/nop-network-1.schema.json`).
+- **Schema:** `1.5.0` on `main` (`outsideWires`), `1.4.0` in the last release ([SCHEMA.md](./SCHEMA.md), machine-readable in `schema/nop-network-1.schema.json`).
 - **Houdini:** the exporter is checked with Houdini 22.0.466. Houdini 20.5 and 21 are not checked yet.
 - **Browsers:** checked by the automated browser tests in Chromium, Firefox and WebKit, and in emulated phone and tablet profiles (Pixel 7, iPhone 14, iPad gen 7), and by hand on a physical iPhone 13 and iPad 11. Not checked in Safari on macOS or on a real Android phone yet.
-- **Example networks:** six guided examples in `fixtures/examples/`, built in Houdini for the playground (scene `nop_examples.hip`).
+- **Example networks:** seven guided examples in `fixtures/examples/`, built in Houdini for the playground (the scene stays outside the repository: non-commercial license).
 
 ## In progress
 

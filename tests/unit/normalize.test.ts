@@ -97,6 +97,24 @@ describe('normalizeNetworkDocument', () => {
     expect(Object.getPrototypeOf(doc.root.nodes[1])).toBe(Object.prototype);
   });
 
+  it('NOP-CONV-034: outside wires keep only their documented fields and sane numbers', () => {
+    const level = normalizeGraph({
+      nodes: [],
+      outsideWires: [
+        { to: 'a', toInput: -2, name: 'grid1', type: 'grid', pos: [1.5, -2], dot: true },
+        { from: 'b', fromOutput: 1.7, count: 3, pos: ['x', 2], dot: 'yes' },
+        { count: 4 },
+        'junk',
+      ],
+    });
+    expect(level.outsideWires).toEqual([
+      { to: 'a', toInput: 0, pos: [1.5, -2], dot: true },
+      // A broken position is dropped, not zeroed, so the stub runs straight instead of toward the origin
+      { from: 'b', fromOutput: 1 },
+    ]);
+    expect(normalizeGraph({ nodes: [] }).outsideWires).toBeUndefined();
+  });
+
   it('limits subnetwork nesting', () => {
     let graph: Record<string, unknown> = { nodes: [] };
     for (let i = 0; i < 100; i++) {

@@ -11,6 +11,7 @@ Feature: Navigate the network
   Scenario: The network is fitted on load
     When the viewer has loaded
     Then every node is inside the view with 14% padding
+    And the names beside the nodes are inside the view too, also after H
 
   @component @NOP-NAV-002
   Scenario: fitView false keeps the initial view

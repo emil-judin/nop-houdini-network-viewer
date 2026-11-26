@@ -69,6 +69,18 @@ Feature: Draw wires like Houdini 22
     When the viewer is rendered
     Then wires use the "default" style
 
+  @component @NOP-WIRE-023
+  Scenario: Wires to items outside an exported selection show as short stubs toward those items
+    Given an export of a selection where "noise1" is fed from outside and output 1 of "copy1" feeds 2 items outside
+    When the viewer is rendered
+    Then the start of each of those wires is drawn from its connector toward the item outside, in the current wire style, dashed and fading out
+    And "copy1" shows 3 stubs, one per wire, with no count
+    And the stubs are drawn under the wires
+    And the stubs name nothing, are not wires, do nothing when clicked or hovered, and are hidden from screen readers
+    And the node's accessible name says it is wired to nodes outside this export
+    Given a whole-network export
+    Then no stubs are drawn
+
   @e2e @NOP-WIRE-022
   Scenario: The wire style buttons (the settings menu in narrow viewers) and Shift+S switch the wire style
     Given the viewer is shown with "default" wires

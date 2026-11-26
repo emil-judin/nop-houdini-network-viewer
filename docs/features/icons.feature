@@ -59,7 +59,7 @@ Feature: Operator icon registry
 
   @NOP-ICON-009
   Scenario: Every node of the example networks has an icon
-    When every node of the six example networks is looked up, subnetwork levels included
+    When every node of the seven example networks is looked up, subnetwork levels included
     Then each has a NOP drawing or its own icon from the file, never the default emblem
     And Compile Block Begin and End show the For-Each bricks in red
 

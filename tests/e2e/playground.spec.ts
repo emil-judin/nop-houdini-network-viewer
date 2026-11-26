@@ -97,11 +97,24 @@ test.describe('playground', () => {
     page.on('request', (request) => requests.push(request.url()));
     await page.goto('/?example=start');
     await expect(node(page, 'lift_tube')).toBeVisible();
-    for (const name of [/^Start Here/, /^VEX Wrangles/, /^For-Each Loop/, /^Parameters/, /^Node Looks/, /^Subnetworks and Assets/]) {
+    for (const name of [/^Start Here/, /^VEX Wrangles/, /^For-Each Loop/, /^Parameters/, /^Node Looks/, /^Subnetworks and Assets/, /^Shared Selection/]) {
       await expect(await networkRow(page, name)).toContainText(/\d+ nodes/);
     }
     // The counts come with the page, the other examples are still not downloaded
     expect(requests.some((url) => url.includes('parameters-network'))).toBe(false);
+  });
+
+  test('NOP-PG-051: the Shared Selection example shows stubs where the selection continues', async ({ page }) => {
+    await page.goto('/?example=selection');
+    await expect(node(page, 'place_trees')).toBeVisible();
+    // Two wires come in from outside and the last node feeds two items outside, one stub per wire
+    const stubs = (name: string) => page.locator(`.react-flow__node[data-id="stubs:${name}"] [data-testid="outside-wire-stubs"] path`);
+    await expect(stubs('scatter_trees')).toHaveCount(1);
+    await expect(stubs('place_trees')).toHaveCount(3);
+    await expect(stubs('random_size')).toHaveCount(0);
+    // Every stub is fully inside the framed view, and the items outside are never named
+    for (const stub of await page.locator('[data-testid="outside-wire-stubs"] path').all()) await expect(stub).toBeInViewport();
+    await expect(page.locator('.react-flow')).not.toContainText(/hills|tree_shape|terrain_and_trees|TREES_ONLY/);
   });
 
   test('P-04: an example downloads only when it is chosen', async ({ page }) => {
