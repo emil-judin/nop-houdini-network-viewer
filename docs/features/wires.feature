@@ -73,8 +73,9 @@ Feature: Draw wires like Houdini 22
   Scenario: Wires to items outside an exported selection show as short stubs toward those items
     Given an export of a selection where "noise1" is fed from outside and output 1 of "copy1" feeds 2 items outside
     When the viewer is rendered
-    Then the start of each of those wires is drawn from its connector toward the item outside, in the current wire style, dashed and fading out
+    Then the start of each of those wires is drawn from its connector toward the item outside, in the current wire style, solid or dotted like the real wire, and fading out
     And "copy1" shows 3 stubs, one per wire, with no count
+    And the stub into the target points input of Copy to Points is dotted like that wire, the others are solid
     And the stubs are drawn under the wires
     And the stubs name nothing, are not wires, do nothing when clicked or hovered, and are hidden from screen readers
     And the node's accessible name says it is wired to nodes outside this export

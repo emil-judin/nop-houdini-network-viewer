@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.5.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-11-26T05:50:36.294974+00:00",
+  "exportedAt": "2026-11-26T06:51:02.288876+00:00",
   "exportMode": "compact",
   "icons": {},
   "customShapes": {},
@@ -261,7 +261,7 @@
     "stickies": [
       {
         "name": "about_selection",
-        "text": "Only these three nodes were selected for export.\n\nThe dashed stubs are wires to nodes that stayed in Houdini: they point to where those nodes are, without naming them.",
+        "text": "Only these three nodes were selected for export.\n\nThe fading wires lead to nodes that stayed in Houdini: they point to where those nodes are, without naming them.",
         "pos": [
           3.0,
           -5.0

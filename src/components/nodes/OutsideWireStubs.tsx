@@ -1,11 +1,9 @@
 import React, { useId } from 'react';
 import { Position, useInternalNode, type Handle, type NodeProps } from '@xyflow/react';
 import { OUTSIDE_STUB_LENGTH_PX, type HoudiniOutsideStubsFlowNodeData } from '../../schema/convertGraph';
+import { DOTTED_WIRE_DASHES } from '../edges/HoudiniWire';
 import { getHoudiniWirePath } from '../edges/wirePaths';
 import { WIRE_COLOR } from '../theme';
-
-/** Dash pattern of a stub: clearly broken, so it never reads as a real wire. */
-const STUB_DASHES = '3 2.5';
 
 /** How far a stub aims when the file has no position for the outside item: straight up or down. */
 const STRAIGHT_FAR_PX = 200;
@@ -20,7 +18,7 @@ function wireEnd(handle: Handle, origin: { x: number; y: number }): { x: number;
 /**
  * Stubs for the wires between one node or dot of an exported selection and items outside it (schema
  * 1.5.0, decision 0015). Each stub is the start of the real wire, in the current wire style, toward
- * where the outside item is: dashed, fading out within `OUTSIDE_STUB_LENGTH_PX`. They name nothing,
+ * where the outside item is: solid or dotted like the wire itself, fading out within `OUTSIDE_STUB_LENGTH_PX`. They name nothing,
  * count nothing and do nothing when clicked. Drawn by a node of their own under the wires (`stubs:`
  * nodes from the converter), which also gives Fit their extent. Not part of Houdini's look.
  */
@@ -43,7 +41,7 @@ export const HoudiniOutsideStubs: React.FC<NodeProps> = ({ data, positionAbsolut
       stub.direction === 'in'
         ? getHoudiniWirePath(wireStyle, far.x, far.y, near.x, near.y, stub.farIsDot, itemIsDot)
         : getHoudiniWirePath(wireStyle, near.x, near.y, far.x, far.y, itemIsDot, stub.farIsDot);
-    return [{ key: index, d, near }];
+    return [{ key: index, d, near, dotted: stub.dotted }];
   });
   if (paths.length === 0) return null;
 
@@ -69,14 +67,14 @@ export const HoudiniOutsideStubs: React.FC<NodeProps> = ({ data, positionAbsolut
             </React.Fragment>
           ))}
         </defs>
-        {paths.map(({ key, d }) => (
+        {paths.map(({ key, d, dotted }) => (
           <path
             key={key}
             d={d}
             fill="none"
             stroke={WIRE_COLOR}
             strokeWidth={1.3}
-            strokeDasharray={STUB_DASHES}
+            strokeDasharray={dotted ? DOTTED_WIRE_DASHES : undefined}
             mask={`url(#${maskId}-mask-${key})`}
             vectorEffect="non-scaling-stroke"
           />

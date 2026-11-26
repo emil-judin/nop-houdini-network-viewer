@@ -211,10 +211,11 @@ describe('convertGraphToReactFlow: wires', () => {
     const level = graph({
       nodes: [node({ name: 'noise1', pos: [0, 0] }), node({ name: 'copy1', type: 'copytopoints', maxInputs: 2, pos: [0, -1] })],
       dots: [{ name: '__dot1', pos: [0, -3] }],
-      wires: [wire('noise1', 'copy1', 0, 1)],
+      wires: [wire('noise1', 'copy1', 0, 0)],
       outsideWires: [
         { to: 'noise1', toInput: 0, pos: [-2, 1] },
-        { to: 'copy1', toInput: 0, pos: [3, 0.5], dot: true },
+        // Into the target points input of Copy to Points: dotted, like the real wire would be
+        { to: 'copy1', toInput: 1, pos: [3, 0.5], dot: true },
         { from: 'copy1', fromOutput: 0, pos: [-1, -2] },
         { from: 'copy1', fromOutput: 0, pos: [1, -2] },
         { to: '__dot1', toInput: 0 },
@@ -229,18 +230,18 @@ describe('convertGraphToReactFlow: wires', () => {
       item: 'noise1',
       itemIsDot: false,
       wireStyle: 'rounded',
-      stubs: [{ handle: 'in-0', direction: 'in', far: { x: -150, y: -91.5 }, farIsDot: false }],
+      stubs: [{ handle: 'in-0', direction: 'in', far: { x: -150, y: -91.5 }, farIsDot: false, dotted: false }],
     });
     // One stub per wire: two outside nodes fed from the same output get two stubs
     expect(stubs('copy1')?.stubs).toEqual([
-      { handle: 'in-0', direction: 'in', far: { x: 300, y: -50 }, farIsDot: true },
-      { handle: 'out-0', direction: 'out', far: { x: -50, y: 161.5 }, farIsDot: false },
-      { handle: 'out-0', direction: 'out', far: { x: 150, y: 161.5 }, farIsDot: false },
+      { handle: 'in-1', direction: 'in', far: { x: 300, y: -50 }, farIsDot: true, dotted: true },
+      { handle: 'out-0', direction: 'out', far: { x: -50, y: 161.5 }, farIsDot: false, dotted: false },
+      { handle: 'out-0', direction: 'out', far: { x: 150, y: 161.5 }, farIsDot: false, dotted: false },
     ]);
     // Without a position (older files) the stub has no far end and runs straight
     expect(stubs(`${DOT_ID_PREFIX}__dot1`)?.stubs).toEqual([
-      { handle: 'in-0', direction: 'in', far: undefined, farIsDot: false },
-      { handle: 'out-0', direction: 'out', far: { x: 250, y: 361.5 }, farIsDot: false },
+      { handle: 'in-0', direction: 'in', far: undefined, farIsDot: false, dotted: false },
+      { handle: 'out-0', direction: 'out', far: { x: 250, y: 361.5 }, farIsDot: false, dotted: false },
     ]);
     expect(stubs(`${DOT_ID_PREFIX}__dot1`)?.item).toBe(`${DOT_ID_PREFIX}__dot1`);
     expect(byId(nodes, 'copy1')?.ariaLabel).toMatch(/wired to nodes outside this export$/);

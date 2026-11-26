@@ -168,7 +168,8 @@ export interface HoudiniBlockFlowNodeData extends Record<string, unknown> {
 
 /**
  * One wire between an exported item and an item outside the selection (schema 1.5.0), drawn as a stub:
- * the first pixels of the wire from the exported connector, fading out (decision 0015).
+ * the first pixels of the wire from the exported connector, solid or dotted like the wire, fading out
+ * (decision 0015).
  */
 export interface HoudiniOutsideStub {
   /** Handle on the exported node or dot where the stub starts (`in-0`, `in-multi-7`, `out-0`). */
@@ -182,6 +183,11 @@ export interface HoudiniOutsideStub {
   far?: { x: number; y: number };
   /** Whether the outside end is a dot (wires leave and enter dots differently). */
   farIsDot: boolean;
+  /**
+   * Drawn dotted like the real wire (`isDottedWire`): only known for wires into the selection, since
+   * the file never says what the outside item is.
+   */
+  dotted: boolean;
 }
 
 /**
@@ -459,6 +465,7 @@ export function convertGraphToReactFlow(
       direction: 'in',
       far: outside?.pos ? outsideConnector(outside.pos, farIsDot, 'output') : undefined,
       farIsDot,
+      dotted: isDottedWire(nodesByName.get(to), outside?.toInput),
     });
   }
   for (const outside of outsideWires) {
@@ -472,6 +479,7 @@ export function convertGraphToReactFlow(
       direction: 'out',
       far: outside.pos ? outsideConnector(outside.pos, farIsDot, 'input') : undefined,
       farIsDot,
+      dotted: false,
     });
   }
 

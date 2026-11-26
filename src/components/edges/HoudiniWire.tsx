@@ -13,7 +13,7 @@ const SELECTED_NODE_WIRE_COLOR = '#a8b36f';
  * Dot pattern of a dotted wire in screen pixels: short dots every 4px (Houdini 22 screenshot of the
  * Copy to Points target points input).
  */
-const DOTTED_WIRE_DASHES = '1.5 2.5';
+export const DOTTED_WIRE_DASHES = '1.5 2.5';
 
 /**
  * Custom Houdini wire edge component (`hou.NodeConnection`).
