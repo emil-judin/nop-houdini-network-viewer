@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.5.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-11-26T08:34:32.298758+00:00",
+  "exportedAt": "2026-11-26T11:19:07.102002+00:00",
   "exportMode": "compact",
   "icons": {},
   "customShapes": {},
@@ -365,7 +365,7 @@
     "stickies": [
       {
         "name": "about_selection",
-        "text": "Only these nodes were selected for export.\n\nThe fading wires lead to nodes that stayed in Houdini: they point to where those nodes are, without naming them.",
+        "text": "Only these nodes were selected for export.\n\nThe fading wires lead to nodes that stayed in Houdini.",
         "pos": [
           6.8,
           -5.0
