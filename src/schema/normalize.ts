@@ -282,6 +282,8 @@ function normalizeOutsideWire(raw: JsonRecord): HoudiniOutsideWireData | null {
   const pos = asVec2(raw.pos, [NaN, NaN]);
   if (Number.isFinite(pos[0])) wire.pos = pos;
   if (raw.dot === true) wire.dot = true;
+  if (typeof raw.type === 'string' && raw.type !== '') wire.type = raw.type;
+  if (from !== null && typeof raw.input === 'number' && Number.isFinite(raw.input)) wire.input = Math.max(0, Math.floor(raw.input));
   return wire;
 }
 

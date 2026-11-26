@@ -901,15 +901,20 @@ def serialize_network(net, state, selected_only=False):
     return out
 
 
-def outside_end(item):
-    """Where the far end of a wire to an item outside the selection is: its position, and whether it is a dot.
+def outside_end(item, input_index=None):
+    """The far end of a wire to an item outside the selection (schema 1.5.0): its position, whether it is
+    a dot, a node's operator type, and for wires leaving the selection the input they enter there.
 
-    Never its name, type or anything else: the viewer only needs to know which way the wire leaves
-    (schema 1.5.0).
+    Never its name: the viewer draws the start of the wire toward it, solid or dotted like the real wire.
     """
     end = {"pos": [round(x, 4) for x in item.position()]}
-    if item.networkItemType() == hou.networkItemType.NetworkDot:
+    kind = item.networkItemType()
+    if kind == hou.networkItemType.NetworkDot:
         end["dot"] = True
+    elif kind == hou.networkItemType.Node:
+        end["type"] = item.type().name()
+    if input_index is not None:
+        end["input"] = input_index
     return end
 
 
@@ -920,7 +925,7 @@ def outside_outputs(item, item_names):
     except (AttributeError, hou.Error):
         return []
     return [
-        {"from": item.name(), "fromOutput": conn.outputIndex(), **outside_end(conn.outputItem())}
+        {"from": item.name(), "fromOutput": conn.outputIndex(), **outside_end(conn.outputItem(), conn.inputIndex())}
         for conn in connections
         if conn.outputItem().name() not in item_names
     ]

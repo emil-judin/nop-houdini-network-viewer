@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.5.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-11-26T06:51:02.288876+00:00",
+  "exportedAt": "2026-11-26T07:05:07.507077+00:00",
   "exportMode": "compact",
   "icons": {},
   "customShapes": {},
@@ -305,7 +305,8 @@
         "pos": [
           0.0,
           -1.5
-        ]
+        ],
+        "type": "mountain::2.0"
       },
       {
         "to": "place_trees",
@@ -313,7 +314,8 @@
         "pos": [
           -2.5,
           -3.5
-        ]
+        ],
+        "type": "sphere"
       },
       {
         "from": "place_trees",
@@ -321,7 +323,9 @@
         "pos": [
           0.0,
           -8.0
-        ]
+        ],
+        "type": "merge",
+        "input": 1
       },
       {
         "from": "place_trees",
@@ -330,7 +334,8 @@
           -2.5,
           -7.5
         ],
-        "dot": true
+        "dot": true,
+        "input": 0
       }
     ],
     "subnetInputs": [],

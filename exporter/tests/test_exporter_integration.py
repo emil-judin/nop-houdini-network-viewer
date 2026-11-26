@@ -72,16 +72,17 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual([n["name"] for n in document["root"]["nodes"]], ["a", "b"])
         self.assertEqual(document["root"]["wires"], [{"from": "a", "fromOutput": 0, "to": "b", "toInput": 0}])
 
-    def test_NOP_EXP_052_wires_to_items_outside_the_selection_keep_the_far_end_position_not_its_name(self):
-        grid, box = node("grid1", pos=(-2.0, 3.0)), node("box1", pos=(4.0, 1.5))
+    def test_NOP_EXP_052_wires_to_items_outside_the_selection_keep_the_far_end_position_and_type_not_its_name(self):
+        grid, box = node("grid1", "grid", pos=(-2.0, 3.0)), node("box1", "box", pos=(4.0, 1.5))
         noise, copy = node("noise1"), node("copy1", "copytopoints")
-        merge, xfer, out = node("merge1", pos=(-1.0, -2.0)), node("xfer1", pos=(1.0, -2.0)), node("OUT")
+        merge, xfer, out = node("merge1", "merge", pos=(-1.0, -2.0)), node("xfer1", "copytopoints", pos=(1.0, -2.0)), node("OUT")
         dot = fake_hou.NetworkDot("dot1", pos=(3.123456, -1.5))
         fake_hou.connect(grid, noise)
         fake_hou.connect(box, copy, input_index=0)
         fake_hou.connect(noise, copy, input_index=1)
-        for target in (merge, xfer, dot):
-            fake_hou.connect(copy, target)
+        fake_hou.connect(copy, merge)
+        fake_hou.connect(copy, xfer, input_index=1)
+        fake_hou.connect(copy, dot)
         fake_hou.connect(dot, out)
         geo = network(grid, box, noise, copy, merge, xfer, out, dot)
         fake_hou.SELECTION.extend([noise, copy])
@@ -90,12 +91,13 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual(
             root["outsideWires"],
             [
-                {"to": "noise1", "toInput": 0, "pos": [-2.0, 3.0]},
-                {"to": "copy1", "toInput": 0, "pos": [4.0, 1.5]},
-                # One entry per wire, so an output feeding 3 items outside shows 3 leads
-                {"from": "copy1", "fromOutput": 0, "pos": [-1.0, -2.0]},
-                {"from": "copy1", "fromOutput": 0, "pos": [1.0, -2.0]},
-                {"from": "copy1", "fromOutput": 0, "pos": [3.1235, -1.5], "dot": True},
+                {"to": "noise1", "toInput": 0, "pos": [-2.0, 3.0], "type": "grid"},
+                {"to": "copy1", "toInput": 0, "pos": [4.0, 1.5], "type": "box"},
+                # One entry per wire, so an output feeding 3 items outside shows 3 leads; wires leaving
+                # the selection keep the input they enter (the second input of a Copy to Points is dotted)
+                {"from": "copy1", "fromOutput": 0, "pos": [-1.0, -2.0], "type": "merge", "input": 0},
+                {"from": "copy1", "fromOutput": 0, "pos": [1.0, -2.0], "type": "copytopoints", "input": 1},
+                {"from": "copy1", "fromOutput": 0, "pos": [3.1235, -1.5], "dot": True, "input": 0},
             ],
         )
         text = json.dumps(root["outsideWires"])

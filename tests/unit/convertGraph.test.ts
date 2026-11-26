@@ -216,8 +216,9 @@ describe('convertGraphToReactFlow: wires', () => {
         { to: 'noise1', toInput: 0, pos: [-2, 1] },
         // Into the target points input of Copy to Points: dotted, like the real wire would be
         { to: 'copy1', toInput: 1, pos: [3, 0.5], dot: true },
-        { from: 'copy1', fromOutput: 0, pos: [-1, -2] },
-        { from: 'copy1', fromOutput: 0, pos: [1, -2] },
+        { from: 'copy1', fromOutput: 0, pos: [-1, -2], type: 'merge', input: 0 },
+        // Into the target points input of a Copy to Points outside: dotted too
+        { from: 'copy1', fromOutput: 0, pos: [1, -2], type: 'copytopoints::2.0', input: 1 },
         { to: '__dot1', toInput: 0 },
         { from: '__dot1', fromOutput: 0, pos: [2, -4] },
       ],
@@ -236,7 +237,7 @@ describe('convertGraphToReactFlow: wires', () => {
     expect(stubs('copy1')?.stubs).toEqual([
       { handle: 'in-1', direction: 'in', far: { x: 300, y: -50 }, farIsDot: true, dotted: true },
       { handle: 'out-0', direction: 'out', far: { x: -50, y: 161.5 }, farIsDot: false, dotted: false },
-      { handle: 'out-0', direction: 'out', far: { x: 150, y: 161.5 }, farIsDot: false, dotted: false },
+      { handle: 'out-0', direction: 'out', far: { x: 150, y: 161.5 }, farIsDot: false, dotted: true },
     ]);
     // Without a position (older files) the stub has no far end and runs straight
     expect(stubs(`${DOT_ID_PREFIX}__dot1`)?.stubs).toEqual([

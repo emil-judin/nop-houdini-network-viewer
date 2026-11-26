@@ -80,8 +80,8 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 - Never remove or rename a field in 1.x: old exports must stay readable. A breaking change needs a new major
   version and a viewer that reads both.
 - Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0), `outsideWires`
-  (1.5.0: one entry per wire between the selection and an outside item, with that item's `pos` and `dot`, never its
-  name or type; decision 0015).
+  (1.5.0: one entry per wire between the selection and an outside item, with that item's `pos`, `dot`, `type` and, for
+  wires leaving the selection, `input`; never its name; decision 0015).
 
 ## 5. Package and tests
 

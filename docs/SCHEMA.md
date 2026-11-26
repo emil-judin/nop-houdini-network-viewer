@@ -43,13 +43,14 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 `exportWarnings` (schema 1.4.0, optional) counts parameters the exporter could not read and left out. It is missing when there were none.
 
-`outsideWires` (schema 1.5.0, optional, exported root only) lists the wires between an exported selection and items outside it, one entry per wire, so the viewer can draw the start of each wire as a short stub toward the outside item. An input entry is `{ "to": "noise1", "toInput": 0, "pos": [-2, 3] }`: that input is wired from the item at `pos`. An output entry is `{ "from": "copy1", "fromOutput": 0, "pos": [1, -2], "dot": true }`: that output feeds the dot at `pos`. `pos` is in network units like the `pos` of nodes (lower left corner) and dots (center); `dot` is only written for dots. Like a wire with one end blanked out, it never names the item outside or says what it is. Without `pos` the viewer draws a straight stub. Whole-network exports and older exports omit `outsideWires`, and the viewer then draws no stubs.
+`outsideWires` (schema 1.5.0, optional, exported root only) lists the wires between an exported selection and items outside it, one entry per wire, so the viewer can draw the start of each wire as a short stub toward the outside item. An input entry is `{ "to": "noise1", "toInput": 0, "pos": [-2, 3], "type": "grid" }`: that input is wired from the Grid node at `pos`. An output entry is `{ "from": "copy1", "fromOutput": 0, "pos": [1, -2], "type": "copytopoints::2.0", "input": 1 }`: that output feeds input 2 of the Copy to Points at `pos`. `pos` is in network units like the `pos` of nodes (lower left corner) and dots (center); `dot` is written only for dots, `type` (the operator type) only for nodes, and `input` (the input the wire enters outside) only on output entries. With them the viewer draws each stub solid or dotted like the real wire. It never names the item outside. Without `pos` the viewer draws a straight stub. Whole-network exports and older exports omit `outsideWires`, and the viewer then draws no stubs.
 
 ```json
 "outsideWires": [
-  { "to": "noise1", "toInput": 0, "pos": [-2, 3] },
-  { "from": "copy1", "fromOutput": 0, "pos": [-1, -2] },
-  { "from": "copy1", "fromOutput": 0, "pos": [1, -2], "dot": true }
+  { "to": "noise1", "toInput": 0, "pos": [-2, 3], "type": "grid" },
+  { "from": "copy1", "fromOutput": 0, "pos": [-1, -2], "type": "merge", "input": 0 },
+  { "from": "copy1", "fromOutput": 0, "pos": [1, -2], "type": "copytopoints::2.0", "input": 1 },
+  { "from": "copy1", "fromOutput": 0, "pos": [3, -2], "dot": true, "input": 0 }
 ]
 ```
 

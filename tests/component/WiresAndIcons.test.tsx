@@ -117,7 +117,7 @@ describe('wires', () => {
     doc.root.outsideWires = [
       { to: 'noise1', toInput: 0, pos: [-3, 1] },
       { to: 'copy1', toInput: 1, pos: [3, 0] },
-      { from: 'copy1', fromOutput: 0, pos: [-2, -4] },
+      { from: 'copy1', fromOutput: 0, pos: [-2, -4], type: 'merge', input: 0 },
       { from: 'copy1', fromOutput: 0, pos: [2, -4], dot: true },
     ];
     await renderNetwork(doc);

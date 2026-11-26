@@ -183,6 +183,7 @@ Feature: Load and convert a Houdini network document
     When the graph is converted with rounded wires
     Then the only edge is the wire between "noise1" and "copy1"
     And each node and dot gets a stubs node with one stub per outside wire: its handle, its direction, and the outside connector it heads for
+    And a stub is dotted like its wire: into the target points input of "copy1", and out of "copy1" into input 2 of a Copy to Points outside
     And a stub without a position has no far end
     And the stubs node frames the item and its stubs on every side, under the wires, taking no clicks
 
@@ -197,6 +198,7 @@ Feature: Load and convert a Houdini network document
     Given "outsideWires" with negative or fractional indices, extra fields such as a name or a count, broken positions and entries without a name
     When the file is normalized
     Then indices are whole and not negative, broken positions are dropped rather than zeroed, extra fields and nameless entries are dropped
+    And the outside item's type is kept, and its input only on wires leaving the selection
 
   @NOP-CONV-026
   Scenario: The chosen wire style is passed to every edge

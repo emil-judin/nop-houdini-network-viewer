@@ -38,7 +38,7 @@
         "stickies": { "type": "array", "items": { "$ref": "#/$defs/sticky" } },
         "wires": { "type": "array", "items": { "$ref": "#/$defs/wire" } },
         "outsideWires": {
-          "description": "Wires between an exported selection and items outside it, one per wire (schema 1.5.0). Keeps the outside item's position and whether it is a dot, never its name or type.",
+          "description": "Wires between an exported selection and items outside it, one per wire (schema 1.5.0). Keeps the outside item's position, whether it is a dot, a node's operator type and, for wires leaving the selection, the input they enter; never its name.",
           "type": "array",
           "items": {
             "oneOf": [
@@ -49,7 +49,8 @@
                   "to": { "type": "string" },
                   "toInput": { "type": "integer", "minimum": 0 },
                   "pos": { "$ref": "#/$defs/vec2" },
-                  "dot": { "type": "boolean" }
+                  "dot": { "type": "boolean" },
+                  "type": { "type": "string" }
                 }
               },
               {
@@ -59,7 +60,9 @@
                   "from": { "type": "string" },
                   "fromOutput": { "type": "integer", "minimum": 0 },
                   "pos": { "$ref": "#/$defs/vec2" },
-                  "dot": { "type": "boolean" }
+                  "dot": { "type": "boolean" },
+                  "type": { "type": "string" },
+                  "input": { "type": "integer", "minimum": 0 }
                 }
               }
             ]

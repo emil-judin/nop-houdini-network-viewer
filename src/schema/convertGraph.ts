@@ -183,10 +183,7 @@ export interface HoudiniOutsideStub {
   far?: { x: number; y: number };
   /** Whether the outside end is a dot (wires leave and enter dots differently). */
   farIsDot: boolean;
-  /**
-   * Drawn dotted like the real wire (`isDottedWire`): only known for wires into the selection, since
-   * the file never says what the outside item is.
-   */
+  /** Drawn dotted like the real wire (`isDottedWire`; for wires leaving the selection from the outside node's type and input). */
   dotted: boolean;
 }
 
@@ -251,7 +248,7 @@ function outsideConnector(pos: [number, number], isDot: boolean, side: 'output' 
  * Whether Houdini draws the wire into input `toInput` of `target` dotted: the second input (target
  * points) of Copy to Points.
  */
-export function isDottedWire(target: HoudiniNodeData | undefined, toInput: number | undefined): boolean {
+export function isDottedWire(target: { type: string } | undefined, toInput: number | undefined): boolean {
   return target !== undefined && toInput === 1 && parseOperatorType(target.type).baseType === 'copytopoints';
 }
 
@@ -479,7 +476,7 @@ export function convertGraphToReactFlow(
       direction: 'out',
       far: outside.pos ? outsideConnector(outside.pos, farIsDot, 'input') : undefined,
       farIsDot,
-      dotted: false,
+      dotted: isDottedWire(outside.type === undefined ? undefined : { type: outside.type }, outside.input),
     });
   }
 

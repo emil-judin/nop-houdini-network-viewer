@@ -294,7 +294,7 @@ export interface HoudiniWireData {
 
 /**
  * A wire between an exported selection and an item outside it (schema 1.5.0), one per wire. Like a
- * wire with one end blanked out: it keeps where the outside item is, never its name or type.
+ * wire with one end blanked out: it keeps where the outside item is and its type, never its name.
  * - Input: `to` and `toInput` are set (that input is wired from the item at `pos`).
  * - Output: `from` and `fromOutput` are set (that output feeds the item at `pos`).
  */
@@ -315,6 +315,13 @@ export interface HoudiniOutsideWireData {
   pos?: [number, number];
   /** Whether the item outside is a dot. */
   dot?: boolean;
+  /** Operator type of the node outside (`copytopoints::2.0`); missing for dots and older files. */
+  type?: string;
+  /**
+   * For wires leaving the selection (`from`): the input of the item outside that the wire enters. With
+   * `type` it tells whether the wire is drawn dotted (the target points input of Copy to Points).
+   */
+  input?: number;
 }
 
 /**

@@ -49,7 +49,7 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
 - **Outside-wire stubs** (`OutsideWireStubs.tsx`, [decision 0015](../../../docs/decisions/0015-stubs-for-wires-outside-a-selection.md)):
   each wire in `outsideWires` (selection exports) becomes a stub: the first 40px of the real wire path
   (`getHoudiniWirePath`, current wire style) from the exported connector toward the outside item's `pos`, solid or
-  dotted like the real wire (`isDottedWire`, known only for wires into the selection), fading out. A `stubs:` node per item (zIndex 3, just under the wires, no clicks) draws them from React Flow's handle bounds
+  dotted like the real wire (`isDottedWire`, from the outside `type` and `input` for wires leaving the selection), fading out. A `stubs:` node per item (zIndex 3, just under the wires, no clicks) draws them from React Flow's handle bounds
   and frames them for Fit. No names, no counts, no hover. Inputs wired from outside join the multi-input fan-out.
 - **Dotted wires:** the wire into the second input (target points) of Copy to Points is dotted, `1.5 2.5` px
   (`isDottedWire` in `convertGraph.ts`).
