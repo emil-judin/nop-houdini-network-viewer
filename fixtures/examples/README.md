@@ -6,6 +6,7 @@ The seven example networks of the playground, exported in Houdini 22 from the sc
 
 The scene and its assets are saved with a non-commercial Houdini license (Education). SideFX restricts files in its non-commercial formats to non-commercial use, so they cannot be shared under NOP's MIT License, and `.gitignore` keeps every Houdini scene and asset out of the repository. Only the JSON exports are shared.
 
+- The owner keeps the scene, the assets and the logo scenes in the private repository `nop-resources`, at the same paths as here.
 - To change an example, put `nop_examples.hipnc` in this folder and the assets in `otls/` (Houdini finds them in `$HIP/otls`), then re-export below.
 - Keep the non-commercial file names (`.hipnc`, `.hdanc`), so nobody takes them for commercial files, and never open them in a commercial Houdini: it switches that session to non-commercial mode.
 
