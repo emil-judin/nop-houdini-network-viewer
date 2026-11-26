@@ -76,7 +76,7 @@ Not shown on purpose:
 
 ## Re-export
 
-1. Go inside the object, so the Network Editor shows `/obj/<name>`, and select nothing (for example 7, select `scatter_trees`, `random_size`, `place_trees` and the sticky note beside them).
+1. Go inside the object, so the Network Editor shows `/obj/<name>`, and select nothing (for example 7, select `scatter_trees`, `random_size`, `place_trees`, `rock_shape`, `place_rocks` and the sticky note beside them).
 2. Click **Export for NOP** on the NOP shelf and pick the export mode from the Files table.
 3. Save as `<name>-network.json` into this folder.
 4. Open every changed file in the playground (`npm run dev`) and compare it with its row in the coverage table.

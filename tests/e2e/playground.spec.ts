@@ -112,9 +112,14 @@ test.describe('playground', () => {
     await expect(stubs('scatter_trees')).toHaveCount(1);
     await expect(stubs('place_trees')).toHaveCount(3);
     await expect(stubs('random_size')).toHaveCount(0);
+    // The second Copy to Points gets its target points from outside: that stub is dotted like the wire,
+    // the one from its output solid
+    await expect(stubs('place_rocks')).toHaveCount(2);
+    await expect(stubs('place_rocks').first()).toHaveAttribute('stroke-dasharray', '1.5 2.5');
+    await expect(stubs('place_rocks').last()).not.toHaveAttribute('stroke-dasharray', /./);
     // Every stub is fully inside the framed view, and the items outside are never named
     for (const stub of await page.locator('[data-testid="outside-wire-stubs"] path').all()) await expect(stub).toBeInViewport();
-    await expect(page.locator('.react-flow')).not.toContainText(/hills|tree_shape|terrain_and_trees|TREES_ONLY/);
+    await expect(page.locator('.react-flow')).not.toContainText(/hills|tree_shape|rock_points|terrain_and_trees|TREES_ONLY/);
   });
 
   test('P-04: an example downloads only when it is chosen', async ({ page }) => {

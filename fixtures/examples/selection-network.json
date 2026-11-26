@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.5.0",
   "houdiniVersion": "22.0.466",
-  "exportedAt": "2026-11-26T07:05:07.507077+00:00",
+  "exportedAt": "2026-11-26T08:34:32.298758+00:00",
   "exportMode": "compact",
   "icons": {},
   "customShapes": {},
@@ -254,6 +254,110 @@
         "isSubnetwork": false,
         "hdaState": null,
         "parms": []
+      },
+      {
+        "name": "rock_shape",
+        "type": "box",
+        "label": "Box",
+        "icon": "SOP_box",
+        "pos": [
+          2.8,
+          -4.5
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 1,
+        "inputLabels": [
+          "Bounding Source"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": [
+          {
+            "name": "scale",
+            "label": "Uniform Scale",
+            "type": "Float",
+            "val": [
+              0.3
+            ],
+            "expr": [
+              null
+            ],
+            "changed": [
+              true
+            ],
+            "range": [
+              0.0,
+              10.0
+            ]
+          }
+        ]
+      },
+      {
+        "name": "place_rocks",
+        "type": "copytopoints::2.0",
+        "label": "Copy to Points",
+        "icon": "SOP_copytopoints-2.0",
+        "pos": [
+          3.3,
+          -6.0
+        ],
+        "size": [
+          1.1296,
+          0.2824
+        ],
+        "color": [
+          1.0,
+          0.65,
+          0.1
+        ],
+        "shape": "rect",
+        "flags": {
+          "bypass": false,
+          "display": false,
+          "render": false,
+          "template": false,
+          "selectableTemplate": false,
+          "lock": false,
+          "softLock": false
+        },
+        "maxInputs": 2,
+        "inputLabels": [
+          "Geometry to Copy",
+          "Target Points to Copy to"
+        ],
+        "maxOutputs": 1,
+        "outputLabels": [
+          "Output 1"
+        ],
+        "comment": "",
+        "showComment": false,
+        "isSubnetwork": false,
+        "hdaState": null,
+        "parms": []
       }
     ],
     "dots": [],
@@ -261,9 +365,9 @@
     "stickies": [
       {
         "name": "about_selection",
-        "text": "Only these three nodes were selected for export.\n\nThe fading wires lead to nodes that stayed in Houdini: they point to where those nodes are, without naming them.",
+        "text": "Only these nodes were selected for export.\n\nThe fading wires lead to nodes that stayed in Houdini: they point to where those nodes are, without naming them.",
         "pos": [
-          3.0,
+          6.8,
           -5.0
         ],
         "size": [
@@ -296,6 +400,12 @@
         "fromOutput": 0,
         "to": "place_trees",
         "toInput": 1
+      },
+      {
+        "from": "rock_shape",
+        "fromOutput": 0,
+        "to": "place_rocks",
+        "toInput": 0
       }
     ],
     "outsideWires": [
@@ -336,6 +446,25 @@
         ],
         "dot": true,
         "input": 0
+      },
+      {
+        "to": "place_rocks",
+        "toInput": 1,
+        "pos": [
+          5.3,
+          -3.5
+        ],
+        "type": "scatter::2.0"
+      },
+      {
+        "from": "place_rocks",
+        "fromOutput": 0,
+        "pos": [
+          0.0,
+          -8.0
+        ],
+        "type": "merge",
+        "input": 2
       }
     ],
     "subnetInputs": [],

@@ -30,6 +30,7 @@ Feature: Playground web app
   Scenario: The Shared Selection example shows where the selection continues
     When the "Shared Selection" example is opened
     Then "scatter_trees" shows one stub toward the node that feeds it, and "place_trees" shows three: one per wire in and out
+    And "place_rocks", a Copy to Points fed its target points from outside, shows a dotted stub on that input and a solid one on its output
     And every stub is inside the framed view, and no node outside the selection is named
 
   @NOP-PG-002

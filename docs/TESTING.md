@@ -15,7 +15,7 @@ NOP's tests follow the Gherkin feature list in [features/](./features/). Test na
 
 ## Fixtures
 
-- `fixtures/examples/*-network.json`: the seven guided playground examples, real Houdini 22 exports. The tests use `start_here` (`lift_tube`, `merge1`), `vex_wrangles` (`wrangle_rings`), `for_each` (`twist_piece`, slanted wires), `parameters` (the largest file, Full Parms) `assets` (subnetwork `scene`) and `selection` (stubs: `scatter_trees`, `place_trees`).
+- `fixtures/examples/*-network.json`: the seven guided playground examples, real Houdini 22 exports. The tests use `start_here` (`lift_tube`, `merge1`), `vex_wrangles` (`wrangle_rings`), `for_each` (`twist_piece`, slanted wires), `parameters` (the largest file, Full Parms) `assets` (subnetwork `scene`) and `selection` (stubs: `scatter_trees`, `place_trees`, and `place_rocks` with a dotted one).
 - `fixtures/edge-cases/`: small hand-written files for one behavior each (malformed items, schema 2.0.0, prototype-key names, a minimized box, out-of-order merge wires, a sticky note without background, items of different kinds sharing a name, three SideFX Labs tools for the on-demand Labs icons in `labs-tools.json`, a long node name at the right edge of the network for Fit in `long-names.json`).
 - `exporter/tests/sample_network.py`: builders for fake networks, and one sample network with every item kind and a private path in every text field. `python exporter/tests/sample_network.py` prints its export; the Vitest tests read it through `tests/unit/exporterSample.ts` (set `PYTHON` if the interpreter is not `python`).
 
