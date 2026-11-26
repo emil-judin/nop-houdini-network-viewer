@@ -4,6 +4,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+## 0.1.0-alpha.9 (2026-11-26, tester release)
+
 ### Added
 - Exporting a selection now shows where it connects to the rest of the network: each wire to an unselected node is drawn as a short stub that starts like the real wire, solid or dotted, and fades out toward that node. The file keeps where the outside nodes are and their operator types, never their names (schema 1.5.0, `outsideWires`, [decision 0015](docs/decisions/0015-stubs-for-wires-outside-a-selection.md)). Re-export a selection to get the stubs. A new playground example, Shared Selection, shows them.
 
