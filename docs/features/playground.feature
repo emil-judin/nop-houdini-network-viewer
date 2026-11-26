@@ -163,9 +163,11 @@ Feature: Playground web app
     Given a browser that has not closed the welcome card before
     When the playground loads
     Then "Welcome" opens like a desktop app's start screen, with a picture banner with the NOP logo and name, like Houdini's Start Here window
-    And under a one-line intro, the left column has "Your networks" (Get the exporter, Open a network file, Embed on your website) and "Learn more" (Docs and GitHub, in a new tab)
-    And "Examples" on the right lists every example in two columns with a small thumbnail of its network, its name and its node count, the one on screen marked
-    And on phones the columns stack: the links first, then the examples, and on screens lower than 560 pixels the banner is left out
+    And the left column has "Your networks" (Get the exporter, Open a network file, Embed on your website) and "Learn more" (Docs and GitHub, in a new tab)
+    And "How it works" on the right says what NOP is (an interactive view of Houdini node networks to browse parameters, open subnetworks and read VEX, all in the browser, no Houdini needed) and shows three steps with round icons, without numbers, side by side and centered on wide screens and stacked on narrow ones: "Export from Houdini", "Embed on your website" and "Explore", then a note that a file opened here never leaves the browser
+    And the card does not list the examples (they are in the Networks pane)
+    And its footer says it is not affiliated with or endorsed by SideFX, beside "Start exploring"
+    And on phones the columns stack: the links first, then "How it works", and on screens lower than 560 pixels the banner is left out
     When the visitor clicks "Start exploring" (or presses Escape)
     Then the card closes and does not come back on the next visit
     When the visitor clicks "Help" in the Networks pane
@@ -176,8 +178,6 @@ Feature: Playground web app
   @NOP-PG-019
   Scenario: The welcome card opens what it names
     Given the welcome card is open
-    When the visitor clicks an example thumbnail
-    Then the card closes and that example is on screen
     When the visitor clicks "Get the exporter"
     Then the card closes and the exporter download opens
     When the visitor clicks "Open a network file"

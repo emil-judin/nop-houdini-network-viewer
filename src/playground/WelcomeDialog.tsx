@@ -1,7 +1,7 @@
 import React from 'react';
-import { BookOpen, Code2, Download, FileUp, Network } from 'lucide-react';
+import { BookOpen, Code2, Download, Eye, FileUp, Lock, Network } from 'lucide-react';
 import { TOUCH_TARGET } from '../components/hud/touchTarget';
-import { AVAILABLE_EXAMPLES, EXAMPLE_SITE_PAGE, exampleNodeCount, type PlaygroundExample } from './examples';
+import { EXAMPLE_SITE_PAGE } from './examples';
 import { PlaygroundBanner } from './PlaygroundBanner';
 import { PlaygroundDialog } from './PlaygroundDialog';
 
@@ -15,10 +15,6 @@ export interface WelcomeDialogProps {
   onOpenExporter: () => void;
   /** Closes the card and opens the file picker for an own network. */
   onOpenFile: () => void;
-  /** Closes the card and shows the example with this key. */
-  onSelectExample: (key: string) => void;
-  /** Key of the network on screen, marked in the example list. */
-  activeKey: string;
 }
 
 /** The NOP repository on GitHub. */
@@ -26,17 +22,6 @@ const GITHUB_URL = 'https://github.com/emil-judin/nop-houdini-network-viewer';
 
 /** The documentation table of the README (exporter, embedding, schema). */
 const DOCS_URL = `${GITHUB_URL}#documentation`;
-
-/**
- * Example thumbnails by file path (`scripts/capture_example_thumbnails.mjs` makes them from the
- * real viewer). An example without one shows a plain network icon instead.
- */
-const THUMBNAILS = import.meta.glob<string>('./assets/example-thumbs/*.jpg', { eager: true, import: 'default' });
-
-const thumbnailOf = (example: PlaygroundExample): string | undefined => {
-  const path = `./assets/example-thumbs/${example.key}.jpg`;
-  return Object.hasOwn(THUMBNAILS, path) ? THUMBNAILS[path] : undefined;
-};
 
 /** GitHub mark in Lucide's stroke style (Lucide 1.x has no brand icons). */
 const GithubIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -56,8 +41,8 @@ const GithubIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 /** Small heading over a group, like the section titles of the Networks pane. */
-const GroupTitle: React.FC<{ id: string; children: React.ReactNode }> = ({ id, children }) => (
-  <h3 id={id} className="px-2 pb-1 text-[12px] font-bold text-[#a8a8a8]">
+const GroupTitle: React.FC<{ id: string; className?: string; children: React.ReactNode }> = ({ id, className = 'px-2', children }) => (
+  <h3 id={id} className={`${className} pb-1 text-[12px] font-bold text-[#a8a8a8]`}>
     {children}
   </h3>
 );
@@ -72,72 +57,47 @@ const LinkIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </span>
 );
 
-/** One row of the example list: thumbnail, name and node count. Opens the example and closes the card. */
-const ExampleRow: React.FC<{ example: PlaygroundExample; active: boolean; onSelect: () => void }> = ({
-  example,
-  active,
-  onSelect,
-}) => {
-  const thumbnail = thumbnailOf(example);
-  const count = exampleNodeCount(example);
-  return (
-    <li>
-      <button
-        type="button"
-        onClick={onSelect}
-        aria-current={active ? 'true' : undefined}
-        title={example.description}
-        className={`group flex items-center gap-2.5 w-full p-1 rounded-[3px] text-left cursor-pointer ${
-          active ? 'bg-[#383c48]' : 'hover:bg-[#3a3a3a]'
-        }`}
-      >
-        <span
-          className={`shrink-0 w-16 h-[38px] overflow-hidden rounded-[2px] bg-[#222222] border ${
-            active ? 'border-[#7082b9]' : 'border-[#1f1f1f] group-hover:border-[#5a5a5a]'
-          }`}
-        >
-          {thumbnail ? (
-            <img src={thumbnail} alt="" width={64} height={38} className="w-full h-full object-cover" />
-          ) : (
-            <span className="flex items-center justify-center w-full h-full text-[#6a6a6a]">
-              <Network className="w-4 h-4" aria-hidden="true" />
-            </span>
-          )}
-        </span>
-        <span className="min-w-0">
-          <span className={`block truncate text-[13px] ${active ? 'font-bold text-white' : 'text-[#dddddd]'}`}>{example.label}</span>
-          {count !== undefined && <span className="block text-[12px] text-[#a8a8a8]">{count} nodes</span>}
-        </span>
-      </button>
-    </li>
-  );
-};
+/**
+ * One step of "How it works": a blue icon circle (the blue of the card's main button), a title and a
+ * sentence. On wide screens the steps stand side by side, circle and text centered in their columns,
+ * and all but the last draw a dashed line across to the next circle, so the three read as one flow.
+ * The line starts 8px after this circle and ends 8px before the next one: one column plus the 14px
+ * gap, minus a 40px circle and two 8px spaces, is `100% - 42px`. On narrower screens the steps
+ * stack, icon beside the text.
+ */
+const Step: React.FC<{ icon: React.ReactNode; title: string; last?: boolean; children: React.ReactNode }> = ({
+  icon,
+  title,
+  last = false,
+  children,
+}) => (
+  <li className="relative flex gap-3 md:flex-col md:gap-2.5">
+    <div className="flex md:justify-center" aria-hidden="true">
+      <span className="flex items-center justify-center w-10 h-10 shrink-0 rounded-full bg-[#474e62] text-white">{icon}</span>
+      {!last && (
+        <span className="hidden md:block absolute top-4.75 left-[calc(50%+28px)] w-[calc(100%-42px)] border-t-2 border-dashed border-[#5a5a5a]" />
+      )}
+    </div>
+    <div className="pt-0.5 md:pt-0 md:text-center">
+      <p className="text-[14px] font-bold text-white">{title}</p>
+      <p className="mt-0.75 text-[13px] leading-[1.45] text-[#bdbdbd]">{children}</p>
+    </div>
+  </li>
+);
 
 /**
  * Start screen on the first visit (and from the Help button), like a desktop app's splash: the
  * banner on top, then on the left the links for the visitor's own networks (exporter, open a file,
- * embed on a site) and to the docs and GitHub, and on the right the examples as a compact list with
- * thumbnails, each opening its network. On phones the columns stack, links first.
+ * embed on a site) and to the docs and GitHub, and on the right what NOP is and how it works in
+ * three steps (export, embed, explore). On phones the columns stack, links first.
  */
-export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
-  open,
-  onClose,
-  onOpenExporter,
-  onOpenFile,
-  onSelectExample,
-  activeKey,
-}) => {
+export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({ open, onClose, onOpenExporter, onOpenFile }) => {
   return (
     <PlaygroundDialog open={open} onClose={onClose} title="Welcome" maxWidthPx={760}>
-      {/* Like Houdini's Start Here window; left out on short screens so the examples keep their room */}
+      {/* Like Houdini's Start Here window; left out on short screens so the text keeps its room */}
       <PlaygroundBanner className="[@media(max-height:560px)]:hidden" />
       <div className="overflow-y-auto px-4 py-3">
-        <p className="px-2 text-[13px] leading-[1.5] text-[#d6d6d6]">
-          NOP is an interactive viewer for Houdini node networks on the web. Open an example to try it, or test your own exported
-          networks.
-        </p>
-
-        <div className="mt-3 flex flex-col sm:flex-row gap-4 sm:gap-3">
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-3">
           <div className="sm:w-[200px] shrink-0 flex flex-col gap-2.5">
             <section aria-labelledby="welcome-own">
               <GroupTitle id="welcome-own">Your networks</GroupTitle>
@@ -193,19 +153,34 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
             </section>
           </div>
 
-          <section aria-labelledby="welcome-examples" className="flex-1 min-w-0 sm:border-l sm:border-[#3a3a3a] sm:pl-3">
-            <GroupTitle id="welcome-examples">Examples</GroupTitle>
-            {/* One column on narrow phones, so the longer names still fit beside their thumbnails */}
-            <ul className="grid grid-cols-1 min-[440px]:grid-cols-2 gap-x-2 gap-y-0.5">
-              {AVAILABLE_EXAMPLES.map((example) => (
-                <ExampleRow
-                  key={example.key}
-                  example={example}
-                  active={example.key === activeKey}
-                  onSelect={() => onSelectExample(example.key)}
-                />
-              ))}
-            </ul>
+          <section
+            aria-labelledby="welcome-how"
+            className="flex-1 min-w-0 flex flex-col gap-3.5 px-2 sm:px-0 sm:border-l sm:border-[#3a3a3a] sm:pl-4.5"
+          >
+            <div>
+              <GroupTitle id="welcome-how" className="">
+                How it works
+              </GroupTitle>
+              <p className="text-[13px] leading-[1.5] text-[#d6d6d6]">
+                An interactive view for your Houdini node networks: browse parameters, open subnetworks and read VEX.
+                All in the browser, no Houdini needed.
+              </p>
+            </div>
+            <ol className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              <Step icon={<Network className="w-5 h-5" strokeWidth={2.2} />} title="Export from Houdini">
+                Click the NOP shelf tool. The network is saved as one JSON file.
+              </Step>
+              <Step icon={<Code2 className="w-5 h-5" strokeWidth={2.2} />} title="Embed on your website">
+                Add the file to your site with one line of HTML using the web component.
+              </Step>
+              <Step icon={<Eye className="w-5 h-5" strokeWidth={2.2} />} title="Explore" last>
+                Visitors can pan, zoom, open subnetworks and read parameters and VEX
+              </Step>
+            </ol>
+            <p className="flex items-center gap-2 px-2.5 py-2 rounded-[3px] bg-[#262626] text-[12px] leading-[1.4] text-[#b0b0b0]">
+              <Lock className={`w-3.5 h-3.5 shrink-0 text-[#a9b8e6]`} aria-hidden="true" />
+              Try your file here first. It never leaves your browser.
+            </p>
           </section>
         </div>
       </div>
@@ -216,7 +191,7 @@ export const WelcomeDialog: React.FC<WelcomeDialogProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className={`shrink-0 ml-auto h-7 px-3 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-[13px] text-white cursor-pointer ${TOUCH_TARGET}`}
+          className={`shrink-0 ml-auto h-8 px-4 rounded-[3px] bg-[#474e62] hover:bg-[#535b72] text-[13px] font-bold text-white cursor-pointer ${TOUCH_TARGET}`}
         >
           Start exploring
         </button>

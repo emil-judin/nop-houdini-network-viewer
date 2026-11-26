@@ -12,6 +12,8 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ### Changed
 - The Houdini scenes (the examples scene and the logo scene) and the two example assets are no longer in the repository: they were saved with a non-commercial Houdini license, which SideFX restricts to non-commercial use, so they cannot be shared under the MIT License. The example networks stay as JSON exports.
+- The playground's Welcome card explains NOP instead of listing the examples: what it is, then "How it works" in three steps with round icons (export from Houdini, embed on your website, explore), side by side and centered on wide screens. The examples stay in the Networks pane.
+- The example thumbnails and `scripts/capture_example_thumbnails.mjs` are removed: only the old Welcome card's example list used them.
 
 ## 0.1.0-alpha.8 (2026-11-19, tester release)
 
