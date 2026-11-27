@@ -95,7 +95,7 @@ Open work lives in [GitHub issues](https://github.com/emil-judin/nop-houdini-net
 **Commits** follow [Conventional Commits](https://www.conventionalcommits.org/): `type(area): summary`.
 
 - Types: `feat` (something new a user can see or use), `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, `chore` (only when nothing else fits), `revert`.
-- Areas: `viewer`, `schema`, `exporter`, `embed`, `playground`, `examples`, `icons`, `brand`, `docs`, `tests`, `ci`, `deps`, `release`, `teaser`. Leave the area out only when a change spans several.
+- Areas: `viewer`, `schema`, `exporter`, `embed`, `playground`, `examples`, `icons`, `brand`, `docs`, `tests`, `ci`, `deps`, `release`. Leave the area out only when a change spans several.
 - New icon drawings are `feat(icons)`, corrected ones `fix(icons)`. Never use `style` for anything visual: in Conventional Commits it means code formatting only.
 - Summary: plain words, lowercase after the colon unless a name follows (`Copy to Points`, `Welcome card`), no full stop, no en or em dashes, the whole subject at most 72 characters.
 - Body (optional, after a blank line): why, wrapped at 72. Footer: `Refs #<issue>`. A change that breaks the JSON schema or the component API gets `!` after the area and a `BREAKING CHANGE:` footer, also in `0.x`.

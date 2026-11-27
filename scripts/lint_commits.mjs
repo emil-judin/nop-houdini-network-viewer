@@ -27,7 +27,6 @@ const AREAS = [
   'ci',
   'deps',
   'release',
-  'teaser',
 ];
 const MAX_LENGTH = 72;
 // En dash and em dash, built from their code points so this file contains neither
