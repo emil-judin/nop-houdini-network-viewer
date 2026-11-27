@@ -7,6 +7,7 @@ import type {
   HoudiniNetworkBoxData,
   HoudiniNetworkGraph,
   HoudiniNodeData,
+  HoudiniOutsideWireData,
   HoudiniRgbColor,
   HoudiniStickyNoteData,
   HoudiniSubnetInputData,
@@ -62,6 +63,23 @@ export const BOX_ID_PREFIX = 'box:';
 export const STICKY_ID_PREFIX = 'sticky:';
 /** ID prefix of For-Each and Compile block underlays, followed by the end node's name. */
 export const BLOCK_ID_PREFIX = 'block:';
+/** ID prefix of the invisible bounds around a node's or dot's outside-wire stubs, followed by its name. */
+export const STUB_BOUNDS_ID_PREFIX = 'stubs:';
+
+/**
+ * How much of a wire to an item outside an exported selection is drawn: its first pixels from the
+ * exported connector, measured as distance at zoom 1 (decision 0015). It then fades out.
+ */
+export const OUTSIDE_STUB_LENGTH_PX = 40;
+
+/**
+ * How far stubs can reach past a node's or dot's box in any direction: the connector sits up to 8.5px
+ * outside the box, then the stub. Fit includes this.
+ */
+const OUTSIDE_STUB_REACH_PX = 8.5 + OUTSIDE_STUB_LENGTH_PX + 2;
+
+/** How far a connector sits outside a node's box, for the far end of a stub (a node outside the export). */
+const OUTSIDE_CONNECTOR_OFFSET_PX = 8.5;
 
 /**
  * Configurable label size preset for node names and descriptive labels.
@@ -149,10 +167,88 @@ export interface HoudiniBlockFlowNodeData extends Record<string, unknown> {
 }
 
 /**
+ * One wire between an exported item and an item outside the selection (schema 1.5.0), drawn as a stub:
+ * the first pixels of the wire from the exported connector, solid or dotted like the wire, fading out
+ * (decision 0015).
+ */
+export interface HoudiniOutsideStub {
+  /** Handle on the exported node or dot where the stub starts (`in-0`, `in-multi-7`, `out-0`). */
+  handle: string;
+  /** `in`: the wire comes from outside into `handle`; `out`: it leaves `handle` for outside. */
+  direction: 'in' | 'out';
+  /**
+   * The outside end of the wire, in flow coordinates: the outside item's output (`in`) or input
+   * (`out`) connector. Missing for files without positions: the stub then runs straight.
+   */
+  far?: { x: number; y: number };
+  /** Whether the outside end is a dot (wires leave and enter dots differently). */
+  farIsDot: boolean;
+  /** Drawn dotted like the real wire (`isDottedWire`; for wires leaving the selection from the outside node's type and input). */
+  dotted: boolean;
+}
+
+/**
+ * Custom React Flow node data payload for the stubs of one node or dot (`HoudiniOutsideStubs`).
+ */
+export interface HoudiniOutsideStubsFlowNodeData extends Record<string, unknown> {
+  /** React Flow ID of the node or dot the stubs start from. */
+  item: string;
+  /** Whether that item is a dot. */
+  itemIsDot: boolean;
+  stubs: HoudiniOutsideStub[];
+  wireStyle: HoudiniWireStyle;
+}
+
+/**
+ * The stubs of one node or dot, as a node of their own (`stubs:` prefix): a box around the item and
+ * its stubs, so Fit keeps them in view, drawn under the wires. It lets every click through.
+ */
+function outsideStubsNode(
+  id: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  data: HoudiniOutsideStubsFlowNodeData,
+): Node {
+  const reach = OUTSIDE_STUB_REACH_PX;
+  return {
+    id: `${STUB_BOUNDS_ID_PREFIX}${id}`,
+    type: 'houdiniOutsideStubs',
+    position: { x: x - reach, y: y - reach },
+    initialWidth: width + 2 * reach,
+    initialHeight: height + 2 * reach,
+    width: width + 2 * reach,
+    height: height + 2 * reach,
+    zIndex: 3,
+    selectable: false,
+    draggable: false,
+    focusable: false,
+    style: { pointerEvents: 'none' },
+    data,
+  };
+}
+
+/**
+ * Flow position of the connector of an item outside an exported selection, from its `pos`: a dot's
+ * center, or the bottom (`output`) or top (`input`) middle of a node's box.
+ */
+function outsideConnector(pos: [number, number], isDot: boolean, side: 'output' | 'input'): { x: number; y: number } {
+  const x = pos[0] * HOUDINI_UNIT_TO_PX;
+  const y = -pos[1] * HOUDINI_UNIT_TO_PX;
+  if (isDot) return { x, y };
+  // Nodes are drawn 1.0 x 0.3 network units up from their lower left corner (see the operator nodes below)
+  const middle = x + 0.5 * HOUDINI_UNIT_TO_PX;
+  return side === 'output'
+    ? { x: middle, y: y + OUTSIDE_CONNECTOR_OFFSET_PX }
+    : { x: middle, y: y - 0.3 * HOUDINI_UNIT_TO_PX - OUTSIDE_CONNECTOR_OFFSET_PX };
+}
+
+/**
  * Whether Houdini draws the wire into input `toInput` of `target` dotted: the second input (target
  * points) of Copy to Points.
  */
-export function isDottedWire(target: HoudiniNodeData | undefined, toInput: number | undefined): boolean {
+export function isDottedWire(target: { type: string } | undefined, toInput: number | undefined): boolean {
   return target !== undefined && toInput === 1 && parseOperatorType(target.type).baseType === 'copytopoints';
 }
 
@@ -315,13 +411,81 @@ export function convertGraphToReactFlow(
     });
   }
 
+  // Incoming connections per target: the wires, then the inputs wired from outside an exported selection
+  // (schema 1.5.0). Multi-input bars (`merge`, `switch`) fan both out across the bar in input order
+  // (input 1 on the left), like Houdini, whatever the order in the file
+  const nodesByName = new Map((graph.nodes ?? []).map((node) => [node.name, node]));
+  const wires = graph.wires ?? [];
+  const outsideWires = graph.outsideWires ?? [];
+  const incoming: Array<{ to: string; toInput: number; outside?: HoudiniOutsideWireData }> = [
+    ...wires.map((w) => ({ to: w.to, toInput: w.toInput ?? 0 })),
+    ...outsideWires.flatMap((o) => (o.to !== undefined ? [{ to: o.to, toInput: o.toInput ?? 0, outside: o }] : [])),
+  ];
+  const incomingByTarget = new Map<string, number[]>();
+  incoming.forEach(({ to }, index) => {
+    const list = incomingByTarget.get(to) ?? [];
+    list.push(index);
+    incomingByTarget.set(to, list);
+  });
+  const orderInTarget = new Map<number, number>();
+  for (const list of incomingByTarget.values()) {
+    list.sort((a, b) => incoming[a].toInput - incoming[b].toInput || a - b);
+    list.forEach((index, order) => orderInTarget.set(index, order));
+  }
+
+  /** Target handle of incoming connection `index` (into `incoming`) on its node, or on a dot. */
+  const inputHandle = (index: number, isToDot: boolean): string => {
+    if (isToDot) return 'in-0';
+    const { to, toInput } = incoming[index];
+    const targetNode = nodesByName.get(to);
+    if ((targetNode?.maxInputs ?? 1) > 4) {
+      const total = incomingByTarget.get(to)?.length ?? 1;
+      const order = orderInTarget.get(index) ?? 0;
+      const slot = total === 1 ? 7 : Math.min(15, Math.max(0, Math.round(3 + (order / (total - 1)) * 9)));
+      return `in-multi-${slot}`;
+    }
+    return `in-${Math.min(toInput, Math.max(0, (targetNode?.maxInputs ?? 1) - 1))}`;
+  };
+
+  // Stubs for wires to items outside an exported selection: one per wire, drawn by a node of their own
+  const outsideStubs = new Map<string, HoudiniOutsideStub[]>();
+  const addStub = (name: string, stub: HoudiniOutsideStub) => {
+    const list = outsideStubs.get(name) ?? [];
+    list.push(stub);
+    outsideStubs.set(name, list);
+  };
+  for (let index = wires.length; index < incoming.length; index++) {
+    const { to, outside } = incoming[index];
+    const farIsDot = outside?.dot === true;
+    addStub(to, {
+      handle: inputHandle(index, !nodesByName.has(to)),
+      direction: 'in',
+      far: outside?.pos ? outsideConnector(outside.pos, farIsDot, 'output') : undefined,
+      farIsDot,
+      dotted: isDottedWire(nodesByName.get(to), outside?.toInput),
+    });
+  }
+  for (const outside of outsideWires) {
+    if (outside.to !== undefined || outside.from === undefined) continue;
+    const sourceNode = nodesByName.get(outside.from);
+    const outputs = sourceNode ? outputConnectorCount(sourceNode) : 1;
+    if (outputs === 0) continue;
+    const farIsDot = outside.dot === true;
+    addStub(outside.from, {
+      handle: `out-${Math.min(outside.fromOutput ?? 0, outputs - 1)}`,
+      direction: 'out',
+      far: outside.pos ? outsideConnector(outside.pos, farIsDot, 'input') : undefined,
+      farIsDot,
+      dotted: isDottedWire(outside.type === undefined ? undefined : { type: outside.type }, outside.input),
+    });
+  }
+
   // 4. Operator Nodes
   // Note: Houdini's NodeShapes/*.json use an isotropic 10:3 aspect ratio (1.0 x 0.3),
   // whereas hou.Node.size() reports [1.1296, 0.2824]. We enforce the 10:3 shape aspect
   // ratio (100px x 30px) so node shapes match Houdini's native rendering 1:1.
   const nodeLookup = new Map<string, HoudiniNodeData>();
   const operatorNodes: Node[] = [];
-  const nodesByName = new Map((graph.nodes ?? []).map((node) => [node.name, node]));
   for (const node of graph.nodes ?? []) {
     if (hiddenItemNames.has(node.name)) {
       continue;
@@ -335,6 +499,7 @@ export function convertGraphToReactFlow(
 
     const screenX = (node.pos?.[0] ?? 0) * HOUDINI_UNIT_TO_PX;
     const screenY = -((node.pos?.[1] ?? 0) + heightUnits) * HOUDINI_UNIT_TO_PX;
+    const stubs = outsideStubs.get(node.name);
 
     operatorNodes.push({
       id: node.name,
@@ -347,7 +512,9 @@ export function convertGraphToReactFlow(
       draggable: false,
       // Keyboard access: Tab reaches each operator node, announced with its type and name
       focusable: true,
-      ariaLabel: `${node.label || node.type} node ${node.name}${node.isSubnetwork && node.children ? ', subnetwork' : ''}`,
+      ariaLabel: `${node.label || node.type} node ${node.name}${node.isSubnetwork && node.children ? ', subnetwork' : ''}${
+        stubs ? ', wired to nodes outside this export' : ''
+      }`,
       data: {
         node,
         // Own properties only: an icon named `constructor` must not find `Object.prototype.constructor`
@@ -359,6 +526,9 @@ export function convertGraphToReactFlow(
         descriptiveText: blockMethodLabel(node, (name) => nodesByName.get(name), graph.path) ?? undefined,
       } satisfies HoudiniSopFlowNodeData,
     });
+    if (stubs) {
+      rfNodes.push(outsideStubsNode(node.name, screenX, screenY, widthPx, heightPx, { item: node.name, itemIsDot: false, stubs, wireStyle }));
+    }
   }
 
   // Tab order follows the network from top to bottom, then left to right (the DOM order is the
@@ -392,25 +562,15 @@ export function convertGraphToReactFlow(
         dot,
       } satisfies HoudiniDotFlowNodeData,
     });
+    const dotStubs = outsideStubs.get(dot.name);
+    if (dotStubs) {
+      const id = `${DOT_ID_PREFIX}${dot.name}`;
+      const diameter = HOUDINI_DOT_RADIUS_PX * 2;
+      rfNodes.push(outsideStubsNode(id, screenX, screenY, diameter, diameter, { item: id, itemIsDot: true, stubs: dotStubs, wireStyle }));
+    }
   }
 
   // 6. Wires (Edges)
-  // Group incoming wires per target node so multi-input bars (`merge`, `switch`) fan out wires across
-  // the bar in input order (input 1 on the left), like Houdini, whatever the order in the file
-  const wires = graph.wires ?? [];
-  const incomingWiresByTarget = new Map<string, number[]>();
-  for (let i = 0; i < wires.length; i++) {
-    const w = wires[i];
-    const list = incomingWiresByTarget.get(w.to) ?? [];
-    list.push(i);
-    incomingWiresByTarget.set(w.to, list);
-  }
-  const orderInTarget = new Map<number, number>();
-  for (const list of incomingWiresByTarget.values()) {
-    list.sort((a, b) => (wires[a].toInput ?? 0) - (wires[b].toInput ?? 0) || a - b);
-    list.forEach((wireIndex, order) => orderInTarget.set(wireIndex, order));
-  }
-
   /** React Flow ID of a wire end: an operator node first, then a dot, then a subnet input. */
   const endpointId = (name: string): string | null => {
     if (nodeLookup.has(name)) return name;
@@ -446,22 +606,7 @@ export function convertGraphToReactFlow(
         ? 'out-0'
         : `out-${Math.min(wire.fromOutput ?? 0, Math.max(0, outputConnectorCount(sourceNode) - 1))}`;
 
-    const isMultiInputTarget = !isToDot && (targetNode?.maxInputs ?? 1) > 4;
-    let multiSlotIndex = 7;
-    if (isMultiInputTarget) {
-      const totalIn = incomingWiresByTarget.get(wire.to)?.length ?? 1;
-      const orderIdx = orderInTarget.get(i) ?? 0;
-      multiSlotIndex =
-        totalIn === 1
-          ? 7
-          : Math.min(15, Math.max(0, Math.round(3 + (orderIdx / (totalIn - 1)) * 9)));
-    }
-
-    const targetHandle = isToDot
-      ? 'in-0'
-      : isMultiInputTarget
-        ? `in-multi-${multiSlotIndex}`
-        : `in-${Math.min(wire.toInput ?? 0, Math.max(0, (targetNode?.maxInputs ?? 1) - 1))}`;
+    const targetHandle = inputHandle(i, isToDot);
 
     rfEdges.push({
       id: `wire-${i}-${sourceId}-${wire.fromOutput}-${targetId}-${wire.toInput}`,

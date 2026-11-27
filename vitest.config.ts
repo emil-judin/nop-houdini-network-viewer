@@ -21,6 +21,9 @@ export default defineConfig({
     // Component tests render the whole viewer in jsdom; on a busy machine with every worker running,
     // some take longer than Vitest's default 5 seconds without anything being wrong
     testTimeout: 20_000,
+    // The same for setup hooks: loading every SOP icon domain in a `beforeAll` takes under a second
+    // alone, but can pass Vitest's default 10 seconds while the component tests keep every worker busy
+    hookTimeout: 20_000,
     // Every component test renders React Flow in jsdom: one worker per core (15 on a 16 core machine)
     // makes them slow each other down until waits run out, half of them is faster overall
     maxWorkers: '50%',

@@ -37,6 +37,37 @@
         "boxes": { "type": "array", "items": { "$ref": "#/$defs/box" } },
         "stickies": { "type": "array", "items": { "$ref": "#/$defs/sticky" } },
         "wires": { "type": "array", "items": { "$ref": "#/$defs/wire" } },
+        "outsideWires": {
+          "description": "Wires between an exported selection and items outside it, one per wire (schema 1.5.0). Keeps the outside item's position, whether it is a dot, a node's operator type and, for wires leaving the selection, the input they enter; never its name.",
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["to", "toInput"],
+                "properties": {
+                  "to": { "type": "string" },
+                  "toInput": { "type": "integer", "minimum": 0 },
+                  "pos": { "$ref": "#/$defs/vec2" },
+                  "dot": { "type": "boolean" },
+                  "type": { "type": "string" }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["from", "fromOutput"],
+                "properties": {
+                  "from": { "type": "string" },
+                  "fromOutput": { "type": "integer", "minimum": 0 },
+                  "pos": { "$ref": "#/$defs/vec2" },
+                  "dot": { "type": "boolean" },
+                  "type": { "type": "string" },
+                  "input": { "type": "integer", "minimum": 0 }
+                }
+              }
+            ]
+          }
+        },
         "subnetInputs": { "type": "array", "items": { "$ref": "#/$defs/subnetInput" } },
         "wireStyle": { "enum": ["default", "rounded"] },
         "pathNodes": {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStoreApi } from '@xyflow/react';
 
 /** Longest time the network stays hidden while it waits for its first fit (an empty network never fits). */
@@ -10,11 +10,15 @@ const FIRST_FIT_TIMEOUT_MS = 400;
  * visitor sees the network huge in the top-left corner for a frame before it jumps into place.
  *
  * `waitsForFit` is false when the viewer starts without a fit; the network then shows right away.
+ * `onFirstFit` runs one frame after React Flow's fit, before the network shows: React Flow frames the
+ * node boxes only, and the viewer refits there to frame the node names too.
  * Must be used inside React Flow's provider. Once true, it stays true (later fits animate on screen).
  */
-export function useFirstFitDone(waitsForFit: boolean): boolean {
+export function useFirstFitDone(waitsForFit: boolean, onFirstFit?: () => void): boolean {
   const store = useStoreApi();
   const [done, setDone] = useState(!waitsForFit);
+  const onFirstFitRef = useRef(onFirstFit);
+  onFirstFitRef.current = onFirstFit;
 
   useEffect(() => {
     if (done) return;
@@ -22,7 +26,11 @@ export function useFirstFitDone(waitsForFit: boolean): boolean {
     // Two frames after the fit started: the fitted transform has been drawn by then
     const reveal = () => {
       frame = requestAnimationFrame(() => {
-        frame = requestAnimationFrame(() => setDone(true));
+        onFirstFitRef.current?.();
+        // Two more frames for the refitted transform to be drawn
+        frame = requestAnimationFrame(() => {
+          frame = requestAnimationFrame(() => setDone(true));
+        });
       });
     };
     let revealing = false;

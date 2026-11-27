@@ -10,6 +10,7 @@ import {
   houdiniRgbTitleColor,
   houdiniRgbToCss,
   normalizeNetworkDocument,
+  type HoudiniOutsideStubsFlowNodeData,
   type HoudiniWireFlowEdgeData,
 } from '../../src/schema/converter';
 import { graph, node, wire } from './networkFixtures';
@@ -204,6 +205,70 @@ describe('convertGraphToReactFlow: wires', () => {
     expect(handleOf('src1')).toBe('in-multi-6');
     expect(handleOf('src2')).toBe('in-multi-9');
     expect(handleOf('src3')).toBe('in-multi-12');
+  });
+
+  it('NOP-CONV-032: wires to items outside the selection become stubs toward those items, not edges', () => {
+    const level = graph({
+      nodes: [node({ name: 'noise1', pos: [0, 0] }), node({ name: 'copy1', type: 'copytopoints', maxInputs: 2, pos: [0, -1] })],
+      dots: [{ name: '__dot1', pos: [0, -3] }],
+      wires: [wire('noise1', 'copy1', 0, 0)],
+      outsideWires: [
+        { to: 'noise1', toInput: 0, pos: [-2, 1] },
+        // Into the target points input of Copy to Points: dotted, like the real wire would be
+        { to: 'copy1', toInput: 1, pos: [3, 0.5], dot: true },
+        { from: 'copy1', fromOutput: 0, pos: [-1, -2], type: 'merge', input: 0 },
+        // Into the target points input of a Copy to Points outside: dotted too
+        { from: 'copy1', fromOutput: 0, pos: [1, -2], type: 'copytopoints::2.0', input: 1 },
+        { to: '__dot1', toInput: 0 },
+        { from: '__dot1', fromOutput: 0, pos: [2, -4] },
+      ],
+    });
+    const { nodes, edges } = convertGraphToReactFlow(level, undefined, undefined, 'medium', 'rounded');
+    expect(edges).toHaveLength(1);
+    const stubs = (id: string) => byId(nodes, `stubs:${id}`)?.data as unknown as HoudiniOutsideStubsFlowNodeData | undefined;
+    // The far end is the outside item's output (a node's bottom middle, a dot's center) or input (a node's top middle)
+    expect(stubs('noise1')).toEqual({
+      item: 'noise1',
+      itemIsDot: false,
+      wireStyle: 'rounded',
+      stubs: [{ handle: 'in-0', direction: 'in', far: { x: -150, y: -91.5 }, farIsDot: false, dotted: false }],
+    });
+    // One stub per wire: two outside nodes fed from the same output get two stubs
+    expect(stubs('copy1')?.stubs).toEqual([
+      { handle: 'in-1', direction: 'in', far: { x: 300, y: -50 }, farIsDot: true, dotted: true },
+      { handle: 'out-0', direction: 'out', far: { x: -50, y: 161.5 }, farIsDot: false, dotted: false },
+      { handle: 'out-0', direction: 'out', far: { x: 150, y: 161.5 }, farIsDot: false, dotted: true },
+    ]);
+    // Without a position (older files) the stub has no far end and runs straight
+    expect(stubs(`${DOT_ID_PREFIX}__dot1`)?.stubs).toEqual([
+      { handle: 'in-0', direction: 'in', far: undefined, farIsDot: false, dotted: false },
+      { handle: 'out-0', direction: 'out', far: { x: 250, y: 361.5 }, farIsDot: false, dotted: false },
+    ]);
+    expect(stubs(`${DOT_ID_PREFIX}__dot1`)?.item).toBe(`${DOT_ID_PREFIX}__dot1`);
+    expect(byId(nodes, 'copy1')?.ariaLabel).toMatch(/wired to nodes outside this export$/);
+    // The stubs node frames the item and its stubs on every side, for Fit, under the wires and taking no clicks
+    const box = byId(nodes, 'stubs:noise1');
+    expect(box?.position.x).toBeCloseTo(-50.5, 9);
+    expect(box?.width).toBeCloseTo(100 + 2 * 50.5, 9);
+    expect(box?.height).toBeCloseTo(30 + 2 * 50.5, 9);
+    expect(box).toMatchObject({ type: 'houdiniOutsideStubs', zIndex: 3, selectable: false, focusable: false, style: { pointerEvents: 'none' } });
+    expect(byId(nodes, 'stubs:merge1')).toBeUndefined();
+  });
+
+  it('NOP-CONV-033: inputs wired from outside take their place in the multi-input fan-out', () => {
+    const { nodes, edges } = convertGraphToReactFlow(
+      graph({
+        nodes: [node({ name: 'a' }), node({ name: 'merge1', type: 'merge', maxInputs: 9999 })],
+        wires: [wire('a', 'merge1', 0, 1)],
+        outsideWires: [
+          { to: 'merge1', toInput: 0 },
+          { to: 'merge1', toInput: 2 },
+        ],
+      }),
+    );
+    expect(edges[0].targetHandle).toBe('in-multi-8');
+    const data = byId(nodes, 'stubs:merge1')?.data as unknown as HoudiniOutsideStubsFlowNodeData;
+    expect(data.stubs.map((stub) => stub.handle)).toEqual(['in-multi-3', 'in-multi-12']);
   });
 
   it('NOP-CONV-026: the chosen wire style is passed to every edge', () => {

@@ -79,7 +79,9 @@ Exports must be as safe to share as a screenshot of the network: no user, client
   and in `src/schema/types.ts`, and add it to `schema/nop-network-1.schema.json`.
 - Never remove or rename a field in 1.x: old exports must stay readable. A breaking change needs a new major
   version and a viewer that reads both.
-- Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0).
+- Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0), `outsideWires`
+  (1.5.0: one entry per wire between the selection and an outside item, with that item's `pos`, `dot`, `type` and, for
+  wires leaving the selection, `input`; never its name; decision 0015).
 
 ## 5. Package and tests
 

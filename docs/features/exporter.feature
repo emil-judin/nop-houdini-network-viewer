@@ -76,6 +76,16 @@ Feature: Houdini exporter and package
     Then only the selected items of "/obj/geo1" are exported
     And wires to unselected nodes are left out, except wires from subnet inputs
 
+  @NOP-EXP-052
+  Scenario: Wires to items outside the selection keep where the far end is and its type, never its name
+    Given "noise1" and "copy1" are selected, "grid1" feeds "noise1", "box1" feeds input 1 of "copy1", and "copy1" feeds "merge1", input 2 of the Copy to Points "xfer1" and a dot
+    When "/obj/geo1" is exported
+    Then "outsideWires" has one entry per wire: input 1 of "noise1" and input 1 of "copy1", then output 1 of "copy1" three times
+    And each entry has the position of the item outside, a node's operator type, and the dot's entry says it is a dot
+    And each wire leaving the selection says which input it enters outside
+    And no unselected item's name appears in it
+    And a whole-network export has no "outsideWires"
+
   @NOP-EXP-011
   Scenario: Nothing selected exports the whole network
     Given nothing is selected in "/obj/geo1"

@@ -14,7 +14,7 @@ Feature: Playground web app
   Scenario: The playground opens on the first example
     When the playground loads
     Then the first example of the Networks pane ("Start Here") is current and its network is shown
-    And the examples are the six guided networks of fixtures/examples/
+    And the examples are the seven guided networks of fixtures/examples/
     And each example row has a short description of what it shows, and every row has room for two description lines, so all are the same height (trial)
     And the Networks pane is 360 pixels wide beside the network (240 where it floats over it on phones)
 
@@ -25,6 +25,13 @@ Feature: Playground web app
     And the counts are read from the example files when the playground is built, so no other example is downloaded for them
     And the browser tab says "NOP Playground", and so does the page heading for screen readers
     And all icons, the favicon and the manifest load from the sub-path
+
+  @NOP-PG-051
+  Scenario: The Shared Selection example shows where the selection continues
+    When the "Shared Selection" example is opened
+    Then "scatter_trees" shows one stub toward the node that feeds it, and "place_trees" shows three: one per wire in and out
+    And "place_rocks", a Copy to Points fed its target points from outside, shows a dotted stub on that input and a solid one on its output
+    And every stub is inside the framed view, and no node outside the selection is named
 
   @NOP-PG-002
   Scenario: Switching examples and linking to one
@@ -156,9 +163,11 @@ Feature: Playground web app
     Given a browser that has not closed the welcome card before
     When the playground loads
     Then "Welcome" opens like a desktop app's start screen, with a picture banner with the NOP logo and name, like Houdini's Start Here window
-    And under a one-line intro, the left column has "Your networks" (Get the exporter, Open a network file, Embed on your website) and "Learn more" (Docs and GitHub, in a new tab)
-    And "Examples" on the right lists every example in two columns with a small thumbnail of its network, its name and its node count, the one on screen marked
-    And on phones the columns stack: the links first, then the examples, and on screens lower than 560 pixels the banner is left out
+    And the left column has "Your networks" (Get the exporter, Open a network file, Embed on your website) and "Learn more" (Docs and GitHub, in a new tab)
+    And "How it works" on the right says what NOP is (an interactive view of Houdini node networks to browse parameters, open subnetworks and read VEX, all in the browser, no Houdini needed) and shows three steps with round icons, without numbers, side by side and centered on wide screens and stacked on narrow ones: "Export from Houdini", "Embed on your website" and "Explore", then a note that a file opened here never leaves the browser
+    And the card does not list the examples (they are in the Networks pane)
+    And its footer says it is not affiliated with or endorsed by SideFX, beside "Start exploring"
+    And on phones the columns stack: the links first, then "How it works", and on screens lower than 560 pixels the banner is left out
     When the visitor clicks "Start exploring" (or presses Escape)
     Then the card closes and does not come back on the next visit
     When the visitor clicks "Help" in the Networks pane
@@ -169,8 +178,6 @@ Feature: Playground web app
   @NOP-PG-019
   Scenario: The welcome card opens what it names
     Given the welcome card is open
-    When the visitor clicks an example thumbnail
-    Then the card closes and that example is on screen
     When the visitor clicks "Get the exporter"
     Then the card closes and the exporter download opens
     When the visitor clicks "Open a network file"

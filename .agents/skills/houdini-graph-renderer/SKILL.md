@@ -35,9 +35,9 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
   hidden handles `in-multi-0..15`; never render one handle per input in a loop. Wires fan out across the bar in
   input order (`toInput`), computed in the converter.
 - **IDs:** operator nodes use their Houdini name; boxes, stickies, dots, subnet inputs and block underlays use
-  the prefixes `box:`, `sticky:`, `dot:`, `input:`, `block:` (Houdini never allows a colon in names). Wire ends resolve node first,
+  the prefixes `box:`, `sticky:`, `dot:`, `input:`, `block:`, `stubs:` (Houdini never allows a colon in names). Wire ends resolve node first,
   then dot, then subnet input. Wires to items that are not in the export are skipped.
-- **Drawing order (`zIndex`):** network boxes -20, sticky notes -10, block underlays -5, wires 4, subnet
+- **Drawing order (`zIndex`):** network boxes -20, sticky notes -10, block underlays -5, outside-wire stubs 3, wires 4, subnet
   inputs 5, operator nodes 10, dots 12.
 - **Block underlays** (`src/schema/blockUnderlays.ts`, `HoudiniBlockUnderlay`): For-Each and Compile blocks get a
   rounded convex outline in the Block End color. Members are the end node, every begin node whose `blockpath`
@@ -46,6 +46,11 @@ If a visual detail is unclear, ask the owner for a Houdini screenshot instead of
 - **Block method labels** (`src/schema/blockLabels.ts`): For-Each Block Begin and End nodes show their method in
   blue under the name (`Point` / `Piece`, `Metadata`, `Feedback`, `Input`, `Merge`), read from the `method`
   parameter (and the end's `class` for piece begins). Compile blocks have none.
+- **Outside-wire stubs** (`OutsideWireStubs.tsx`, [decision 0015](../../../docs/decisions/0015-stubs-for-wires-outside-a-selection.md)):
+  each wire in `outsideWires` (selection exports) becomes a stub: the first 40px of the real wire path
+  (`getHoudiniWirePath`, current wire style) from the exported connector toward the outside item's `pos`, solid or
+  dotted like the real wire (`isDottedWire`, from the outside `type` and `input` for wires leaving the selection), fading out. A `stubs:` node per item (zIndex 3, just under the wires, no clicks) draws them from React Flow's handle bounds
+  and frames them for Fit. No names, no counts, no hover. Inputs wired from outside join the multi-input fan-out.
 - **Dotted wires:** the wire into the second input (target points) of Copy to Points is dotted, `1.5 2.5` px
   (`isDottedWire` in `convertGraph.ts`).
 - **View-only:** `nodesDraggable={false}`, `nodesConnectable={false}`, `edgesReconnectable={false}`. Flags are

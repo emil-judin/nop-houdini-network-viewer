@@ -72,6 +72,43 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual([n["name"] for n in document["root"]["nodes"]], ["a", "b"])
         self.assertEqual(document["root"]["wires"], [{"from": "a", "fromOutput": 0, "to": "b", "toInput": 0}])
 
+    def test_NOP_EXP_052_wires_to_items_outside_the_selection_keep_the_far_end_position_and_type_not_its_name(self):
+        grid, box = node("grid1", "grid", pos=(-2.0, 3.0)), node("box1", "box", pos=(4.0, 1.5))
+        noise, copy = node("noise1"), node("copy1", "copytopoints")
+        merge, xfer, out = node("merge1", "merge", pos=(-1.0, -2.0)), node("xfer1", "copytopoints", pos=(1.0, -2.0)), node("OUT")
+        dot = fake_hou.NetworkDot("dot1", pos=(3.123456, -1.5))
+        fake_hou.connect(grid, noise)
+        fake_hou.connect(box, copy, input_index=0)
+        fake_hou.connect(noise, copy, input_index=1)
+        fake_hou.connect(copy, merge)
+        fake_hou.connect(copy, xfer, input_index=1)
+        fake_hou.connect(copy, dot)
+        fake_hou.connect(dot, out)
+        geo = network(grid, box, noise, copy, merge, xfer, out, dot)
+        fake_hou.SELECTION.extend([noise, copy])
+        root = export(geo)["root"]
+        self.assertEqual(root["wires"], [{"from": "noise1", "fromOutput": 0, "to": "copy1", "toInput": 1}])
+        self.assertEqual(
+            root["outsideWires"],
+            [
+                {"to": "noise1", "toInput": 0, "pos": [-2.0, 3.0], "type": "grid"},
+                {"to": "copy1", "toInput": 0, "pos": [4.0, 1.5], "type": "box"},
+                # One entry per wire, so an output feeding 3 items outside shows 3 leads; wires leaving
+                # the selection keep the input they enter (the second input of a Copy to Points is dotted)
+                {"from": "copy1", "fromOutput": 0, "pos": [-1.0, -2.0], "type": "merge", "input": 0},
+                {"from": "copy1", "fromOutput": 0, "pos": [1.0, -2.0], "type": "copytopoints", "input": 1},
+                {"from": "copy1", "fromOutput": 0, "pos": [3.1235, -1.5], "dot": True, "input": 0},
+            ],
+        )
+        text = json.dumps(root["outsideWires"])
+        for name in ("grid1", "box1", "merge1", "xfer1", "dot1", "OUT"):
+            self.assertNotIn(name, text)
+
+    def test_NOP_EXP_052_a_whole_network_export_has_no_outside_wires(self):
+        a, b = node("a"), node("b")
+        fake_hou.connect(a, b)
+        self.assertNotIn("outsideWires", export(network(a, b))["root"])
+
     def test_NOP_EXP_010_wires_from_subnet_inputs_are_kept(self):
         subnet = network(subnet_with_inputs()).children()[0]
         fake_hou.SELECTION.append(subnet.children()[0])
@@ -403,7 +440,7 @@ class FieldsTest(unittest.TestCase):
         self.assertEqual(
             set(document), {"schemaVersion", "houdiniVersion", "exportedAt", "exportMode", "icons", "customShapes", "root"}
         )
-        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.4.0", "22.0.100"))
+        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.5.0", "22.0.100"))
         exported_at = datetime.datetime.fromisoformat(document["exportedAt"])
         self.assertEqual(exported_at.utcoffset(), datetime.timedelta(0))
         self.assertIsInstance(document["customShapes"], dict)

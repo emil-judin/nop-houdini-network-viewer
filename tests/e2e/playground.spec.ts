@@ -97,11 +97,29 @@ test.describe('playground', () => {
     page.on('request', (request) => requests.push(request.url()));
     await page.goto('/?example=start');
     await expect(node(page, 'lift_tube')).toBeVisible();
-    for (const name of [/^Start Here/, /^VEX Wrangles/, /^For-Each Loop/, /^Parameters/, /^Node Looks/, /^Subnetworks and Assets/]) {
+    for (const name of [/^Start Here/, /^VEX Wrangles/, /^For-Each Loop/, /^Parameters/, /^Node Looks/, /^Subnetworks and Assets/, /^Shared Selection/]) {
       await expect(await networkRow(page, name)).toContainText(/\d+ nodes/);
     }
     // The counts come with the page, the other examples are still not downloaded
     expect(requests.some((url) => url.includes('parameters-network'))).toBe(false);
+  });
+
+  test('NOP-PG-051: the Shared Selection example shows stubs where the selection continues', async ({ page }) => {
+    await page.goto('/?example=selection');
+    await expect(node(page, 'place_trees')).toBeVisible();
+    // Two wires come in from outside and the last node feeds two items outside, one stub per wire
+    const stubs = (name: string) => page.locator(`.react-flow__node[data-id="stubs:${name}"] [data-testid="outside-wire-stubs"] path`);
+    await expect(stubs('scatter_trees')).toHaveCount(1);
+    await expect(stubs('place_trees')).toHaveCount(3);
+    await expect(stubs('random_size')).toHaveCount(0);
+    // The second Copy to Points gets its target points from outside: that stub is dotted like the wire,
+    // the one from its output solid
+    await expect(stubs('place_rocks')).toHaveCount(2);
+    await expect(stubs('place_rocks').first()).toHaveAttribute('stroke-dasharray', '1.5 2.5');
+    await expect(stubs('place_rocks').last()).not.toHaveAttribute('stroke-dasharray', /./);
+    // Every stub is fully inside the framed view, and the items outside are never named
+    for (const stub of await page.locator('[data-testid="outside-wire-stubs"] path').all()) await expect(stub).toBeInViewport();
+    await expect(page.locator('.react-flow')).not.toContainText(/hills|tree_shape|rock_points|terrain_and_trees|TREES_ONLY/);
   });
 
   test('P-04: an example downloads only when it is chosen', async ({ page }) => {
@@ -641,8 +659,13 @@ test.describe('first visit', () => {
     await page.goto('/?example=start');
     const welcome = page.getByRole('dialog', { name: 'Welcome' });
     await expect(welcome).toBeVisible();
-    // The example on screen is marked in the grid
-    await expect(welcome.getByRole('button', { name: 'Start Here' })).toHaveAttribute('aria-current', 'true');
+    // The card explains NOP in three steps instead of listing the examples
+    const how = welcome.getByRole('region', { name: 'How it works' });
+    await expect(how).toContainText('No Houdini needed', { ignoreCase: true });
+    await expect(how.getByRole('listitem')).toHaveText([/^Export from Houdini/, /^Embed on your website/, /^Explore/]);
+    await expect(how).toContainText('never leaves your browser');
+    await expect(welcome.getByRole('button', { name: 'Start Here' })).toHaveCount(0);
+    await expect(welcome).toContainText('Not affiliated with or endorsed by SideFX');
     await expect(welcome.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', /github\.com\/emil-judin\/nop-houdini-network-viewer#documentation$/);
     await expect(welcome.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/emil-judin/nop-houdini-network-viewer');
     await welcome.getByRole('button', { name: 'Start exploring' }).click();
@@ -656,16 +679,10 @@ test.describe('first visit', () => {
     await expect(welcome).toBeVisible();
   });
 
-  test('NOP-PG-019: the welcome card opens the examples, the exporter, a file and the embed code', async ({ page }) => {
+  test('NOP-PG-019: the welcome card opens the exporter, a file and the embed code', async ({ page }) => {
     await page.goto('/?example=start');
     const welcome = page.getByRole('dialog', { name: 'Welcome' });
     await expect(node(page, 'lift_tube')).toBeAttached();
-    await welcome.getByRole('button', { name: 'VEX Wrangles' }).click();
-    await expect(welcome).toBeHidden();
-    await expect(node(page, 'wrangle_rings')).toBeVisible();
-
-    if (!(await networksPanelOpen(page))) await page.getByRole('button', { name: 'Show networks panel' }).click();
-    await page.getByRole('button', { name: 'Help' }).click();
     await welcome.getByRole('button', { name: 'Get the exporter' }).click();
     await expect(welcome).toBeHidden();
     const exporter = page.getByRole('dialog', { name: 'Get the Houdini exporter' });

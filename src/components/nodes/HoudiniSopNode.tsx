@@ -423,7 +423,9 @@ export const HoudiniSopNode: React.FC<NodeProps> = ({ data, selected }) => {
       })}
 
       {/* Floating Right-Side Node Name, Descriptive Type Label & Lock Badge */}
+      {/* Framed by Fit with the box (`FIT_EXTENT_ATTRIBUTE` in useFitWithLabels) */}
       <div
+        data-nop-fit-extent=""
         style={{ left: `${widthPx + 9}px` }}
         className="absolute top-1/2 -translate-y-1/2 flex flex-col items-start whitespace-nowrap pointer-events-none leading-none"
       >

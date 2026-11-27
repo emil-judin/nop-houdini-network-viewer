@@ -30,9 +30,16 @@ teaser/public/
 teaser/src/generated/
 teaser/out/
 
-# Houdini scenes saved with a non-commercial license (Apprentice, Education): SideFX restricts them
-# to non-commercial use, so they cannot be shared under NOP's MIT License. Keep sources as .hip.
+# Houdini scenes and assets stay out of the repository: they are saved with a non-commercial license
+# (Education), which SideFX restricts to non-commercial use, so they cannot be shared under NOP's MIT
+# License. The example networks are shared as their JSON exports (fixtures/examples/README.md).
+*.hip
 *.hipnc
+*.hiplc
+*.hda
+*.hdanc
+*.hdalc
+*.otl
 
 # NOP spiderweb 3D scene (design/nop-spiderweb-3d/): kept local until the owner reworks and releases it.
 # Remove this line to release it (see its README).

@@ -382,11 +382,6 @@ export const App: React.FC = () => {
           // Still inside the click, so the browser lets the file picker open
           fileInputRef.current?.click();
         }}
-        onSelectExample={(key) => {
-          closeWelcome();
-          selectNetwork(key);
-        }}
-        activeKey={tab}
       />
       {FEEDBACK_ACCESS_KEY && (
         <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} networkName={activeNetworkName} />

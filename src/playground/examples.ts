@@ -54,6 +54,12 @@ const EXAMPLES: PlaygroundExample[] = [
     description: 'Nested subnetworks and custom digital assets',
     file: 'examples/assets-network.json',
   },
+  {
+    key: 'selection',
+    label: 'Shared Selection',
+    description: 'Part of a network, with stubs where it continues',
+    file: 'examples/selection-network.json',
+  },
 ];
 
 /** The network files, each loaded only when its example is first shown. */

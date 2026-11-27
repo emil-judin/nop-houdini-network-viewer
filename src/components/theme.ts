@@ -14,5 +14,8 @@ export const CANVAS_RGB: HoudiniRgbColor = [0x24 / 255, 0x24 / 255, 0x24 / 255];
 /** Tailwind background class of `CANVAS_COLOR`. */
 export const CANVAS_BG_CLASS = 'bg-[#242424]';
 
+/** Houdini 22 default wire color (sampled from the Network Editor). */
+export const WIRE_COLOR = '#7082b8';
+
 /** Grid line color of the canvas background. */
 export const GRID_LINE_COLOR = '#2c2c2c';

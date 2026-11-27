@@ -11,13 +11,13 @@ const validate = ajv.compile(schema);
 const readJson = (path: string) => JSON.parse(readFileSync(path, 'utf8')) as unknown;
 
 describe('D-21: JSON Schema for exports', () => {
-  // Every real Houdini export: the six guided examples
+  // Every real Houdini export: the seven guided examples
   const exports = readdirSync('fixtures/examples')
     .filter((name) => name.endsWith('-network.json'))
     .map((name) => join('fixtures/examples', name));
 
-  it('finds the six example exports', () => {
-    expect(exports).toHaveLength(6);
+  it('finds the seven example exports', () => {
+    expect(exports).toHaveLength(7);
   });
 
   it.each(exports)('%s matches the schema', (file) => {

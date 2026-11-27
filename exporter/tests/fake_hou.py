@@ -412,13 +412,17 @@ class ChildTypeCategory:
 class Connection:
     """A wire into `output_item`'s input `input_index`, from output `output_index` of `input_item`."""
 
-    def __init__(self, input_item, output_index, input_index):
+    def __init__(self, input_item, output_index, input_index, output_item=None):
         self._input_item = input_item
         self._output_index = output_index
         self._input_index = input_index
+        self._output_item = output_item
 
     def inputItem(self):
         return self._input_item
+
+    def outputItem(self):
+        return self._output_item
 
     def outputIndex(self):
         return self._output_index
@@ -429,7 +433,9 @@ class Connection:
 
 def connect(source, target, output_index=0, input_index=0):
     """Wires `source` (a node, dot or subnet input) into `target` (a node or dot)."""
-    target._input_connections.append(Connection(source, output_index, input_index))
+    connection = Connection(source, output_index, input_index, target)
+    target._input_connections.append(connection)
+    source._output_connections.append(connection)
 
 
 class Item:
@@ -444,6 +450,7 @@ class Item:
         self._color = Color(color)
         self._parent = None
         self._input_connections = []
+        self._output_connections = []
 
     def name(self):
         return self._name
@@ -465,6 +472,9 @@ class Item:
 
     def inputConnections(self):
         return tuple(self._input_connections)
+
+    def outputConnections(self):
+        return tuple(self._output_connections)
 
 
 class SubnetIndirectInput(Item):

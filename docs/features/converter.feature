@@ -177,6 +177,29 @@ Feature: Load and convert a Houdini network document
     When the graph is converted
     Then the wire to input 0 uses the leftmost bar handle
 
+  @NOP-CONV-032
+  Scenario: Wires to items outside the selection become stubs toward those items, not edges
+    Given a graph whose "outsideWires" list inputs of "noise1", "copy1" and a dot, two outputs of "copy1" and one of the dot, most with the outside item's position
+    When the graph is converted with rounded wires
+    Then the only edge is the wire between "noise1" and "copy1"
+    And each node and dot gets a stubs node with one stub per outside wire: its handle, its direction, and the outside connector it heads for
+    And a stub is dotted like its wire: into the target points input of "copy1", and out of "copy1" into input 2 of a Copy to Points outside
+    And a stub without a position has no far end
+    And the stubs node frames the item and its stubs on every side, under the wires, taking no clicks
+
+  @NOP-CONV-033
+  Scenario: Inputs wired from outside take their place in the multi-input fan-out
+    Given a "merge1" with a wire into input 2 and inputs 1 and 3 wired from outside
+    When the graph is converted
+    Then the stubs sit on the left and right of the bar and the wire in the middle
+
+  @NOP-CONV-034
+  Scenario: Outside wires are checked like every other part of a file
+    Given "outsideWires" with negative or fractional indices, extra fields such as a name or a count, broken positions and entries without a name
+    When the file is normalized
+    Then indices are whole and not negative, broken positions are dropped rather than zeroed, extra fields and nameless entries are dropped
+    And the outside item's type is kept, and its input only on wires leaving the selection
+
   @NOP-CONV-026
   Scenario: The chosen wire style is passed to every edge
     Given a graph with 3 wires

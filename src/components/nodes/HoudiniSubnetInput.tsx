@@ -100,8 +100,10 @@ export const HoudiniSubnetInput: React.FC<NodeProps> = ({ data }) => {
         }}
       />
 
-      {/* Floating label: first line vertically aligned with the digit, parent input node name below */}
+      {/* Floating label: first line vertically aligned with the digit, parent input node name below.
+          Framed by Fit with the box (`FIT_EXTENT_ATTRIBUTE` in useFitWithLabels) */}
       <div
+        data-nop-fit-extent=""
         style={{
           left: `${shapeRightPx + 12}px`,
           top: `${digitCenterY}px`,

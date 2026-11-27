@@ -14,6 +14,7 @@ import type {
   HoudiniSubnetInputData,
   HoudiniVec2,
   HoudiniWireData,
+  HoudiniOutsideWireData,
 } from './types';
 
 /**
@@ -269,6 +270,23 @@ function normalizeWire(raw: JsonRecord): HoudiniWireData | null {
   };
 }
 
+/** An outside wire keeps only its documented fields: an input (`to`) or, failing that, an output (`from`). */
+function normalizeOutsideWire(raw: JsonRecord): HoudiniOutsideWireData | null {
+  const to = asName(raw.to);
+  const from = to === null ? asName(raw.from) : null;
+  let wire: HoudiniOutsideWireData;
+  if (to !== null) wire = { to, toInput: Math.max(0, Math.floor(asNumber(raw.toInput, 0))) };
+  else if (from !== null) wire = { from, fromOutput: Math.max(0, Math.floor(asNumber(raw.fromOutput, 0))) };
+  else return null;
+  // A broken position is dropped, not zeroed: the stub would point at the origin
+  const pos = asVec2(raw.pos, [NaN, NaN]);
+  if (Number.isFinite(pos[0])) wire.pos = pos;
+  if (raw.dot === true) wire.dot = true;
+  if (typeof raw.type === 'string' && raw.type !== '') wire.type = raw.type;
+  if (from !== null && typeof raw.input === 'number' && Number.isFinite(raw.input)) wire.input = Math.max(0, Math.floor(raw.input));
+  return wire;
+}
+
 function normalizePathNode(raw: JsonRecord): HoudiniPathNode | null {
   const name = asName(raw.name);
   if (name === null) return null;
@@ -297,6 +315,7 @@ export function normalizeGraph(raw: unknown, depth = 0): HoudiniNetworkGraph {
   if (graph.context !== undefined) normalized.context = asString(graph.context, 'Sop');
   if (graph.wireStyle !== undefined) normalized.wireStyle = graph.wireStyle === 'rounded' ? 'rounded' : 'default';
   if (graph.pathNodes !== undefined) normalized.pathNodes = mapRecords(graph.pathNodes, normalizePathNode);
+  if (graph.outsideWires !== undefined) normalized.outsideWires = mapRecords(graph.outsideWires, normalizeOutsideWire);
   return normalized;
 }
 

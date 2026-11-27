@@ -65,7 +65,7 @@ The playground's **Embed** button opens the [example page](https://emil-judin.gi
 Upload the exported `.json` file next to your page, then add:
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.8/dist/web-component.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/nop-houdini-network-viewer@0.1.0-alpha.9/dist/web-component.js"></script>
 
 <houdini-network src="my-network.json" style="display: block; height: 600px"></houdini-network>
 ```
@@ -139,4 +139,4 @@ NOP is an independent community project. It is **not affiliated with, endorsed b
 
 MIT, copyright (c) 2026 Emil Judin. See [`LICENSE`](./LICENSE).
 
-The builds also ship third-party fonts (SIL Open Font License) and libraries (MIT, ISC, BSD) under their own licenses, listed in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md). The Houdini scenes in the repository are `.hip` files; scenes saved with a non-commercial Houdini license (`.hipnc`) are not included, because SideFX restricts them to non-commercial use.
+The builds also ship third-party fonts (SIL Open Font License) and libraries (MIT, ISC, BSD) under their own licenses, listed in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md). The repository holds no Houdini scenes or assets: they are made with a non-commercial Houdini license, which SideFX restricts to non-commercial use, so they cannot be shared under the MIT License. The example networks are included as their JSON exports.

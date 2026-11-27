@@ -27,6 +27,7 @@ import { useFullscreen } from './hooks/useFullscreen';
 import { useOperatorIcons } from './hooks/useOperatorIcons';
 import { isPathPrefix, useNavigationHistory, type BeforeNavigate } from './hooks/useNavigationHistory';
 import { useFirstFitDone } from './hooks/useFirstFitDone';
+import { useFitWithLabels } from './hooks/useFitWithLabels';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { useViewerHotkeys, type HotkeyMode } from './hooks/useViewerHotkeys';
 import { useTwoFingerPan, type TouchPanMode } from './hooks/useTwoFingerPan';
@@ -41,6 +42,7 @@ import { ResizableInspectorPanel, SHEET_SLIDE_MS, SIDE_PANEL_MIN_VIEWER_WIDTH } 
 import { useElementSize } from './useElementSize';
 import { NetworkErrorBoundary } from './NetworkErrorBoundary';
 import { HoudiniBlockUnderlay } from './nodes/HoudiniBlockUnderlay';
+import { HoudiniOutsideStubs } from './nodes/OutsideWireStubs';
 import { HoudiniDotNode } from './nodes/HoudiniDotNode';
 import { HoudiniNetBox } from './nodes/HoudiniNetBox';
 import { HoudiniSopNode } from './nodes/HoudiniSopNode';
@@ -136,6 +138,7 @@ const NODE_TYPES: NodeTypes = {
   houdiniNetBox: memo(HoudiniNetBox),
   houdiniSticky: memo(HoudiniStickyNote),
   houdiniBlock: memo(HoudiniBlockUnderlay),
+  houdiniOutsideStubs: memo(HoudiniOutsideStubs),
 };
 
 const EDGE_TYPES: EdgeTypes = {
@@ -191,8 +194,8 @@ function resolveMiniMapNodeColor(node: Node): string {
     const data = node.data as unknown as HoudiniStickyFlowNodeData;
     return houdiniRgbToCss(data?.sticky?.color, '#d9c25b');
   }
-  if (node.type === 'houdiniBlock') {
-    // The overview shows the nodes themselves; a block's bounding box would hide them
+  if (node.type === 'houdiniBlock' || node.type === 'houdiniOutsideStubs') {
+    // The overview shows the nodes themselves; a block's or a stub's bounding box would hide them
     return 'transparent';
   }
   return '#777777';
@@ -226,7 +229,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   isFullscreen,
   onToggleFullscreen,
 }) => {
-  const { fitView: triggerFitView, getViewport, setViewport } = useReactFlow();
+  const { getViewport, setViewport } = useReactFlow();
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   // The inspector takes keyboard focus when the node was selected with the keyboard
   const [focusInspector, setFocusInspector] = useState(false);
@@ -240,6 +243,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   onNodeSelectRef.current = onNodeSelect;
 
   const rootRef = useRef<HTMLDivElement>(null);
+  // Every fit frames the node names too, not only their boxes
+  const fitNetwork = useFitWithLabels(rootRef);
   const viewerSize = useElementSize(rootRef);
   const isSidePanel = viewerSize.width >= SIDE_PANEL_MIN_VIEWER_WIDTH;
   // `0` before the first measurement (or while hidden): treated as a wide viewer
@@ -337,8 +342,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   );
 
   const fitAll = useCallback(() => {
-    triggerFitView({ padding: FIT_PADDING, duration });
-  }, [duration, triggerFitView]);
+    fitNetwork({ padding: FIT_PADDING, duration });
+  }, [duration, fitNetwork]);
 
   // Houdini Network Editor hotkeys: Shift+S toggles the wire style, H fits the whole network,
   // F frames the selected node, I dives into the selected subnetwork, U goes up a level and O
@@ -358,7 +363,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
         return true;
       case 'KeyF':
         if (selectedNode) {
-          triggerFitView({ nodes: [{ id: selectedNode.name }], padding: FRAME_PADDING, duration, maxZoom: frameMaxZoom });
+          fitNetwork({ nodes: [{ id: selectedNode.name }], padding: FRAME_PADDING, duration, maxZoom: frameMaxZoom });
         } else {
           fitAll();
         }
@@ -409,8 +414,6 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   // The start view frames `focusNode` when it names a node of the top level, else fits everything
   const startFocus = focusNodeName && normalizedDoc.root.nodes.some((n) => n.name === focusNodeName) ? focusNodeName : null;
   const fitsOnStart = fitView || startFocus !== null;
-  // The network stays hidden (canvas and grid show) until the start view is on screen
-  const firstFitDone = useFirstFitDone(fitsOnStart);
   const startFitOptions = useMemo(
     () =>
       startFocus
@@ -421,6 +424,9 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   // Read by the level effect below, which must not run again (and clear the selection) when only these change
   const startFitOptionsRef = useRef(startFitOptions);
   startFitOptionsRef.current = startFitOptions;
+  // The network stays hidden (canvas and grid show) until the start view is on screen. React Flow's
+  // first fit frames the node boxes; the refit before the network shows frames their names too.
+  const firstFitDone = useFirstFitDone(fitsOnStart, () => fitNetwork(startFitOptionsRef.current));
   const rootPathRef = useRef(normalizedDoc.root.path);
   rootPathRef.current = normalizedDoc.root.path;
 
@@ -448,13 +454,13 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
       if (savedViewport) {
         setViewport(savedViewport);
       } else if (startOptions && framesStartNode) {
-        triggerFitView({ ...startOptions, duration: animation });
+        fitNetwork({ ...startOptions, duration: animation });
       } else {
-        triggerFitView({ padding: FIT_PADDING, duration: animation });
+        fitNetwork({ padding: FIT_PADDING, duration: animation });
       }
     }, 30);
     return () => clearTimeout(timer);
-  }, [activeGraph, fitView, focusCanvasNode, selectNode, setViewport, triggerFitView]);
+  }, [activeGraph, fitView, focusCanvasNode, selectNode, setViewport, fitNetwork]);
 
   // A page that changes `focusNode` later (for example the example page's start node list) gets the
   // new start view right away, while the top level is on screen
@@ -463,8 +469,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     if (shownStartFocusRef.current === startFocus) return;
     shownStartFocusRef.current = startFocus;
     if (activeGraph.path !== rootPathRef.current) return;
-    triggerFitView({ ...startFitOptionsRef.current, duration: reducedMotionRef.current ? 0 : 250 });
-  }, [activeGraph.path, startFocus, triggerFitView]);
+    fitNetwork({ ...startFitOptionsRef.current, duration: reducedMotionRef.current ? 0 : 250 });
+  }, [activeGraph.path, startFocus, fitNetwork]);
 
   // The bottom sheet slides down when it closes: the last node stays on it until the slide ends.
   // Set while rendering (React's pattern for state that follows a prop), cleared by a timer.
@@ -596,15 +602,15 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     wasFullscreenRef.current = isFullscreen;
     fitOnResizeRef.current = true;
     // The size may already have changed before the switch was reported
-    const timer = setTimeout(() => triggerFitView({ padding: FIT_PADDING }), 50);
+    const timer = setTimeout(() => fitNetwork({ padding: FIT_PADDING }), 50);
     return () => clearTimeout(timer);
-  }, [isFullscreen, triggerFitView]);
+  }, [isFullscreen, fitNetwork]);
 
   useEffect(() => {
     if (!fitOnResizeRef.current) return;
-    const timer = setTimeout(() => triggerFitView({ padding: FIT_PADDING }), 50);
+    const timer = setTimeout(() => fitNetwork({ padding: FIT_PADDING }), 50);
     return () => clearTimeout(timer);
-  }, [triggerFitView, viewerSize.width, viewerSize.height]);
+  }, [fitNetwork, viewerSize.width, viewerSize.height]);
 
   // A pan or zoom by the visitor (React Flow passes no event for moves made in code, such as a fit)
   const handleMoveStart = useCallback((event: MouseEvent | TouchEvent | null) => {
