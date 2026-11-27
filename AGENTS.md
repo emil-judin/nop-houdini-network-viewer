@@ -120,4 +120,3 @@ Open work lives in [GitHub issues](https://github.com/emil-judin/nop-houdini-net
   - `nop-verify`: the definition of done.
   - `nop-release`: release checklist.
   - `nop-issue-writer`: writing, rewriting and filing GitHub issues (templates, labels, writing rules).
-  - `nop-teaser`: the teaser video in `teaser/` (method, guardrails, efficient workflow; its plan is `teaser/BRIEF.md`).
