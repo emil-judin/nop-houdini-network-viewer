@@ -25,11 +25,6 @@ playwright-report/
 # Personal scratch scripts and notes (may contain local paths)
 scratch/
 
-# Teaser (teaser/): recordings, copied assets and renders made by its scripts
-teaser/public/
-teaser/src/generated/
-teaser/out/
-
 # Houdini scenes and assets stay out of the repository: they are saved with a non-commercial license
 # (Education), which SideFX restricts to non-commercial use, so they cannot be shared under NOP's MIT
 # License. The example networks are shared as their JSON exports (fixtures/examples/README.md).
