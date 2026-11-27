@@ -19,6 +19,7 @@ Short records of decisions that shape NOP and would be expensive to reverse. Eac
 | [0013](./0013-icon-pipeline-in-its-own-repository.md) | The icon pipeline lives in its own repository | Accepted |
 | [0014](./0014-sop-icons-load-per-domain.md) | SOP icons load per domain | Accepted |
 | [0015](./0015-stubs-for-wires-outside-a-selection.md) | Stubs for wires outside an exported selection | Accepted |
+| [0016](./0016-issues-branches-and-commit-names.md) | Work starts from an issue; branches and commits are named after it | Accepted |
 
 ## Add a record
 

@@ -8,6 +8,10 @@ description: >-
 
 # Write integration tests for a NOP area
 
+Before Stage 1, find or propose the issue for the area and work on its branch (AGENTS.md section 5). The
+Stage 1 analysis and the Stage 2 plan go into the issue as comments once the owner approves them, so the next
+session can pick up from there.
+
 Follow these four stages in order. Stop after Stage 1 and after Stage 2 and continue only when the owner
 approves. Go from Stage 3 to Stage 4 without waiting.
 

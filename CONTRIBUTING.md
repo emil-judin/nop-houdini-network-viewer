@@ -5,8 +5,9 @@ Thank you for helping. NOP is a small project with a few rules.
 ## Before you start
 
 - Read [AGENTS.md](./AGENTS.md): the six pillars, the architectural rules and the definition of done apply to human contributors too. The reasons behind them are in [docs/decisions/](./docs/decisions/README.md).
-- Check [docs/ROADMAP.md](./docs/ROADMAP.md) for the current state and planned work.
-- For bigger changes, open an issue first and describe the idea.
+- Planned work is in the [issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues); [docs/ROADMAP.md](./docs/ROADMAP.md) has the current state and the direction.
+- Every change starts from an issue. For anything bigger than a typo, open one first and describe the idea.
+- Branch from `main` as `<issue>-<short-topic>` (for example `42-stubs-outside-selection`). Commits follow [Conventional Commits](https://www.conventionalcommits.org/) with NOP's areas as scope, for example `fix(viewer): fit frames node names at the right edge`. The full rules are in [AGENTS.md](./AGENTS.md) section 5.
 
 ## How NOP is built
 

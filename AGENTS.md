@@ -77,18 +77,47 @@ The viewer renders untrusted JSON, and the exporter writes files people publish.
 
 ## 5. Git Conventions
 
-- Work on a branch; one topic per commit. Commit or push only when the owner asks.
+Open work lives in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues); [docs/ROADMAP.md](./docs/ROADMAP.md) keeps only the current state and the direction ([decision 0016](./docs/decisions/0016-issues-branches-and-commit-names.md)).
+
+**Issue first.** Before changing any file:
+
+1. Find the issue: the number the owner gave, or `gh issue list --search "<words>"`. Read it and its comments: the issue is the scope.
+2. No issue fits: draft one with the `nop-issue-writer` skill, show it to the owner and run `gh issue create` only after they approve that text. The repository is public, so an issue never names private repositories' contents, customer files or unreleased plans the owner has not shared.
+3. Work that turns up outside the scope gets its own issue (proposed the same way), not a detour on this branch.
+4. No issue needed: Dependabot pull requests and the release commit.
+
+**Branches.** From an up-to-date `main`, one issue per branch:
+
+- `<issue>-<kebab-topic>`, two to four words: `42-stubs-outside-selection`.
+- Reserved: `release/<version>` (release commit), `dependabot/` (the bot), `claude/` (temporary agent worktrees: rename to an issue branch before opening a pull request).
+- Never merge one topic branch into another; branch again from `main`.
+
+**Commits** follow [Conventional Commits](https://www.conventionalcommits.org/): `type(area): summary`.
+
+- Types: `feat` (something new a user can see or use), `fix`, `docs`, `test`, `refactor`, `perf`, `build`, `ci`, `chore` (only when nothing else fits), `revert`.
+- Areas: `viewer`, `schema`, `exporter`, `embed`, `playground`, `examples`, `icons`, `brand`, `docs`, `tests`, `ci`, `deps`, `release`, `teaser`. Leave the area out only when a change spans several.
+- New icon drawings are `feat(icons)`, corrected ones `fix(icons)`. Never use `style` for anything visual: in Conventional Commits it means code formatting only.
+- Summary: plain words, lowercase after the colon unless a name follows (`Copy to Points`, `Welcome card`), no full stop, no en or em dashes, the whole subject at most 72 characters.
+- Body (optional, after a blank line): why, wrapped at 72. Footer: `Refs #<issue>`. A change that breaks the JSON schema or the component API gets `!` after the area and a `BREAKING CHANGE:` footer, also in `0.x`.
+- Release commit: `chore(release): <version>`, tag `v<version>`.
+- Pull request title in the same format; the body says what and why and ends with `Closes #<issue>`.
+
+**Also:**
+
+- One topic per commit. Commit or push only when the owner asks.
 - Never commit `local-refs/`, `public/downloads/`, `complex-network.json`, build outputs or real customer exports (all gitignored).
-- Open work lives in [docs/ROADMAP.md](./docs/ROADMAP.md). Review reports and progress logs are working files: never commit them. Record a lasting decision as a new record in [docs/decisions/](./docs/decisions/README.md).
+- Review reports and progress logs are working files: never commit them. Record a lasting decision as a new record in [docs/decisions/](./docs/decisions/README.md).
 
 ## 6. Continuity & On-Demand Skills
 
-- **Before starting work:** Read [docs/ROADMAP.md](./docs/ROADMAP.md) and the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md).
-- **After completing a task:** Add user-visible changes to "Unreleased" in [CHANGELOG.md](./CHANGELOG.md) (one line each), tick or remove the item in [docs/ROADMAP.md](./docs/ROADMAP.md), and write a decision record for anything a later change should not silently undo. Do not keep a separate progress log.
+- **Before starting work:** Find or propose the issue and branch as in section 5. Read the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md), and [docs/ROADMAP.md](./docs/ROADMAP.md) when the direction matters.
+- **While working:** When the scope or the plan changes, say so in a comment on the issue (`gh issue comment <n>`) after the owner agrees, so the issue stays the record of what was decided.
+- **After completing a task:** Add user-visible changes to "Unreleased" in [CHANGELOG.md](./CHANGELOG.md) (one line each) and write a decision record for anything a later change should not silently undo. The pull request closes the issue (`Closes #<issue>`); do not close issues by hand. Do not keep a separate progress log.
 - **Specialized Skills** (in `.agents/skills/`, with pointers in `.claude/skills/` so Claude Code finds them):
   - `houdini-graph-renderer`: drawing the network, coordinates, viewer components.
   - `houdini-python-exporter`: the Houdini exporter, privacy rules, schema versioning.
   - `nop-icon-drawing`: where the operator icons live, their legal rules, and small fixes to live drawings.
   - `nop-verify`: the definition of done.
   - `nop-release`: release checklist.
+  - `nop-issue-writer`: writing, rewriting and filing GitHub issues (templates, labels, writing rules).
   - `nop-teaser`: the teaser video in `teaser/` (method, guardrails, efficient workflow; its plan is `teaser/BRIEF.md`).

@@ -1,6 +1,6 @@
 # Roadmap
 
-Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHANGELOG.md), lasting decisions are in [decisions/](./decisions/README.md).
+Where NOP stands and where it is heading. Open work is in the [issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues), finished work in the [CHANGELOG](../CHANGELOG.md), lasting decisions in [decisions/](./decisions/README.md). An item below becomes an issue when work on it starts ([decision 0016](./decisions/0016-issues-branches-and-commit-names.md)).
 
 ## Current state
 
@@ -14,24 +14,22 @@ Where NOP stands and what comes next. Finished work is in the [CHANGELOG](../CHA
 
 - **Teaser video:** a short video for people who do not want to explore the playground right away.
 
-## Before the public release
+## Next
 
-- [ ] Smoke test on some devices: Safari on macOS, Chrome on Android (iPhone and iPad are checked).
-- [ ] Decide the public API: close the playground exceptions listed in `eslint.config.js` (see [decision 0010](./decisions/0010-one-repository-public-api.md)).
-- [ ] React 19 check, then widen the peer range to `^18.2.0 || ^19.0.0`.
-- [ ] Publish `nop-houdini-network-viewer` on npm (and so on jsDelivr), publish the SRI hash, and drop the README's "not on npm yet" note.
-- [ ] Embedding guide: extend [EMBEDDING.md](./EMBEDDING.md) with CORS, file size and where to host the JSON.
-- [ ] Remove the tester-phase `noindex` from `index.html`.
-- [ ] Repository housekeeping: one-time Prettier reformat with `format:check` in CI.
+- **Public release:** what has to be done before NOP leaves the tester phase: [#43](https://github.com/emil-judin/nop-houdini-network-viewer/issues/43) public API, [#44](https://github.com/emil-judin/nop-houdini-network-viewer/issues/44) React 19, [#45](https://github.com/emil-judin/nop-houdini-network-viewer/issues/45) npm and jsDelivr, [#46](https://github.com/emil-judin/nop-houdini-network-viewer/issues/46) embedding guide, [#47](https://github.com/emil-judin/nop-houdini-network-viewer/issues/47) `noindex`, [#48](https://github.com/emil-judin/nop-houdini-network-viewer/issues/48) Prettier, [#49](https://github.com/emil-judin/nop-houdini-network-viewer/issues/49) Firefox test crash, [#50](https://github.com/emil-judin/nop-houdini-network-viewer/issues/50) Vite 8. Remove an entry here when its issue closes.
+- **Planned features:** open issues labeled [enhancement](https://github.com/emil-judin/nop-houdini-network-viewer/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement).
 
-## Planned features
+## Testing points
 
-- Node search (`Ctrl+F`): find a node by name or type and frame it, also inside subnetworks.
+Checks that need devices or software not at hand. Do them when access comes up; anything broken becomes a bug issue.
+
+- Safari on macOS and Chrome on a real Android phone: the playground, the example page and one embed (iPhone and iPad are checked).
+
+## Open ideas
+
+Not planned yet; open an issue when one becomes real work.
+
 - Links to a subnetwork or node: a share link or embed option that opens a level with a node selected.
-- Multiparm blocks with instance count.
-- Export custom node shapes (`customShapes`; the viewer can already draw them).
-- Keyboard: move between connected nodes with the arrow keys.
-- Exporter runs on Houdini 20.5 and 21.
 
 ## Later (no date)
 
