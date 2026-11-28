@@ -32,7 +32,9 @@ The code is the source of truth: read the function named in each rule before cha
    segment function such as `bezier()` (`KEYFRAME_SEGMENT_FUNCTION`). Write `null` into `expr` for those.
 3. Folders and folder types come from walking `node.parmTemplateGroup()` in `collect_parm_layout`, not from
    `containingFolders()`. Hide-when and disable-when rules are evaluated by `evaluate_conditional` with a
-   per-node value cache (evaluating a parameter can cook geometry). Hidden parameters are skipped.
+   per-node value cache (evaluating a parameter can cook geometry). Hidden parameters are skipped. Rules of
+   multiparm entries (`{ type# == index }`) wait until the entry is known and are evaluated with its number
+   (`resolve_instance_layout`).
 4. Wrap every per-parameter read in `try`; a failure increases `state.warnings` (reported in the status bar and
    as the optional `exportWarnings` field) instead of stopping the export.
 5. Export `"items": [item.name() for item in box.items()]` for every network box, so the viewer can hide the
@@ -81,7 +83,8 @@ Exports must be as safe to share as a screenshot of the network: no user, client
   version and a viewer that reads both.
 - Current fields of note: `hdaState` (1.2.0), `pathNodes` (1.3.0), `exportWarnings` (1.4.0), `outsideWires`
   (1.5.0: one entry per wire between the selection and an outside item, with that item's `pos`, `dot`, `type` and, for
-  wires leaving the selection, `input`; never its name; decision 0015).
+  wires leaving the selection, `input`; never its name; decision 0015), `multiparmIndex` (1.6.0: entry numbers of
+  multiparm entries; the multiparm's own `Folder` parameter is the count).
 
 ## 5. Package and tests
 

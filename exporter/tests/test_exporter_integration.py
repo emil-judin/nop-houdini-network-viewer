@@ -342,6 +342,82 @@ class ParameterTest(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertEqual((exported[name]["folders"], exported[name]["folderTypes"]), (["Points"], ["multiparm"]))
 
+    def multiparm_node(self, count=2, count_default=1, types=("float", "index"), values=(0.5, 0.0)):
+        """An Attribute Create style node: a "Number of Attributes" multiparm in the "Main" tab whose
+        entries hide "value#" when "type#" is index and disable "name#" when "enable#" is off."""
+        templates = {
+            "enable#": fake_hou.ParmTemplate("enable#", Type.Toggle),
+            "name#": fake_hou.ParmTemplate("name#", Type.String, disable_when="{ enable# == 0 }"),
+            "type#": fake_hou.ParmTemplate("type#", Type.Menu),
+            "value#": fake_hou.ParmTemplate("value#", Type.Float, hide_when="{ type# == index }"),
+        }
+        numattr = fake_hou.ParmTemplate(
+            "numattr",
+            Type.Folder,
+            label="Number of Attributes",
+            folder_type=fake_hou.folderType.MultiparmBlock,
+            children=list(templates.values()),
+        )
+        main = fake_hou.ParmTemplate("main", Type.Folder, label="Main", folder_type=fake_hou.folderType.Tabs, children=[numattr])
+        count_parm = fake_hou.Parm("numattr", count, default=count_default, template=numattr)
+        parms = [fake_hou.ParmTuple("numattr", [count_parm], label="Number of Attributes")]
+        for i in range(1, count + 1):
+            entry = [
+                ("enable", i % 2 == 1, True),
+                ("name", f"attr{i}", "attribute1"),
+                ("type", types[i - 1], "float"),
+                ("value", values[i - 1], 0.0),
+            ]
+            for base, value, default in entry:
+                name = f"{base}{i}"
+                parms.append(
+                    fake_hou.ParmTuple(
+                        name,
+                        [fake_hou.Parm(name, value, default=default, template=templates[base + "#"], multiparm_parent=count_parm)],
+                    )
+                )
+        return node("node1", parms=parms, template_group=[main])
+
+    def test_NOP_EXP_053_multiparm_count_and_entries(self):
+        exported = parms_of(export(network(self.multiparm_node()), "full"))
+        count = exported["numattr"]
+        self.assertEqual((count["type"], count["val"]), ("Folder", [2]))
+        self.assertEqual((count["folders"], count["folderTypes"]), (["Main"], ["tabs"]))
+        self.assertNotIn("multiparmIndex", count)
+        for name, index in (("enable1", 1), ("name1", 1), ("value1", 1), ("enable2", 2), ("name2", 2)):
+            with self.subTest(name=name):
+                self.assertEqual(exported[name]["multiparmIndex"], [index])
+                self.assertEqual(exported[name]["folders"], ["Main", "Number of Attributes"])
+                self.assertEqual(exported[name]["folderTypes"], ["tabs", "multiparm"])
+        # Each entry's rules are evaluated with its own parameters (`#` is the entry's number)
+        self.assertNotIn("value2", exported)
+        self.assertNotIn("disabled", exported["name1"])
+        self.assertTrue(exported["name2"]["disabled"])
+
+    def test_NOP_EXP_053_compact_exports_keep_the_count_above_changed_entries(self):
+        # The count is at its default (2), but entry 1 has changed values: the count is still exported
+        exported = parms_of(export(network(self.multiparm_node(count_default=2))))
+        self.assertEqual(list(exported)[0], "numattr")
+        self.assertIn("name1", exported)
+        # No entry exported: no count either
+        unchanged = self.multiparm_node(count=1, count_default=1, types=("float",), values=(0.0,))
+        for pt in unchanged.parmTuples():
+            for p in pt:
+                p._default = p._value
+        self.assertEqual(parms_of(export(network(unchanged))), {})
+
+    def test_NOP_EXP_054_rules_get_the_entry_number(self):
+        cases = [
+            ("{ type# == index }", [3], "{ type3 == index }"),
+            ("{ enable# == 0 } { class# != detail }", [2], "{ enable2 == 0 } { class2 != detail }"),
+            ("{ use#_# == 1 mode == 0 }", [2, 4], "{ use2_4 == 1 mode == 0 }"),
+            ("{ on# == 1 }", [2, 4], "{ on4 == 1 }"),
+            ("{ mode == 1 }", [5], "{ mode == 1 }"),
+        ]
+        for rule, numbers, expected in cases:
+            with self.subTest(rule=rule):
+                self.assertEqual(nop.resolve_instance_rule(rule, numbers), expected)
+
 
 NODE_FIELDS = {
     "name", "type", "label", "icon", "pos", "size", "color", "shape", "flags", "maxInputs", "inputLabels",
@@ -440,7 +516,7 @@ class FieldsTest(unittest.TestCase):
         self.assertEqual(
             set(document), {"schemaVersion", "houdiniVersion", "exportedAt", "exportMode", "icons", "customShapes", "root"}
         )
-        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.5.0", "22.0.100"))
+        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.6.0", "22.0.100"))
         exported_at = datetime.datetime.fromisoformat(document["exportedAt"])
         self.assertEqual(exported_at.utcoffset(), datetime.timedelta(0))
         self.assertIsInstance(document["customShapes"], dict)

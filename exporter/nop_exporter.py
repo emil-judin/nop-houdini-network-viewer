@@ -24,7 +24,7 @@ import re
 import hou
 
 
-SCHEMA_VERSION = "1.5.0"
+SCHEMA_VERSION = "1.6.0"
 
 # Keyframe segment functions: an animated parameter reports the function of its current segment
 # as its "expression". Houdini stores a real expression (ch(), $F, ...) as one keyframe holding it.
@@ -431,7 +431,8 @@ def check_condition(node, name, op, raw, cache=None):
 def evaluate_conditional(node, text, cache=None):
     """Returns True when a hide-when / disable-when rule currently applies to `node`.
 
-    Rules on multiparm instances (names with `#`) are not resolved and never apply. `cache` is passed
+    Rules of multiparm entries refer to the entry's own parameters with `#` (`{ type# == index }`):
+    resolve them first with `resolve_instance_rule()`, unresolved names never match. `cache` is passed
     on to `condition_value()`.
     """
     for group in CONDITION_GROUP.findall(text or ""):
@@ -441,39 +442,130 @@ def evaluate_conditional(node, text, cache=None):
     return False
 
 
+# A parameter name in a rule that holds `#` (`type#`, `use#_#`): the entry's instance numbers go there
+INSTANCE_NAME = re.compile(r"[A-Za-z_#][\w#]*")
+
+
+def resolve_instance_rule(text, numbers):
+    """Puts a multiparm entry's instance numbers into the `#` of a hide-when / disable-when rule.
+
+    `numbers` are the entry's instance numbers, outermost first (`[3]` for `type3`). A name with one `#`
+    gets the innermost number, a name with two (`use#_#` in a nested multiparm) the last two, as in the
+    entry's own parameter names. Houdini resolves the rules of each entry the same way.
+    """
+    if not numbers or "#" not in (text or ""):
+        return text
+
+    def fill(match):
+        word = match.group(0)
+        count = word.count("#")
+        if count == 0:
+            return word
+        values = list(numbers[-count:]) if count <= len(numbers) else [numbers[-1]] * count
+        parts = iter(str(v) for v in values)
+        return re.sub("#", lambda _m: next(parts), word)
+
+    return INSTANCE_NAME.sub(fill, text)
+
+
+def _instance_numbers(info, numbers):
+    """The instance numbers of the multiparms that contain a parameter, outermost first."""
+    levels = info["folderTypes"].count("multiparm")
+    if levels == 0:
+        return []
+    return list(numbers[-levels:]) if len(numbers) >= levels else list(numbers)
+
+
+def resolve_instance_layout(node, info, numbers, cache=None):
+    """Layout info of one multiparm entry's parameter: `info` of its `name#` template with the rules that
+    refer to the entry (`#`) evaluated for `numbers` (from the parameter's name, outermost first).
+
+    Adds `multiparmIndex` (the instance numbers of the containing multiparms) and puts the numbers into
+    folder labels with `#` (a folder inside an entry, labelled "Layer #").
+    """
+    indices = _instance_numbers(info, numbers)
+    result = dict(info)
+    result.pop("deferred", None)
+    if indices:
+        result["multiparmIndex"] = indices
+        labels = []
+        for depth, label in enumerate(info["folders"]):
+            level = info["folderTypes"][:depth].count("multiparm")
+            if "#" in label and 0 < level <= len(indices):
+                label = label.replace("#", str(indices[level - 1]))
+            labels.append(label)
+        result["folders"] = labels
+    for key, text in info.get("deferred", ()):
+        if not result[key] and evaluate_conditional(node, resolve_instance_rule(text, indices or numbers), cache):
+            result[key] = True
+    return result
+
+
 def collect_parm_layout(node):
     """Describes how the Parameter Pane lays out each parameter of `node`.
 
-    Walks `node.parmTemplateGroup()` and returns `(by_name, patterns)`: a dict from parameter tuple name
-    to layout info, and `(regex, info)` pairs for multiparm instances (`name#` templates). Layout info:
-    containing folder labels and types, `hidden` / `disabled` after evaluating hide-when and disable-when
-    rules (folders pass them on to their contents), and drawing hints (join with next, hidden label,
-    slider range, string menu button).
+    Walks `node.parmTemplateGroup()` and returns `(by_name, patterns, resolve)`: a dict from parameter tuple
+    name to layout info, `(regex, info)` pairs for multiparm entries (`name#` templates), and a function
+    that resolves such an info for one entry (`resolve_instance_layout`). Layout info: containing folder
+    labels and types, `hidden` / `disabled` after evaluating hide-when and disable-when rules (folders pass
+    them on to their contents), and drawing hints (join with next, hidden label, slider range, string menu
+    button). Multiparm folders get an entry too: their parameter holds the number of entries (the count).
+    Rules that refer to an entry with `#` wait in `deferred` until the entry is known.
     """
     by_name = {}
     patterns = []
     values = {}
 
-    def walk(templates, folders, folder_types, hidden, disabled):
+    def store(name, info):
+        if "#" in name:
+            pattern = "^" + re.escape(name).replace("\\#", r"(\d+)") + "$"
+            patterns.append((re.compile(pattern), info))
+        else:
+            by_name[name] = info
+
+    def walk(templates, folders, folder_types, hidden, disabled, deferred):
         templates = list(templates)
         for index, template in enumerate(templates):
-            is_hidden = (
-                hidden
-                or bool(getattr(template, "isHidden", lambda: False)())
-                or evaluate_conditional(node, condition_text(template, "HideWhen"), values)
-            )
-            is_disabled = disabled or evaluate_conditional(node, condition_text(template, "DisableWhen"), values)
+            rules = list(deferred)
+            is_hidden = hidden or bool(getattr(template, "isHidden", lambda: False)())
+            is_disabled = disabled
+            for key, kind in (("hidden", "HideWhen"), ("disabled", "DisableWhen")):
+                text = condition_text(template, kind)
+                if "#" in text:
+                    rules.append((key, text))
+                elif evaluate_conditional(node, text, values):
+                    if key == "hidden":
+                        is_hidden = True
+                    else:
+                        is_disabled = True
             if template.type() == hou.parmTemplateType.Folder:
+                folder_type = folder_type_name(template)
+                if folder_type == "multiparm":
+                    # The multiparm's own parameter holds the number of entries, shown above them
+                    store(template.name(), {
+                        "folders": folders,
+                        "folderTypes": folder_types,
+                        "hidden": is_hidden,
+                        "disabled": is_disabled,
+                        "deferred": rules,
+                    })
                 walk(
                     template.parmTemplates(),
                     folders + [template.label()],
-                    folder_types + [folder_type_name(template)],
+                    folder_types + [folder_type],
                     is_hidden,
                     is_disabled,
+                    rules,
                 )
                 continue
 
-            info = {"folders": folders, "folderTypes": folder_types, "hidden": is_hidden, "disabled": is_disabled}
+            info = {
+                "folders": folders,
+                "folderTypes": folder_types,
+                "hidden": is_hidden,
+                "disabled": is_disabled,
+                "deferred": rules,
+            }
             try:
                 if template.joinsWithNext() and index + 1 < len(templates):
                     info["joinNext"] = templates[index + 1].name()
@@ -487,27 +579,34 @@ def collect_parm_layout(node):
                     info["hasMenu"] = True
             except Exception:
                 pass
-
-            name = template.name()
-            if "#" in name:
-                patterns.append((re.compile("^" + re.escape(name).replace("\\#", r"\d+") + "$"), info))
-            else:
-                by_name[name] = info
+            store(template.name(), info)
 
     try:
-        walk(node.parmTemplateGroup().entries(), [], [], False, False)
+        walk(node.parmTemplateGroup().entries(), [], [], False, False, [])
     except Exception:
         pass
-    return by_name, patterns
+
+    def resolve(info, numbers):
+        return resolve_instance_layout(node, info, numbers, values)
+
+    return by_name, patterns, resolve
 
 
 def find_parm_layout(layout, name):
-    """Looks up a parameter tuple's layout info from `collect_parm_layout()`, or None."""
-    by_name, patterns = layout
+    """Looks up a parameter tuple's layout info from `collect_parm_layout()`, or None.
+
+    A multiparm entry's parameter (`type3`) gets the info of its template (`type#`) resolved for its
+    instance numbers: its own hide-when and disable-when rules and `multiparmIndex`.
+    """
+    by_name, patterns = layout[0], layout[1]
     if name in by_name:
         return by_name[name]
     for pattern, info in patterns:
-        if pattern.match(name):
+        match = pattern.match(name)
+        if match:
+            numbers = [int(n) for n in match.groups()]
+            if len(layout) > 2:
+                return layout[2](info, numbers)
             return info
     return None
 
@@ -542,7 +641,7 @@ def serialize_parm_tuple(pt, layout_info=None):
         if layout_info["folders"]:
             data["folders"] = list(layout_info["folders"])
             data["folderTypes"] = list(layout_info["folderTypes"])
-        for key in ("joinNext", "labelHidden", "range", "hasMenu"):
+        for key in ("joinNext", "labelHidden", "range", "hasMenu", "multiparmIndex"):
             if key in layout_info:
                 data[key] = layout_info[key]
         if layout_info["disabled"]:
@@ -566,6 +665,24 @@ def serialize_parm_tuple(pt, layout_info=None):
     if any(keyframed):
         data["keyframed"] = keyframed
     return data
+
+
+def keep_multiparm_counts(pt, parms, pending_counts):
+    """Keeps the counts of the multiparms that contain an exported entry `pt` (compact mode).
+
+    `pending_counts` maps a count at its default to its slot in `parms`, which holds the serialized count
+    in a 1-tuple until an entry of that multiparm (or of a multiparm nested in it) is exported.
+    """
+    try:
+        parm = pt[0]
+        parent = parm.parentMultiParm() if parm.isMultiParmInstance() else None
+        while parent is not None:
+            slot = pending_counts.pop(parent.name(), None)
+            if slot is not None and isinstance(parms[slot], tuple):
+                parms[slot] = parms[slot][0]
+            parent = parent.parentMultiParm() if parent.isMultiParmInstance() else None
+    except Exception:
+        pass
 
 
 def is_sidefx_or_labs_hda(node):
@@ -789,6 +906,8 @@ def serialize_network(net, state, selected_only=False):
             extractor.register_user_icon(it, icon_id)
 
             parms = []
+            # Multiparm counts at their default (compact mode), held in 1-tuples until an entry is exported
+            pending_counts = {}
             layout = collect_parm_layout(it)
             for pt in it.parmTuples():
                 try:
@@ -805,11 +924,18 @@ def serialize_network(net, state, selected_only=False):
                     if layout_info is not None and layout_info["hidden"] and not is_code_parm:
                         continue
                     if export_mode == "compact" and pt.isAtDefault() and not is_code_parm and not is_changed_ramp(pt):
+                        if template.type() == hou.parmTemplateType.Folder:
+                            # A multiparm count: shown above its entries when one of them is exported
+                            pending_counts[pt.name()] = len(parms)
+                            parms.append((serialize_parm_tuple(pt, layout_info),))
                         continue
 
                     parms.append(serialize_parm_tuple(pt, layout_info))
+                    keep_multiparm_counts(pt, parms, pending_counts)
                 except Exception:
                     state.warnings += 1
+            # Counts none of whose entries were exported stay out
+            parms = [p for p in parms if not isinstance(p, tuple)]
 
             output_labels = list(it.outputLabels())
             node_obj = {

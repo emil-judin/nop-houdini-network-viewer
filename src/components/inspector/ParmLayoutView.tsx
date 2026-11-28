@@ -48,6 +48,41 @@ const FolderSection: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'folder' }
 };
 
 /**
+ * A multiparm as in Houdini's Parameter Pane: the count row ("Number of Attributes"), then one block
+ * per entry. Houdini frames each entry in a darker inset with a thin border and keeps a narrow column
+ * on its left for the entry's insert and remove buttons; the viewer is view-only, so that column shows
+ * the entry number instead and there are no count buttons (+, -, Clear) either.
+ */
+const MultiparmSection: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'multiparm' }> }> = ({ item }) => (
+  <div className="mt-1">
+    {item.count && <ParmLine rows={[item.count]} />}
+    {item.blocks.length > 0 && (
+      <div className="mx-1 mt-0.5 mb-1 flex flex-col gap-[3px]">
+        {item.blocks.map((block) => (
+          <div
+            key={block.key}
+            role="group"
+            aria-label={block.index === null ? item.label : `${item.label} ${block.index}`}
+            data-multiparm-entry={block.index ?? undefined}
+            className="flex border border-[#232323] rounded-[2px] bg-[#292929]"
+          >
+            <div
+              className="w-[22px] shrink-0 pt-[7px] text-center text-[11px] leading-none tabular-nums text-[#9a9a9a] border-r border-[#232323]"
+              aria-hidden="true"
+            >
+              {block.index}
+            </div>
+            <div className="flex-1 min-w-0 py-[2px]">
+              <ParmLayoutView items={block.children} />
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+/**
  * Tab bar of `tabs` / `radio` folders. Switching tabs only changes what is shown (view-only).
  * Follows the WAI-ARIA tabs pattern: one tab in the Tab order, Left / Right / Home / End move
  * between tabs.
@@ -118,13 +153,14 @@ const FolderTabs: React.FC<{ item: Extract<ParmLayoutItem, { kind: 'tabs' }> }> 
 };
 
 /**
- * Renders a Parameter Pane layout tree (lines, sections and tab bars) recursively.
+ * Renders a Parameter Pane layout tree (lines, sections, multiparm blocks and tab bars) recursively.
  */
 export const ParmLayoutView: React.FC<{ items: ParmLayoutItem[] }> = ({ items }) => (
   <>
     {items.map((item) => {
       if (item.kind === 'line') return <ParmLine key={item.key} rows={item.rows} />;
       if (item.kind === 'tabs') return <FolderTabs key={item.key} item={item} />;
+      if (item.kind === 'multiparm') return <MultiparmSection key={item.key} item={item} />;
       return <FolderSection key={item.key} item={item} />;
     })}
   </>

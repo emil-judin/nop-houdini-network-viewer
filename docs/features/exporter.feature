@@ -238,6 +238,30 @@ Feature: Houdini exporter and package
     And string parameters with a menu or a menu script have hasMenu true
     And multiparm instances "pt1" and "pt2" get the folders of their "pt#" template
 
+  @NOP-EXP-053
+  Scenario: Multiparm counts and entries
+    Given an Attribute Create style node with "Number of Attributes" (numattr) set to 2 in the "Main" tab
+    And entry 2 has type "index" and enable off, and "value#" has hide-when "{ type# == index }"
+    When it is exported in full mode
+    Then "numattr" is exported with type "Folder", val [2] and the folders of the multiparm
+    And every entry parameter has multiparmIndex [its entry number] and the multiparm in its folders
+    And "value2" is not exported, "value1" is, and only entry 2's "name2" is disabled
+    When it is exported in compact mode with the count at its default
+    Then the count is still exported, before the changed entries, and left out when no entry is exported
+    # Also checked in real Houdini: Attribute Create, Attribute Wrangle bindings and Group Combine (houdini_session.py)
+
+  @NOP-EXP-054 @unit
+  Scenario Outline: Rules of multiparm entries get the entry number
+    When the rule "<rule>" is resolved for entry numbers <numbers>
+    Then it reads "<resolved>"
+
+    Examples:
+      | rule                      | numbers | resolved                  |
+      | { type# == index }        | [3]     | { type3 == index }        |
+      | { use#_# == 1 mode == 0 } | [2, 4]  | { use2_4 == 1 mode == 0 } |
+      | { on# == 1 }              | [2, 4]  | { on4 == 1 }              |
+      | { mode == 1 }             | [5]     | { mode == 1 }             |
+
   @NOP-EXP-029
   Scenario: Code parameters are exported even when a rule hides them
     Given "snippet" has hide-when "{ mode == 1 }" and mode is 1

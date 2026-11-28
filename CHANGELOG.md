@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- The Parameter Inspector shows multiparms like Houdini's Parameter Pane: the count row ("Number of Attributes: 3"), read-only, then each entry in its own numbered block. Parameters that a hide-when rule hides inside one entry (for example Attribute Create's "Value" of a string attribute) are left out of that entry only (schema 1.6.0, `multiparmIndex`). Re-export to get the blocks; older exports show the count and their entries in one block.
+
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.

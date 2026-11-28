@@ -8,7 +8,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 ```json
 {
-  "schemaVersion": "1.5.0",
+  "schemaVersion": "1.6.0",
   "houdiniVersion": "22.0.466",
   "exportedAt": "2026-10-23T15:00:00Z",
   "exportMode": "compact",
@@ -89,6 +89,9 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
      - `hasMenu: true`: string parameter with a menu button on the right (group and attribute name fields).
      - `changed: boolean[]`: per component, `true` when the value differs from the parameter default (Houdini draws it in bold).
      - `ramp: { color, keys, values, basis }`: points of a `Ramp` parameter from `hou.Parm.evalAsRamp()` (`values` are numbers for float ramps, `[r, g, b]` for color ramps; `basis[i]` is the interpolation from point `i` to the next). The inspector draws a curve or a gradient; without it only the point count (`val`) is shown. The per-point parameters (`ramp1pos`, `ramp1value`, `ramp1c`, `ramp1interp`, ...) are not exported; the inspector hides them in older exports.
+   - Multiparms (schema `1.6.0`): Houdini lists a multiparm's own parameter among the node's parameters as type `Folder`, with the number of entries as its value (`{ "name": "numattr", "label": "Number of Attributes", "type": "Folder", "val": [3] }`). The exporter writes its `folders` and `folderTypes` (those that contain the multiparm) and, in compact mode, keeps it even at its default when one of its entries is exported. Each entry's parameters list the multiparm in `folders` (type `multiparm`) and carry:
+     - `multiparmIndex: number[]`: the entry numbers of the multiparms that contain the parameter, outermost first, as in its name (`[3]` for `type3`, `[2, 4]` for `pt2_4` in a nested multiparm). The inspector shows the count row, read-only, then one numbered block per entry. Older exports have no numbers and show their entries in one block.
+     - Hide-when and disable-when rules of entries refer to the entry's own parameters with `#` (`{ type# == index }`); the exporter evaluates them per entry with its number, so a parameter hidden in one entry is left out of that entry only.
    - `parms` follows `hou.Node.parmTuples()` order, which lists spare parameters (for example a wrangle's generated channel parameters) last; the viewer places every parameter inside its folder or tab regardless of where it appears in the list.
 6. **Digital asset state (`hdaState`, schema 1.2.0):** `"locked"` (grey padlock under the node name), `"unlocked"` (red open padlock: the asset is being edited), or `null` for nodes that are not assets. Older exports omit it.
 7. **Path scrubbing:** exports are meant to be as safe to share as a screenshot. In parameter values, expressions, menu labels, node comments, sticky notes, custom icon ids and embedded custom icons:

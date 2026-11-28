@@ -139,6 +139,11 @@
         "labelHidden": { "type": "boolean" },
         "range": { "$ref": "#/$defs/vec2" },
         "hasMenu": { "type": "boolean" },
+        "multiparmIndex": {
+          "description": "Multiparm entries only: the entry numbers of the multiparms that contain the parameter, outermost first (schema 1.6.0).",
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
         "ramp": {
           "type": "object",
           "required": ["color", "keys", "values"],

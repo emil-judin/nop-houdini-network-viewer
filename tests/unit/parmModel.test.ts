@@ -17,19 +17,123 @@ function outline(items: ParmLayoutItem[]): unknown[] {
   return items.map((item) => {
     if (item.kind === 'line') return item.rows.map((row) => row.parm.name).join('+');
     if (item.kind === 'tabs') return { tabs: item.tabs.map((tab) => [tab.label, outline(tab.children)]) };
+    if (item.kind === 'multiparm') {
+      return {
+        multiparm: item.label,
+        count: item.count?.parm.name ?? null,
+        blocks: item.blocks.map((block) => [block.index, outline(block.children)]),
+      };
+    }
     return { [item.label]: outline(item.children) };
   });
 }
 
+/** Attribute Create style entries: `name<i>` and `value<i>` in the "Number of Attributes" multiparm. */
+const entry = (i: number, extra: Partial<HoudiniParmTupleData> = {}) =>
+  ['name', 'value'].map((base) =>
+    parm({
+      name: `${base}${i}`,
+      folders: ['Main', 'Number of Attributes'],
+      folderTypes: ['tabs', 'multiparm'],
+      multiparmIndex: [i],
+      ...extra,
+    }),
+  );
+
+const count = (val: number) =>
+  parm({ name: 'numattr', label: 'Number of Attributes', type: 'Folder', val: [val], folders: ['Main'], folderTypes: ['tabs'] });
+
 describe('parameter layout', () => {
-  it('NOP-INSP-010: folder parameters and buttons are not shown', () => {
+  it('NOP-INSP-010: folder sets, data parameters and buttons are not shown', () => {
     const layout = buildParmLayout(
       node({
         name: 'n',
-        parms: ['Folder', 'FolderSet', 'Data', 'Button'].map((type) => parm({ name: type.toLowerCase(), type })).concat(parm({ name: 'size' })),
+        parms: ['FolderSet', 'Data', 'Button']
+          .map((type) => parm({ name: type.toLowerCase(), type }))
+          // A Folder without a number is not a multiparm count
+          .concat(parm({ name: 'folder0', type: 'Folder', val: ['Main'] }), parm({ name: 'size' })),
       }),
     );
     expect(outline(layout)).toEqual(['size']);
+  });
+
+  it('NOP-INSP-063: a multiparm shows its count, then one numbered block per entry', () => {
+    const layout = buildParmLayout(
+      node({ name: 'n', parms: [count(3), ...entry(1), ...entry(2), ...entry(3), parm({ name: 'after', folders: ['Main'], folderTypes: ['tabs'] })] }),
+    );
+    expect(outline(layout)).toEqual([
+      {
+        tabs: [
+          [
+            'Main',
+            [
+              {
+                multiparm: 'Number of Attributes',
+                count: 'numattr',
+                blocks: [
+                  [1, ['name1', 'value1']],
+                  [2, ['name2', 'value2']],
+                  [3, ['name3', 'value3']],
+                ],
+              },
+              'after',
+            ],
+          ],
+        ],
+      },
+    ]);
+    expect(toDisplayRow(count(3), 'attribcreate::2.0').kind).toBe('number');
+  });
+
+  it('NOP-INSP-064: multiparm entries listed apart, counts without entries and older exports', () => {
+    // Entries are placed by number, also when one is listed after the others (spare parameters)
+    const apart = buildParmLayout(node({ name: 'n', parms: [count(2), ...entry(2), ...entry(1).slice(0, 1), ...entry(1).slice(1)] }));
+    expect(apart[0].kind === 'tabs' && outline(apart[0].tabs[0].children)).toEqual([
+      { multiparm: 'Number of Attributes', count: 'numattr', blocks: [[1, ['name1', 'value1']], [2, ['name2', 'value2']]] },
+    ]);
+    // A count of 0 (Attribute Wrangle's "Number of Bindings") is shown alone
+    const empty = buildParmLayout(node({ name: 'n', parms: [parm({ name: 'bindings', label: 'Number of Bindings', type: 'Folder', val: [0] })] }));
+    expect(outline(empty)).toEqual([{ multiparm: 'Number of Bindings', count: 'bindings', blocks: [] }]);
+    // Exports before schema 1.6.0 have no entry numbers: one block without a number
+    const old = buildParmLayout(
+      node({ name: 'n', parms: [count(2), ...entry(1, { multiparmIndex: undefined }), ...entry(2, { multiparmIndex: undefined })] }),
+    );
+    expect(old[0].kind === 'tabs' && outline(old[0].tabs[0].children)).toEqual([
+      { multiparm: 'Number of Attributes', count: 'numattr', blocks: [[null, ['name1', 'value1', 'name2', 'value2']]] },
+    ]);
+  });
+
+  it('NOP-INSP-065: nested multiparms number their blocks per level', () => {
+    const point = (group: number, pt: number) =>
+      parm({
+        name: `pt${group}_${pt}`,
+        folders: ['Groups', `Points ${group}`],
+        folderTypes: ['multiparm', 'multiparm'],
+        multiparmIndex: [group, pt],
+      });
+    const layout = buildParmLayout(
+      node({
+        name: 'n',
+        parms: [
+          parm({ name: 'groups', label: 'Groups', type: 'Folder', val: [2] }),
+          parm({ name: 'pts1', label: 'Points 1', type: 'Folder', val: [2], folders: ['Groups'], folderTypes: ['multiparm'], multiparmIndex: [1] }),
+          point(1, 1),
+          point(1, 2),
+          parm({ name: 'pts2', label: 'Points 2', type: 'Folder', val: [1], folders: ['Groups'], folderTypes: ['multiparm'], multiparmIndex: [2] }),
+          point(2, 1),
+        ],
+      }),
+    );
+    expect(outline(layout)).toEqual([
+      {
+        multiparm: 'Groups',
+        count: 'groups',
+        blocks: [
+          [1, [{ multiparm: 'Points 1', count: 'pts1', blocks: [[1, ['pt1_1']], [2, ['pt1_2']]] }]],
+          [2, [{ multiparm: 'Points 2', count: 'pts2', blocks: [[1, ['pt2_1']]] }]],
+        ],
+      },
+    ]);
   });
 
   it('NOP-INSP-011: tabs collect their parameters wherever they appear', () => {

@@ -258,6 +258,51 @@ class HoudiniSession(unittest.TestCase):
         self.assertEqual(state.warnings, 0, "parameters that could not be read")
         self.assertNotIn("exportWarnings", document)
 
+    def test_NOP_EXP_053_multiparm_count_entries_and_their_hide_when_rules(self):
+        """Attribute Create: the count, one numbered entry per attribute, and each entry's own rules."""
+        create = self.geo.createNode("attribcreate::2.0", "make_attribs")
+        create.parm("numattr").set(3)
+        create.parm("name1").set("speed")
+        create.parm("name2").set("id")
+        create.parm("type2").set("index")
+        create.parm("name3").set("off")
+        create.parm("enable3").set(0)
+        wrangle = self.geo.createNode("attribwrangle", "no_bindings")
+        wrangle.parm("snippet").set("@id = @ptnum;")
+        combine = self.geo.createNode("groupcombine", "combine")
+        combine.parm("group1").set("both")  # the count stays at its default, 1
+
+        document, _selected, state = export(self.geo, "multiparm-entries", export_mode="full")
+        self.assertEqual(state.warnings, 0)
+        nodes = {item["name"]: item for item in document["root"]["nodes"]}
+        parms = {p["name"]: p for p in nodes["make_attribs"]["parms"]}
+        count = parms["numattr"]
+        self.assertEqual((count["type"], count["val"], count["label"]), ("Folder", [3], "Number of Attributes"))
+        self.assertNotIn("multiparmIndex", count)
+        for number in (1, 2, 3):
+            with self.subTest(entry=number):
+                entry = parms[f"name{number}"]
+                self.assertEqual(entry["multiparmIndex"], [number])
+                self.assertEqual(entry["folderTypes"][-1], "multiparm")
+                self.assertEqual(entry["folders"][-1], "Number of Attributes")
+        # Entry 1 is a float: "Value" is shown, "String" is hidden. Entry 2 is an index (string) attribute.
+        self.assertIn("value1v", parms)
+        self.assertNotIn("string1", parms)
+        self.assertNotIn("value2v", parms)
+        self.assertIn("string2", parms)
+        # Entry 3 is turned off: its own parameters are disabled, the other entries' are not
+        self.assertTrue(parms["name3"].get("disabled"))
+        self.assertNotIn("disabled", parms["name1"])
+
+        # A multiparm without entries still shows its count (Attribute Wrangle's "Number of Bindings")
+        bindings = {p["name"]: p for p in nodes["no_bindings"]["parms"]}["bindings"]
+        self.assertEqual((bindings["val"], bindings["folders"][-1]), ([0], "Bindings"))
+
+        # Compact mode keeps a count at its default above an entry that changed
+        compact, _selected, _state = export(self.geo, "multiparm-entries-compact")
+        combine_parms = [p["name"] for p in {n["name"]: n for n in compact["root"]["nodes"]}["combine"]["parms"]]
+        self.assertLess(combine_parms.index("numcombine"), combine_parms.index("group1"))
+
 
 if __name__ == "__main__":
     result = unittest.main(exit=False, verbosity=2).result

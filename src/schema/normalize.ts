@@ -143,6 +143,11 @@ function normalizeParm(raw: JsonRecord): HoudiniParmTupleData | null {
     else delete parm.range;
   }
   if (raw.hasMenu !== undefined) parm.hasMenu = asBoolean(raw.hasMenu);
+  if (raw.multiparmIndex !== undefined) {
+    const index = Array.isArray(raw.multiparmIndex) ? raw.multiparmIndex : [];
+    if (index.length > 0 && index.every((n) => Number.isInteger(n) && (n as number) >= 0)) parm.multiparmIndex = index as number[];
+    else delete parm.multiparmIndex;
+  }
   const ramp = normalizeRamp(raw.ramp);
   if (ramp) parm.ramp = ramp;
   else delete parm.ramp;

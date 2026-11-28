@@ -75,9 +75,31 @@ Feature: Read-only Parameter Inspector
 
   @unit @NOP-INSP-010
   Scenario: Folder parameters and buttons are not shown
-    Given parameters of type "Folder", "FolderSet", "Data" and "Button"
+    Given parameters of type "FolderSet", "Data" and "Button", and a "Folder" without a number
     When the layout is built
     Then none of them appears
+
+  @unit @NOP-INSP-063
+  Scenario: A multiparm shows its count, then one numbered block per entry
+    Given a "Folder" parameter "Number of Attributes" with val [3] in tab "Main"
+    And parameters "name1" to "value3" in the multiparm "Number of Attributes" with multiparmIndex [1] to [3]
+    When the layout is built
+    Then tab "Main" holds the multiparm: the count row "numattr", then blocks 1, 2 and 3 with their entry's parameters
+    And the count row is drawn as a number
+
+  @unit @NOP-INSP-064
+  Scenario: Multiparm entries listed apart, counts without entries and older exports
+    Given entry 1 of a multiparm is listed after entry 2
+    When the layout is built
+    Then block 1 still comes before block 2
+    And a count of 0 is shown alone, without blocks
+    And entries without multiparmIndex (exports before schema 1.6.0) share one block without a number
+
+  @unit @NOP-INSP-065
+  Scenario: Nested multiparms number their blocks per level
+    Given a multiparm "Groups" with 2 entries, each with a multiparm "Points 1" or "Points 2" of its own
+    When the layout is built
+    Then each "Groups" block holds its own points multiparm, with blocks numbered by the inner entry number
 
   @unit @NOP-INSP-011
   Scenario: Tabs collect their parameters wherever they appear
@@ -259,6 +281,15 @@ Feature: Read-only Parameter Inspector
     When they are inspected
     Then one "Main" band holds "a" and "c"
     And "d" is shown without an "Imported" band
+
+  @component @NOP-INSP-066
+  Scenario: Multiparm blocks show their entry number, and the count cannot be changed
+    Given an Attribute Create node with "Number of Attributes" 2 and two entries
+    When it is inspected
+    Then the count row shows 2
+    And each entry is a block named "Number of Attributes 1" or "Number of Attributes 2" with its number in the left column
+    And the multiparm has no buttons to add, remove or clear entries and no editable field
+    And the document data is unchanged
 
   # Ramps (rampModel.ts, RampView.tsx)
 

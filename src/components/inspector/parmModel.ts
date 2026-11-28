@@ -40,13 +40,26 @@ export interface ParmDisplayRow {
 /**
  * Parameter Pane layout tree, built from the flat, ordered parameter list.
  * - `line`: one row of the pane holding one parameter, or several joined ones ("join with next").
- * - `folder`: a section band (`simple`, `collapsible`, `multiparm`) or a frameless `import` block.
+ * - `folder`: a section band (`simple`, `collapsible`) or a frameless `import` block.
  * - `tabs`: a tab bar (`tabs` / `radio` folders that follow each other).
+ * - `multiparm`: a multiparm: its count row (read-only), then one numbered block per entry.
  */
 export type ParmLayoutItem =
   | { kind: 'line'; key: string; rows: ParmDisplayRow[] }
-  | { kind: 'folder'; key: string; folderType: Exclude<HoudiniFolderType, 'tabs' | 'radio'>; label: string; children: ParmLayoutItem[] }
-  | { kind: 'tabs'; key: string; tabs: Array<{ label: string; children: ParmLayoutItem[] }> };
+  | { kind: 'folder'; key: string; folderType: SectionFolderType; label: string; children: ParmLayoutItem[] }
+  | { kind: 'tabs'; key: string; tabs: Array<{ label: string; children: ParmLayoutItem[] }> }
+  | { kind: 'multiparm'; key: string; label: string; count: ParmDisplayRow | null; blocks: MultiparmBlock[] };
+
+/** Folder types drawn as a section (or, for `import`, without a frame). */
+export type SectionFolderType = Exclude<HoudiniFolderType, 'tabs' | 'radio' | 'multiparm'>;
+
+/** One entry of a multiparm in the layout tree. */
+export interface MultiparmBlock {
+  key: string;
+  /** Entry number as in the parameter names (`3` for `type3`); `null` in exports before schema 1.6.0. */
+  index: number | null;
+  children: ParmLayoutItem[];
+}
 
 /** Parameter names that hold VEX code (Attribute Wrangle, Snippet VOP, Volume Wrangle, ...). */
 const VEX_CODE_PARMS = new Set(['snippet', 'vexsnippet', 'vex_snippet', 'code']);
@@ -59,9 +72,18 @@ const PYTHON_CODE_PARMS = new Set(['python', 'pythoncode', 'script']);
 
 /**
  * Template types that are not shown: folder parameters only structure the pane, and buttons only
- * run actions in Houdini (the viewer is view-only; older exports still contain them).
+ * run actions in Houdini (the viewer is view-only; older exports still contain them). A `Folder`
+ * parameter with a number is a multiparm's count and is shown (`isMultiparmCount`).
  */
 const STRUCTURAL_TYPES = new Set(['Folder', 'FolderSet', 'Data', 'Button']);
+
+/**
+ * `true` for a multiparm's own parameter, which holds its number of entries ("Number of Attributes"):
+ * of all folders, Houdini lists only multiparms among a node's parameters, with the count as value.
+ */
+export function isMultiparmCount(parm: HoudiniParmTupleData): boolean {
+  return parm.type === 'Folder' && parm.val.length === 1 && typeof parm.val[0] === 'number';
+}
 
 /**
  * Returns the node's parameter tuples, converting the legacy `nonDefaultParms` diagnostic
@@ -132,7 +154,10 @@ export function toDisplayRow(parm: HoudiniParmTupleData, operatorType: string): 
   const type = parm.type ?? '';
   const language = detectCodeLanguage(parm, operatorType);
   let kind: ParmDisplayKind;
-  if (STRUCTURAL_TYPES.has(type)) {
+  if (isMultiparmCount(parm)) {
+    // Drawn read-only like an integer field: the viewer never adds or removes entries
+    kind = 'number';
+  } else if (STRUCTURAL_TYPES.has(type)) {
     kind = 'hidden';
   } else if (type === 'Separator') {
     kind = 'separator';
@@ -196,6 +221,27 @@ function groupInOrder<T>(rows: T[], keyOf: (row: T) => string): Array<{ key: str
 }
 
 /**
+ * Splits the parameters of one multiparm (the folder at `depth`) into one block per entry, by entry
+ * number (`multiparmIndex`), in number order. Exports before schema 1.6.0 have no numbers: their
+ * entries share one block without a number.
+ */
+function multiparmBlocks(rows: ParmDisplayRow[], depth: number, keyPrefix: string): MultiparmBlock[] {
+  const indexOf = (row: ParmDisplayRow): number | null => {
+    // Entry numbers are listed per multiparm the parameter is in, outermost first
+    const level = (row.parm.folderTypes ?? []).slice(0, depth).filter((type) => type === 'multiparm').length;
+    const index = row.parm.multiparmIndex?.[level];
+    return typeof index === 'number' ? index : null;
+  };
+  return groupInOrder(rows, (row) => String(indexOf(row)))
+    .map((entry) => ({ index: indexOf(entry.rows[0]), rows: entry.rows }))
+    .sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity))
+    .map(({ index, rows: entryRows }) => {
+      const key = `${keyPrefix}/#${index ?? ''}`;
+      return { key, index, children: buildLevel(entryRows, depth + 1, key) };
+    });
+}
+
+/**
  * Builds the layout items of one folder level. `rows` all share the folders above `depth`.
  *
  * A folder (or a tab set) is placed where its first parameter appears and collects all of its
@@ -203,14 +249,35 @@ function groupInOrder<T>(rows: T[], keyOf: (row: T) => string): Array<{ key: str
  * example a wrangle's generated channel parameters) after all others, but shows them inside their folder.
  */
 function buildLevel(rows: ParmDisplayRow[], depth: number, keyPrefix: string): ParmLayoutItem[] {
-  type Slot =
-    | { kind: 'rows'; rows: ParmDisplayRow[] }
-    | { kind: 'group'; key: string; folderType: HoudiniFolderType; label: string; rows: ParmDisplayRow[] };
+  type Group = {
+    kind: 'group';
+    key: string;
+    folderType: HoudiniFolderType;
+    label: string;
+    rows: ParmDisplayRow[];
+    count?: ParmDisplayRow;
+  };
+  type Slot = { kind: 'rows'; rows: ParmDisplayRow[] } | Group;
   const slots: Slot[] = [];
-  const groups = new Map<string, Extract<Slot, { kind: 'group' }>>();
+  const groups = new Map<string, Group>();
+  const groupFor = (key: string, folderType: HoudiniFolderType, label: string): Group => {
+    let group = groups.get(key);
+    if (!group) {
+      group = { kind: 'group', key, folderType, label, rows: [] };
+      groups.set(key, group);
+      slots.push(group);
+    }
+    return group;
+  };
 
   for (const row of rows) {
     const folders = foldersOf(row);
+    if (folders.length <= depth && isMultiparmCount(row.parm)) {
+      // The count heads its multiparm, whose entries list the multiparm's label as their folder
+      const group = groupFor(`multiparm:${row.label}`, 'multiparm', row.label);
+      group.count ??= row;
+      continue;
+    }
     if (folders.length <= depth) {
       const last = slots[slots.length - 1];
       if (last?.kind === 'rows') last.rows.push(row);
@@ -220,13 +287,7 @@ function buildLevel(rows: ParmDisplayRow[], depth: number, keyPrefix: string): P
     const folderType = folderTypeAt(row, depth);
     // All tab folders of a level form one tab bar; sections are grouped by type and label
     const key = isTabType(folderType) ? 'tabs' : `${folderType}:${folders[depth]}`;
-    let group = groups.get(key);
-    if (!group) {
-      group = { kind: 'group', key, folderType, label: folders[depth], rows: [] };
-      groups.set(key, group);
-      slots.push(group);
-    }
-    group.rows.push(row);
+    groupFor(key, folderType, folders[depth]).rows.push(row);
   }
 
   return slots.flatMap((slot, index): ParmLayoutItem[] => {
@@ -242,11 +303,14 @@ function buildLevel(rows: ParmDisplayRow[], depth: number, keyPrefix: string): P
         },
       ];
     }
+    if (slot.folderType === 'multiparm') {
+      return [{ kind: 'multiparm', key, label: slot.label, count: slot.count ?? null, blocks: multiparmBlocks(slot.rows, depth, key) }];
+    }
     return [
       {
         kind: 'folder',
         key,
-        folderType: slot.folderType as Exclude<HoudiniFolderType, 'tabs' | 'radio'>,
+        folderType: slot.folderType as SectionFolderType,
         label: slot.label,
         children: buildLevel(slot.rows, depth + 1, key),
       },
@@ -255,9 +319,9 @@ function buildLevel(rows: ParmDisplayRow[], depth: number, keyPrefix: string): P
 }
 
 /**
- * Prepares a node's parameters for the inspector: drops structural entries (folder parameters) and
- * ramp point parameters (the ramp draws its points), and nests the rest into the Parameter Pane
- * layout (tabs, sections, joined lines), keeping Houdini's order.
+ * Prepares a node's parameters for the inspector: drops structural entries (folder parameters other
+ * than multiparm counts) and ramp point parameters (the ramp draws its points), and nests the rest
+ * into the Parameter Pane layout (tabs, sections, multiparm blocks, joined lines), keeping Houdini's order.
  */
 export function buildParmLayout(node: HoudiniNodeData): ParmLayoutItem[] {
   const parms = getNodeParmTuples(node);
@@ -314,6 +378,12 @@ function pruneEmpty(items: ParmLayoutItem[]): ParmLayoutItem[] {
     if (item.kind === 'folder') {
       const children = pruneEmpty(item.children);
       return children.length > 0 ? [{ ...item, children }] : [];
+    }
+    if (item.kind === 'multiparm') {
+      const blocks = item.blocks
+        .map((block) => ({ ...block, children: pruneEmpty(block.children) }))
+        .filter((block) => block.children.length > 0);
+      return item.count || blocks.length > 0 ? [{ ...item, blocks }] : [];
     }
     if (item.kind === 'tabs') {
       const tabs = item.tabs

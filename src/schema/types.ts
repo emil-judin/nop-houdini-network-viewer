@@ -88,7 +88,10 @@ export interface HoudiniParmTupleData {
   name: string;
   /** Human-readable parameter label shown in the Houdini Parameter Pane (e.g. `Translate`). */
   label: string;
-  /** Parameter template type name (e.g. `Float`, `Int`, `String`, `Menu`, `Toggle`, `Folder`). */
+  /**
+   * Parameter template type name (e.g. `Float`, `Int`, `String`, `Menu`, `Toggle`). `Folder` is a multiparm's
+   * count (the number of entries, e.g. "Number of Attributes").
+   */
   type?: string;
   /** Evaluated parameter component values. */
   val: Array<string | number | boolean>;
@@ -125,6 +128,13 @@ export interface HoudiniParmTupleData {
   hasMenu?: boolean;
   /** Points of a `Ramp` parameter (`hou.Ramp`), for the curve / gradient display (schema 1.2.0). */
   ramp?: HoudiniRampData;
+  /**
+   * Multiparm entries only: the entry numbers of the multiparms that contain the parameter, outermost
+   * first, as in the parameter's name (`[3]` for `type3` of Attribute Create's "Number of Attributes").
+   * The inspector draws one numbered block per entry (schema 1.6.0). The multiparm's own parameter,
+   * of type `Folder`, holds the number of entries.
+   */
+  multiparmIndex?: number[];
 }
 
 /**
@@ -143,7 +153,8 @@ export interface HoudiniRampData {
 /**
  * How the Houdini Parameter Pane draws a folder (`hou.folderType`):
  * `tabs` / `radio` as a tab bar, `simple` as a titled section band, `collapsible` as a section band with
- * an expand arrow, `multiparm` as a section for multiparm instances, `import` without any frame.
+ * an expand arrow, `multiparm` as a multiparm (its count, then one numbered block per entry), `import`
+ * without any frame.
  */
 export type HoudiniFolderType = 'tabs' | 'radio' | 'simple' | 'collapsible' | 'multiparm' | 'import';
 

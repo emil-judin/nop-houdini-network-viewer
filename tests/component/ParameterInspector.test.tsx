@@ -307,4 +307,32 @@ describe('Parameter Inspector widgets', () => {
     expect(panel.textContent).not.toContain('Imported');
     expect(row(panel, 'D')).toBeTruthy();
   });
+
+  it('NOP-INSP-066: multiparm blocks show their entry number, and the count cannot be changed', async () => {
+    const entry = (i: number, type: string) => [
+      parm({ name: `name${i}`, label: 'Name', type: 'String', val: [`attr${i}`], folders: ['Number of Attributes'], folderTypes: ['multiparm'], multiparmIndex: [i] }),
+      parm({ name: `type${i}`, label: 'Type', type: 'Menu', val: [type], folders: ['Number of Attributes'], folderTypes: ['multiparm'], multiparmIndex: [i] }),
+    ];
+    const parms = [
+      parm({ name: 'numattr', label: 'Number of Attributes', type: 'Folder', val: [2], changed: [true] }),
+      ...entry(1, 'float'),
+      ...entry(2, 'index'),
+    ];
+    const snapshot = JSON.stringify(parms);
+    const panel = await inspectParms(parms, 'attribcreate::2.0');
+    const countRow = row(panel, 'Number of Attributes');
+    expect(countRow.textContent).toContain('2');
+    const blocks = [1, 2].map((i) => row(panel, `Number of Attributes ${i}`));
+    blocks.forEach((block, i) => {
+      expect(block.getAttribute('data-multiparm-entry')).toBe(String(i + 1));
+      expect(block.firstElementChild?.textContent).toBe(String(i + 1));
+      expect(within(block).getByRole('group', { name: 'Name' }).textContent).toContain(`attr${i + 1}`);
+    });
+    expect(within(blocks[0]).queryByText('attr2')).toBeNull();
+    // View-only: no buttons to add, remove or clear entries, and no editable count field
+    const multiparm = countRow.parentElement as HTMLElement;
+    expect(within(multiparm).queryAllByRole('button')).toEqual([]);
+    expect(multiparm.querySelectorAll('input, textarea, select, [contenteditable="true"]')).toHaveLength(0);
+    expect(JSON.stringify(parms)).toBe(snapshot);
+  });
 });
