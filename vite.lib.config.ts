@@ -1,26 +1,9 @@
 import { createHash } from 'node:crypto';
-import { transform } from 'esbuild';
 import MagicString from 'magic-string';
 import postcss from 'postcss';
-import { defineConfig, type Plugin, type Rollup } from 'vite';
+import { defineConfig, type Plugin, type Rolldown } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-
-/**
- * Fully minifies the web component bundle. Vite keeps whitespace in `es` library builds so that
- * bundlers can still tree-shake them, but `web-component.js` is loaded directly by browsers.
- */
-function minifyBrowserBundle(): Plugin {
-  return {
-    name: 'minify-browser-bundle',
-    async renderChunk(code) {
-      // `sourcemap: 'external'` returns the map of this step, which Rollup chains with the earlier ones,
-      // so `web-component.js.map` matches the minified file
-      const result = await transform(code, { minify: true, format: 'esm', target: 'es2022', sourcemap: 'external' });
-      return { code: result.code, map: result.map || null };
-    },
-  };
-}
 
 /** A WOFF2 font inlined as a data URI (Vite library mode inlines every asset). */
 const FONT_DATA_URI = /data:font\/woff2;base64,[A-Za-z0-9+/=]+/g;
@@ -36,7 +19,7 @@ function emitFontFiles(): Plugin {
   const fileNames = new Map<string, string>();
 
   /** Font file name for a data URI, emitting the file the first time it is seen. */
-  const fontFile = (context: Pick<Rollup.PluginContext, 'emitFile'>, dataUri: string): string => {
+  const fontFile = (context: Pick<Rolldown.PluginContext, 'emitFile'>, dataUri: string): string => {
     let fileName = fileNames.get(dataUri);
     if (!fileName) {
       const bytes = Buffer.from(dataUri.slice(FONT_DATA_PREFIX.length), 'base64');
@@ -59,7 +42,7 @@ function emitFontFiles(): Plugin {
       for (const match of code.matchAll(FONT_DATA_URI)) {
         output.overwrite(match.index, match.index + match[0].length, `./${fontFile(this, match[0])}`);
       }
-      // As a JSON string: magic-string 1.x types `sourcesContent` as `(string | null)[]`, which Rollup's map type rejects
+      // As a JSON string: magic-string 1.x types `sourcesContent` as `(string | null)[]`, which Rolldown's map type rejects
       return { code: output.toString(), map: output.generateMap({ hires: 'boundary' }).toString() };
     },
     generateBundle(_options, bundle) {
@@ -125,12 +108,12 @@ const ICONS_DIR = '/components/nodes/icons/';
 
 /**
  * Name of an output file: SOP icon domains as `sop-modeling`, the SideFX Labs drawings as
- * `labs-icons`, drawing kits that several of them share as `icon-kits` (Rollup splits those off on
+ * `labs-icons`, drawing kits that several of them share as `icon-kits` (Rolldown splits those off on
  * its own, so a domain never downloads another domain's drawings; they are small and load in
- * parallel). Grouping the kits by hand (`manualChunks`) is no better: Rollup then also moves shared
+ * parallel). Grouping the kits by hand (`manualChunks`) was no better with Rollup: it also moved shared
  * React code into that file, which the main file must load first. Anything else keeps its name.
  */
-export function chunkName(chunk: Pick<Rollup.PreRenderedChunk, 'facadeModuleId' | 'moduleIds' | 'name'>): string {
+export function chunkName(chunk: Pick<Rolldown.PreRenderedChunk, 'facadeModuleId' | 'moduleIds' | 'name'>): string {
   const facade = chunk.facadeModuleId?.replace(/\\/g, '/') ?? '';
   const domain = new RegExp(`${ICONS_DIR}sop/([^/]+)/index\\.ts$`).exec(facade);
   if (domain) return `sop-${domain[1]}`;
@@ -172,7 +155,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       emitFontFiles(),
       nameChunks(isWebComponent ? 'web-component-chunks/' : ''),
-      ...(isWebComponent ? [minifyBrowserBundle()] : [scopeStylesheetToViewer()]),
+      ...(isWebComponent ? [] : [scopeStylesheetToViewer()]),
     ],
     // The playground's `public/` folder is not part of the package
     publicDir: false,
@@ -197,15 +180,20 @@ export default defineConfig(({ mode }) => {
           },
       // Parts loaded on demand (Parameter Inspector, SOP icon domains, SideFX Labs icons) are separate
       // files in their own folder; the web component imports them relative to `web-component.js`
-      rollupOptions: {
-        // The on-demand chunks import shared code straight from the entry file, instead of Rollup
+      rolldownOptions: {
+        // The on-demand chunks import shared code straight from the entry file, instead of Rolldown
         // moving everything into a second file behind a tiny entry (one request less)
         preserveEntrySignatures: 'allow-extension',
         ...(isWebComponent
           ? {
               output: {
-                // A legal comment (`/*!`), which the minifier keeps: the bundle includes React, React Flow
-                // and other third-party code, whose licenses travel with the npm package
+                // Full minification: Vite keeps whitespace in `es` library builds so that bundlers can
+                // still tree-shake them, but `web-component.js` is loaded directly by browsers
+                minify: true,
+                // Keep legal comments (`/*!`, `@license`), which Vite drops when it minifies: the bundle
+                // includes React, React Flow and other third-party code, whose licenses travel with it
+                comments: { legal: true },
+                // A legal comment, kept by the line above, that points to the full license texts
                 banner:
                   '/*! NOP Houdini network viewer | MIT License, (c) 2026 Emil Judin | Bundles third-party code and fonts under their own licenses: see THIRD_PARTY_NOTICES.md in the npm package */',
               },

@@ -7,6 +7,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.
+- Builds use Vite 8 (Rolldown and Oxc instead of Rollup and esbuild) and `@vitejs/plugin-react` 6. The web component shrinks from about 183 KB to about 161 KB gzipped (688 KB to 528 KB unpacked), and its license comments stay in. Contributors need Node.js 20.19 or 22.12 or later.
 
 ### Removed
 - Unused NOP logo files: the icon pack in `design/nop-icon/pack/` (rounded, circle, white-web, white and dark variants and PNG sizes), its preview page `design/nop-icon/web.html`, `design/nop-icon/nop-icon.svg`, the unlinked `public/favicon-16x16.png` and `favicon-32x32.png`, and `scripts/build_nop_thicker_variants.py`. `scripts/build_nop_icon_pack.py` now writes only the used files (the cutout master, the website icons, the manifest and the Houdini shelf icon); the shipped icons are unchanged.
