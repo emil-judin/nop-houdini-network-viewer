@@ -147,10 +147,14 @@ describe('view', () => {
     await renderAssets();
     const fitted = await settledViewport();
     await inspect('OUT');
+    // Ctrl+F and Cmd+F open the node search instead (NOP-FIND-002)
+    expect(pressKey('KeyF', { altKey: true })).toBe(true);
     for (const modifier of [{ ctrlKey: true }, { metaKey: true }, { altKey: true }]) {
-      expect(pressKey('KeyF', modifier)).toBe(true);
+      expect(pressKey('KeyH', modifier)).toBe(true);
+      expect(pressKey('KeyO', modifier)).toBe(true);
     }
     expect(await settledViewport()).toEqual(fitted);
+    expect(document.querySelector('.react-flow__minimap')).toBeNull();
   });
 
   it('NOP-NAV-040: the network stays hidden until its start view is fitted', async () => {

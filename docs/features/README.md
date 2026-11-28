@@ -10,6 +10,7 @@ NOP's current behavior as Gherkin feature files. Every automated test is named a
 | [`node-rendering.feature`](./node-rendering.feature) | Node shapes, flags, icons, labels, badges, boxes, notes, dots | component |
 | [`wires.feature`](./wires.feature) | Wire styles, selection highlight | unit, component |
 | [`navigation.feature`](./navigation.feature) | Pan, zoom, fit, subnetwork diving, path bar, history | component, e2e |
+| [`node-search.feature`](./node-search.feature) | Find Node: search field, matches in subnetworks, next and previous | unit, component, e2e |
 | [`parameter-inspector.feature`](./parameter-inspector.feature) | Parameter Pane layout and widgets, code, resizing | unit, component |
 | [`viewer-chrome.feature`](./viewer-chrome.feature) | Toolbar, minimap, fullscreen, debug actions, error and loading states | component, e2e |
 | [`view-only.feature`](./view-only.feature) | Pillar 3: nothing can be edited | component, e2e |

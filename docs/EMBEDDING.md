@@ -63,10 +63,11 @@ Give the viewer the full screen width and most of its height, for example `heigh
 | Dive into a subnetwork | Double-click it, or select it and press `I` | Double-tap it, or tap **Open subnetwork** in the inspector |
 | Go up a level | `U`, the arrow button, or a path segment | Arrow button or path segment |
 | Resize the parameter panel | Drag its edge (arrow keys when focused, double-click resets) | Drag the grip above the panel |
+| Find a node by name or type, also in subnetworks | `/` (or `Ctrl+F` while the viewer has focus), type, `Enter`. `Enter` or `Ctrl+G` (`Shift+.`) next match, `Shift+Enter` or `Ctrl+Shift+G` (`Shift+,`) previous, `Esc` closes. `*` and `?` work as wildcards | Search button in the header, then the arrow buttons |
 | Fit all, frame selected | `H` or double-click the empty canvas; `F` | Double-tap the empty canvas |
 | Fullscreen | Fullscreen button; `Esc` leaves it. The network is fitted to the new size | Fullscreen button (a full-screen overlay on iPhone) |
 | Network overview (minimap) | Click to jump, hold and drag to follow, wheel to zoom; `O` or the map button shows or hides it | Settings menu > Network overview. Starts closed on phone-sized viewers |
 | Wire style | `Shift+S` or the two wire buttons | Settings menu > Wire Style |
 | Screenshot (PNG of the visible network) | Camera button | Settings menu > Save screenshot |
 
-**Keyboard:** `Tab` reaches every node, top to bottom. `Enter` opens its parameters, `Esc` closes them. The single-key hotkeys react only while the viewer has focus (click into it first), so they never interfere with typing elsewhere on the page. With `hotkeys="hover"` they also react while the pointer is over the viewer, like in Houdini; the playground uses this.
+**Keyboard:** `Tab` reaches every node, top to bottom. `Enter` opens its parameters, `Esc` closes them. The single-key hotkeys react only while the viewer has focus (click into it first), so they never interfere with typing elsewhere on the page. With `hotkeys="hover"` they also react while the pointer is over the viewer, like in Houdini; the playground uses this. `Ctrl+F` and `Ctrl+G` belong to the viewer only while it has focus, so the browser's own find keeps working on the rest of the page.

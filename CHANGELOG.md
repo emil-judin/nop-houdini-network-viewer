@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- Find a node by name or operator type, like Houdini's Find Node: `/` (or `Ctrl+F` while the viewer has focus) or the new search button opens a search field, `Enter` selects and frames the first match and opens its subnetwork when it is inside one, `Ctrl+G` and `Ctrl+Shift+G` (or `Shift+.` and `Shift+,`) step through the matches. `*` and `?` work as wildcards; on touch screens the arrow buttons step.
+
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.

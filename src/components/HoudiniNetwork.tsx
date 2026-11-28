@@ -21,6 +21,7 @@ import {
 } from '../schema/converter';
 import { canDiveInto } from '../schema/subnetPath';
 import type { HoudiniNetworkDocument, HoudiniNodeData, HoudiniWireStyle } from '../schema/types';
+import type { NodeSearchMatch } from '../schema/findNodes';
 import { Maximize2 } from 'lucide-react';
 import { HoudiniWire } from './edges/HoudiniWire';
 import { useFullscreen } from './hooks/useFullscreen';
@@ -28,6 +29,7 @@ import { useOperatorIcons } from './hooks/useOperatorIcons';
 import { isPathPrefix, useNavigationHistory, type BeforeNavigate } from './hooks/useNavigationHistory';
 import { useFirstFitDone } from './hooks/useFirstFitDone';
 import { useFitWithLabels } from './hooks/useFitWithLabels';
+import { useNodeSearch } from './hooks/useNodeSearch';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { useViewerHotkeys, type HotkeyMode } from './hooks/useViewerHotkeys';
 import { useTwoFingerPan, type TouchPanMode } from './hooks/useTwoFingerPan';
@@ -37,6 +39,7 @@ import { buildNetworkPathSegments } from './hud/networkPathSegments';
 import { NavigableMiniMap } from './hud/NavigableMiniMap';
 import { NetworkErrorState } from './hud/NetworkErrorState';
 import { NetworkLoadingState } from './hud/NetworkLoadingState';
+import { NodeSearchBar } from './hud/NodeSearchBar';
 import { ViewerToolbar, type ScreenshotState } from './hud/ViewerToolbar';
 import { ResizableInspectorPanel, SHEET_SLIDE_MS, SIDE_PANEL_MIN_VIEWER_WIDTH } from './inspector/ResizableInspectorPanel';
 import { useElementSize } from './useElementSize';
@@ -120,9 +123,10 @@ export interface HoudiniNetworkProps {
    */
   wireStyle?: HoudiniWireStyle;
   /**
-   * When the Houdini hotkeys (H, F, I, U, O, Shift+S) react: `"focus"` only while focus is inside the
-   * viewer (after clicking or tabbing into it), `"hover"` also while the pointer is over it, `"off"`
-   * never. Defaults to `"focus"`, so single keys never act on a page the visitor is typing on.
+   * When the Houdini hotkeys (H, F, I, U, O, Shift+S, and `/` for the node search) react: `"focus"`
+   * only while focus is inside the viewer (after clicking or tabbing into it), `"hover"` also while
+   * the pointer is over it, `"off"` never. Defaults to `"focus"`, so single keys never act on a page
+   * the visitor is typing on. `Ctrl+F` and `Ctrl+G` work only while focus is inside the viewer.
    */
   hotkeys?: HotkeyMode;
   /** Optional callback fired when the selected operator node changes (`null` when nothing is selected). */
@@ -250,6 +254,9 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   // `0` before the first measurement (or while hidden): treated as a wide viewer
   const isNarrow = viewerSize.width > 0 && viewerSize.width < NARROW_VIEWER_WIDTH;
   const frameMaxZoom = isNarrow ? FRAME_MAX_ZOOM_NARROW : FRAME_MAX_ZOOM;
+  // Read by the level effect below, which must not run again when only the viewer width changes
+  const frameMaxZoomRef = useRef(frameMaxZoom);
+  frameMaxZoomRef.current = frameMaxZoom;
 
   // Network overview (minimap): toolbar button, settings menu or the O hotkey. Narrow viewers
   // (phones) start without it whatever `showMiniMap` says, because it covers much of the network
@@ -268,6 +275,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   const twoFingerPan = touchPan === 'two-fingers' && !isFullscreen;
   const touchHintVisible = useTwoFingerPan(rootRef, twoFingerPan);
   const lastClickRef = useRef<{ id: string; time: number } | null>(null);
+  // A waiting click selection (see `handleNodeClick`) that a node search step cancels
+  const cancelClickSelectRef = useRef<() => void>(() => undefined);
 
   // Viewport of every visited level (by network path), restored when coming back like in Houdini
   const viewportsRef = useRef(new Map<string, Viewport>());
@@ -275,6 +284,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   const pendingSelectionRef = useRef<string | null>(null);
   // Keyboard focus was inside the viewer when the network changed: keep it there afterwards
   const restoreFocusRef = useRef(false);
+  // Node search match to select and frame once its network level is on screen
+  const pendingMatchRef = useRef<string | null>(null);
   const activePathRef = useRef('');
 
   /** `true` when keyboard focus is inside this viewer (also inside the web component's Shadow DOM). */
@@ -297,7 +308,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   );
 
   const navigation = useNavigationHistory(normalizedDoc, beforeNavigate);
-  const { activeGraph, levels, trailLevels, diveInto, navigateToDepth } = navigation;
+  const { activeGraph, levels, trailLevels, diveInto, navigateToDepth, showPath } = navigation;
   activePathRef.current = activeGraph.path;
 
   const initialWireStyle = wireStyleProp ?? normalizedDoc.root.wireStyle ?? 'default';
@@ -345,10 +356,77 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
     fitNetwork({ padding: FIT_PADDING, duration });
   }, [duration, fitNetwork]);
 
+  /** `true` when keyboard focus is in the node search field. */
+  const searchHasFocus = useCallback(() => {
+    const element = rootRef.current;
+    const root = element?.getRootNode() as Document | ShadowRoot | undefined;
+    return Boolean(root && element?.querySelector('[role="search"]')?.contains(root.activeElement));
+  }, []);
+
+  // Node search (Houdini's Find Node): a match in the network on screen is selected and framed at
+  // once; a match in another level opens that level first (see the level effect below)
+  const searchFrameTimerRef = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(searchFrameTimerRef.current), []);
+  const showMatch = useCallback(
+    (match: NodeSearchMatch) => {
+      const name = match.node.name;
+      window.clearTimeout(searchFrameTimerRef.current);
+      cancelClickSelectRef.current();
+      pendingMatchRef.current = name;
+      if (showPath(match.path)) return;
+      pendingMatchRef.current = null;
+      selectNode(match.node);
+      if (!searchHasFocus() && hasFocusInside()) window.setTimeout(() => focusCanvasNode(name), 0);
+      // After the inspector panel has taken its room from the canvas
+      searchFrameTimerRef.current = window.setTimeout(
+        () => fitNetwork({ nodes: [{ id: name }], padding: FRAME_PADDING, duration, maxZoom: frameMaxZoom }),
+        50,
+      );
+    },
+    [duration, fitNetwork, focusCanvasNode, frameMaxZoom, hasFocusInside, searchHasFocus, selectNode, showPath],
+  );
+  const search = useNodeSearch(normalizedDoc.root, showMatch);
+  // Each request focuses the search field and selects its text
+  const [searchFocusRequest, setSearchFocusRequest] = useState(0);
+  const { open: openSearchField, close: closeSearchField } = search;
+  const openSearch = useCallback(() => {
+    openSearchField();
+    setSearchFocusRequest((count) => count + 1);
+  }, [openSearchField]);
+  const closeSearch = useCallback(
+    (returnFocus: boolean) => {
+      closeSearchField();
+      if (!returnFocus) return;
+      window.setTimeout(() => {
+        if (selectedNodeId) focusCanvasNode(selectedNodeId);
+        if (!hasFocusInside()) rootRef.current?.focus({ preventScroll: true });
+      }, 0);
+    },
+    [closeSearchField, focusCanvasNode, hasFocusInside, selectedNodeId],
+  );
+
   // Houdini Network Editor hotkeys: Shift+S toggles the wire style, H fits the whole network,
   // F frames the selected node, I dives into the selected subnetwork, U goes up a level and O
-  // shows or hides the overview. When they react is set by the `hotkeys` prop.
+  // shows or hides the overview. Find Node: `/` (and `Ctrl+F` while the viewer has focus) opens the
+  // node search, `Ctrl+G` or `Shift+.` shows the next match, `Ctrl+Shift+G` or `Shift+,` the previous
+  // one. When they react is set by the `hotkeys` prop.
   const hotkeyHandlers = useViewerHotkeys(rootRef, hotkeys, (event) => {
+    if (event.ctrlKey || event.metaKey) {
+      if (event.code === 'KeyF' && !event.shiftKey) {
+        openSearch();
+        return true;
+      }
+      // With nothing to step through, the browser keeps its own Ctrl+G
+      if (event.code === 'KeyG') return event.shiftKey ? search.previous() : search.next();
+      return false;
+    }
+    // By character, not key position: `/` is Shift+7 on some keyboard layouts
+    if (event.key === '/') {
+      openSearch();
+      return true;
+    }
+    if (event.shiftKey && event.code === 'Period') return search.next();
+    if (event.shiftKey && event.code === 'Comma') return search.previous();
     if (event.code === 'KeyS' && event.shiftKey) {
       setWireStyle((style) => (style === 'rounded' ? 'default' : 'rounded'));
       return true;
@@ -433,14 +511,25 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   // Entering a level: select the subnetwork we came up from (if any), then restore the
   // remembered view of this level, or frame the start node, or fit the whole network
   useEffect(() => {
-    const pendingName = pendingSelectionRef.current;
+    const matchName = pendingMatchRef.current;
+    pendingMatchRef.current = null;
+    // A node search match wins over the subnetwork we came up from
+    const pendingName = matchName ?? pendingSelectionRef.current;
     pendingSelectionRef.current = null;
     selectNode(pendingName ? activeGraph.nodes.find((n) => n.name === pendingName) ?? null : null);
-    if (restoreFocusRef.current) {
-      restoreFocusRef.current = false;
-      // Focus the viewer itself (the hotkeys keep working, Tab then reaches the nodes)
+    // Focus the viewer itself (the hotkeys keep working, Tab then reaches the nodes), or the node to
+    // select; the search field keeps its focus while the visitor steps through the matches
+    if (restoreFocusRef.current && !(matchName && searchHasFocus())) {
       if (pendingName) window.setTimeout(() => focusCanvasNode(pendingName), 0);
       else rootRef.current?.focus({ preventScroll: true });
+    }
+    restoreFocusRef.current = false;
+    if (matchName) {
+      const timer = setTimeout(() => {
+        const animation = reducedMotionRef.current ? 0 : 250;
+        fitNetwork({ nodes: [{ id: matchName }], padding: FRAME_PADDING, duration: animation, maxZoom: frameMaxZoomRef.current });
+      }, 50);
+      return () => clearTimeout(timer);
     }
     const isFirstLevel = firstLevelRef.current;
     firstLevelRef.current = false;
@@ -460,7 +549,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
       }
     }, 30);
     return () => clearTimeout(timer);
-  }, [activeGraph, fitView, focusCanvasNode, selectNode, setViewport, fitNetwork]);
+  }, [activeGraph, fitView, focusCanvasNode, searchHasFocus, selectNode, setViewport, fitNetwork]);
 
   // A page that changes `focusNode` later (for example the example page's start node list) gets the
   // new start view right away, while the top level is on screen
@@ -522,6 +611,7 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
   // viewers, the side panel at the right edge) and catch the second click or tap
   const clickSelectTimerRef = useRef<number | undefined>(undefined);
   const cancelClickSelect = useCallback(() => window.clearTimeout(clickSelectTimerRef.current), []);
+  cancelClickSelectRef.current = cancelClickSelect;
   // A waiting selection belongs to the network on screen: drop it when the level changes or the viewer goes
   useEffect(() => cancelClickSelect, [activeGraph, cancelClickSelect]);
 
@@ -697,6 +787,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
               showFullscreenButton={showFullscreenButton}
               isFullscreen={isFullscreen}
               onToggleFullscreen={onToggleFullscreen}
+              searchOpen={search.isOpen}
+              onToggleSearch={() => (search.isOpen ? closeSearch(false) : openSearch())}
             />
           )}
 
@@ -743,6 +835,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
                 {miniMapShown && <NavigableMiniMap nodeColor={resolveMiniMapNodeColor} />}
               </ReactFlow>
             </NetworkErrorBoundary>
+
+            {search.isOpen && <NodeSearchBar search={search} focusRequest={searchFocusRequest} onClose={closeSearch} />}
 
             {/* Shown while one finger scrolls the page over the canvas in two-finger mode (touch only,
                 so it is a visual hint: screen reader gestures do not pan the canvas, and keyboard users
@@ -808,7 +902,8 @@ const HoudiniNetworkInnerCanvas: React.FC<InnerCanvasProps> = ({
  * Embeddable, strictly view-only viewer component for SideFX Houdini networks (NOP).
  *
  * Visitors can pan, zoom, select nodes to read their parameters, and dive into exported
- * subnetworks (double-click or double-tap, `I` to enter and `U` to go up), but never edit the network.
+ * subnetworks (double-click or double-tap, `I` to enter and `U` to go up), and find nodes by name or
+ * type (`/` or the search button, like Houdini's Find Node), but never edit the network.
  * Keyboard users reach each node with Tab and open its parameters with Enter.
  */
 export const HoudiniNetwork: React.FC<HoudiniNetworkProps> = (props) => {

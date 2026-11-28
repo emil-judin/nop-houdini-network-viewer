@@ -30,6 +30,18 @@ test.describe('accessibility', () => {
     expect(await seriousViolations(page)).toEqual([]);
   });
 
+  test('NOP-FIND-013: no serious axe violations with the node search open and a match shown', async ({ page }) => {
+    await page.goto('/?example=start');
+    await expect(page.locator('.react-flow__node[data-id="lift_tube"]')).toBeVisible();
+    await page.getByRole('button', { name: 'Find node' }).click();
+    const field = page.getByRole('textbox', { name: 'Find node by name or type' });
+    await field.fill('lift');
+    await field.press('Enter');
+    await expect(page.getByRole('complementary', { name: 'Parameters of lift_tube' })).toBeVisible();
+    await expect(page.getByRole('search', { name: 'Find node' }).getByRole('status')).toHaveText(/of/);
+    expect(await seriousViolations(page)).toEqual([]);
+  });
+
   test('NOP-A11Y-010: no serious axe violations on the example page with a network and its code', async ({ page }) => {
     await page.goto('/example-site.html');
     const yours = page.getByRole('region', { name: 'Embed a network on your website' });

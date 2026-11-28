@@ -87,6 +87,20 @@ export function useNavigationHistory(doc: HoudiniNetworkDocument, beforeNavigate
     [goTo, levels],
   );
 
+  /**
+   * Shows the network at `path` (subnetwork names from the exported root), for example the level of
+   * a node search match. Returns `false` when that network is already on screen.
+   */
+  const showPath = useCallback(
+    (path: string[]): boolean => {
+      const current = levelNames(levels);
+      if (current.length === path.length && isPathPrefix(path, current)) return false;
+      goTo(path);
+      return true;
+    },
+    [goTo, levels],
+  );
+
   const goBack = useCallback(() => {
     if (nav.index > 0) goTo(nav.history[nav.index - 1], nav.index - 1);
   }, [goTo, nav]);
@@ -104,6 +118,7 @@ export function useNavigationHistory(doc: HoudiniNetworkDocument, beforeNavigate
     canGoForward: nav.index < nav.history.length - 1,
     navigateToDepth,
     diveInto,
+    showPath,
     goBack,
     goForward,
   };

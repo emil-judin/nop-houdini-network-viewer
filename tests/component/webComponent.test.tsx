@@ -29,6 +29,30 @@ describe('<houdini-network>', () => {
     expect(document.head.querySelectorAll('style[data-houdini-network-fonts]')).toHaveLength(1);
   });
 
+  it('NOP-FIND-001: typing in the search field inside the Shadow DOM never triggers the hotkeys', async () => {
+    const element = await act(async () =>
+      addElement(`<houdini-network style="height: 400px"><script type="application/json">${network}</script></houdini-network>`),
+    );
+    await waitFor(() => expect(shadowNode(element, 'box1')).not.toBeNull());
+    const root = element.shadowRoot as ShadowRoot;
+    await act(async () => {
+      root.querySelector<HTMLElement>('.nop-root .\\@container')?.focus();
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '/', code: 'Slash', bubbles: true }));
+    });
+    const field = await waitFor(() => {
+      const input = root.querySelector<HTMLInputElement>('input[aria-label="Find node by name or type"]');
+      expect(input).not.toBeNull();
+      return input as HTMLInputElement;
+    });
+    // At the window the event target is the host element; `o` would show the overview
+    const typed = new KeyboardEvent('keydown', { key: 'o', code: 'KeyO', bubbles: true, composed: true, cancelable: true });
+    await act(async () => {
+      field.dispatchEvent(typed);
+    });
+    expect(typed.defaultPrevented).toBe(false);
+    expect(root.querySelector('.react-flow__minimap')).toBeNull();
+  });
+
   it('NOP-EMB-008 and Q-04: changing an attribute does not parse the inline JSON again', async () => {
     const parse = vi.spyOn(JSON, 'parse');
     const element = await act(async () =>
