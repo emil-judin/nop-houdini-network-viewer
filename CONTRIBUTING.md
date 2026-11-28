@@ -19,7 +19,7 @@ Contributions made with an AI assistant are welcome. Most assistants read AGENTS
 
 ## Setup
 
-Node.js 20 or newer (CI uses 22, see `.nvmrc`).
+Node.js 20.19 or 22.12 or newer, as Vite 8 requires (CI uses 22, see `.nvmrc`).
 
 ```bash
 npm install

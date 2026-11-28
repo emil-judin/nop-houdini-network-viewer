@@ -26,7 +26,8 @@ describe('NOP-PG-037: search engines and link previews', () => {
     const transform = openGraphUrls(siteUrl).transformIndexHtml;
     if (typeof transform !== 'function') throw new Error('openGraphUrls has no plain transformIndexHtml hook');
     const context = { path: page, filename: page.slice(1) } as Parameters<typeof transform>[1];
-    return transform('<html></html>', context);
+    // The hook does not use its plugin context (`this`), so the test passes an empty one
+    return transform.call({} as ThisParameterType<typeof transform>, '<html></html>', context);
   }
 
   it('NOP-PG-037: with a site address, og:url and og:image are absolute URLs', async () => {

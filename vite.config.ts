@@ -203,7 +203,7 @@ export default defineConfig(({ mode }) => ({
     // `dist/` belongs to the library build (`npm.cmd run build:lib`)
     outDir: 'dist-playground',
     // Two pages: the playground and the example page its Embed button opens
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         example: fileURLToPath(new URL('./example-site.html', import.meta.url)),
