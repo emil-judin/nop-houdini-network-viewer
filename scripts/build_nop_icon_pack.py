@@ -1,28 +1,22 @@
-"""Generate the NOP icon pack: website icons, the Houdini shelf icon and the pack preview page.
+"""Generate the NOP logo files: website icons and the Houdini shelf icon.
 
 The NOP icon (owner choice, 2026-10-28) is a spiral spider web. Eight spokes leave the center of
 the Houdini spiral, the web makes two turns to the outer row (turn radii 76, 208 and 385 px on the
 512 canvas) with a 34px stroke and a gentle organic thickness wave. All geometry is computed here,
-nothing is traced. Earlier designs and the scripts that explored them are in the git history.
+nothing is traced. The logo is the cutout: a square in the brand orange with the web cut out, so the
+background shows through. Earlier designs and variants are in the git history.
 
-1. Writes the master SVGs to ``design/nop-icon/``: ``nop-icon.svg`` (white web on orange) and
-   ``nop-icon-cutout.svg`` (orange with the web cut out).
-2. Writes vector SVG variants to ``design/nop-icon/pack/``:
-   - ``nop-icon.svg``: 512x512 square icon (NOP orange, see ``ORANGE``, + white web)
-   - ``favicon.svg``: 512x512 orange square with the spiderweb cut out (transparent web)
-   - ``nop-icon-rounded.svg``: 512x512 rounded-square badge (rx=96, white web on orange)
-   - ``nop-icon-circle.svg``: 512x512 circular badge (white web on orange)
-   - ``nop-icon-transparent.svg`` (and the alias ``nop-icon-cutout.svg``): orange square with the spiderweb cut out
-   - ``nop-icon-rounded-transparent.svg``: orange rounded square with the spiderweb cut out
-   - ``nop-icon-circle-transparent.svg``: orange circle with the spiderweb cut out
-   - ``nop-icon-transparent-white.svg``: white (#FFFFFF) square with the spiderweb cut out
-   - ``nop-icon-transparent-dark.svg``: dark (#1E1E1E) square with the spiderweb cut out
-   - ``safari-pinned-tab.svg``: black (#000000) square with the spiderweb cut out
-3. Writes raster PNGs, multi-size ``favicon.ico`` and
-   ``site.webmanifest`` into ``design/nop-icon/pack/``.
-4. Writes the icon pack showcase page to ``design/nop-icon/web.html``.
-5. Copies the website icons into ``public/`` and writes the see-through icon as a 256px PNG for
-   the Houdini shelf (``exporter/package/nop/icons/nop.png``).
+Writes only the files that are used:
+
+- ``design/nop-icon/nop-icon-cutout.svg``: the master SVG
+- ``design/nop-icon/nop-icon-cutout-512.png``: input for ``scripts/build_og_image.py`` (link preview)
+- ``public/favicon.svg`` (the master) and ``public/favicon.ico`` (16, 32, 48): browser tab icons
+- ``public/apple-touch-icon.png``, ``public/android-chrome-192x192.png`` and ``-512x512.png``: home
+  screen icons, the cutout drawn on the dark page color
+- ``public/site.webmanifest``
+- ``exporter/package/nop/icons/nop.png``: the Houdini shelf icon
+
+Run ``scripts/build_og_image.py`` after this script to rebuild ``public/og-image.png``.
 
 Usage: ``python scripts/build_nop_icon_pack.py`` (needs numpy and Pillow).
 """
@@ -32,7 +26,6 @@ from __future__ import annotations
 import json
 import math
 import random
-import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -41,7 +34,7 @@ from PIL import Image, ImageDraw
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ICON_DIR = ROOT_DIR / "design" / "nop-icon"
-PACK_DIR = ICON_DIR / "pack"
+PUBLIC_DIR = ROOT_DIR / "public"
 SHELF_ICON = ROOT_DIR / "exporter" / "package" / "nop" / "icons" / "nop.png"
 SHELF_ICON_PX = 256  # sharp on high-DPI screens; Houdini scales it down for the shelf
 
@@ -49,7 +42,6 @@ FINAL_NAME = "nop-icon"
 
 SIZE = 512
 ORANGE = "#FF6600"  # brand orange: the web value of PMS 172 (was #FE4703, sampled from the Houdini app icon)
-WHITE = "#FFFFFF"
 DARK = "#1E1E1E"
 
 HUB = (182.0, 316.0)  # center of the Houdini spiral on the 512x512 canvas
@@ -216,73 +208,27 @@ class SpiralWeb:
 FINAL_WEB = SpiralWeb()
 
 
-def shape_element(shape: str, fill: str, extra_attrs: str = "", corner_rx: int = 96) -> str:
-    extra = f" {extra_attrs}" if extra_attrs else ""
-    if shape == "rounded":
-        return f'<rect width="{SIZE}" height="{SIZE}" rx="{corner_rx}" fill="{fill}"{extra}/>'
-    if shape == "circle":
-        half = SIZE // 2
-        return f'<circle cx="{half}" cy="{half}" r="{half}" fill="{fill}"{extra}/>'
-    return f'<rect width="{SIZE}" height="{SIZE}" fill="{fill}"{extra}/>'
-
-
-def build_svg_variant(
-    web: SpiralWeb,
-    *,
-    bg_color: str = ORANGE,
-    fg_color: str | None = WHITE,  # None means the spiderweb is cut out (transparent) from bg_color
-    shape: str = "square",  # "square" | "rounded" | "circle"
-    corner_rx: int = 96,
-) -> str:
-    """Render an SVG variant of the final NOP spiderweb icon.
-
-    When ``fg_color`` is ``None``, the spiderweb is punched out of ``bg_color`` with an SVG
-    ``<mask>``, so everything is ``bg_color`` except the transparent web.
-    """
+def build_cutout_svg(web: SpiralWeb, bg_color: str = ORANGE) -> str:
+    """The NOP icon as SVG: a ``bg_color`` square with the spiderweb punched out by an SVG ``<mask>``."""
     fill_d = web.inner_fill_d()
-    if fg_color is None:
-        # Cutout mask: white (opaque) everywhere, black (transparent) on the spiderweb
-        common_mask = (
-            f'fill="none" stroke="#000000" stroke-width="{web.stroke_w:g}" '
-            'stroke-linecap="round" stroke-linejoin="round"'
-        )
-        lines = [
-            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" width="{SIZE}" height="{SIZE}">',
-            "  <defs>",
-            f'    <mask id="web-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="{SIZE}" height="{SIZE}">',
-            f'      <rect width="{SIZE}" height="{SIZE}" fill="#FFFFFF"/>',
-        ]
-        if fill_d:
-            lines.append(f'      <path d="{fill_d}" fill="#000000"/>')
-        lines.append(f'      <path d="{web.spokes_d()}" {common_mask}/>')
-        lines.extend("      " + sub_path for sub_path in web.spiral_subpaths("#000000"))
-        mask_attr = 'mask="url(#web-cutout)"'
-        lines.extend([
-            "    </mask>",
-            "  </defs>",
-            f"  {shape_element(shape, bg_color, extra_attrs=mask_attr, corner_rx=corner_rx)}",
-            "</svg>",
-            "",
-        ])
-        return "\n".join(lines)
-
-    clip_shape = shape_element(shape, bg_color, corner_rx=corner_rx).replace(f' fill="{bg_color}"', "")
-    lines = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" width="{SIZE}" height="{SIZE}">',
-        f'  <clipPath id="canvas">{clip_shape}</clipPath>',
-        '  <g clip-path="url(#canvas)">',
-        f'    <rect width="{SIZE}" height="{SIZE}" fill="{bg_color}"/>',
-    ]
-    if fill_d:
-        lines.append(f'    <path d="{fill_d}" fill="{fg_color}"/>')
-    common = (
-        f'fill="none" stroke="{fg_color}" stroke-width="{web.stroke_w:g}" '
+    common_mask = (
+        f'fill="none" stroke="#000000" stroke-width="{web.stroke_w:g}" '
         'stroke-linecap="round" stroke-linejoin="round"'
     )
-    lines.append(f'    <path d="{web.spokes_d()}" {common}/>')
-    lines.extend("    " + sub_path for sub_path in web.spiral_subpaths(fg_color))
+    lines = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SIZE} {SIZE}" width="{SIZE}" height="{SIZE}">',
+        "  <defs>",
+        f'    <mask id="web-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="{SIZE}" height="{SIZE}">',
+        f'      <rect width="{SIZE}" height="{SIZE}" fill="#FFFFFF"/>',
+    ]
+    if fill_d:
+        lines.append(f'      <path d="{fill_d}" fill="#000000"/>')
+    lines.append(f'      <path d="{web.spokes_d()}" {common_mask}/>')
+    lines.extend("      " + sub_path for sub_path in web.spiral_subpaths("#000000"))
     lines.extend([
-        "  </g>",
+        "    </mask>",
+        "  </defs>",
+        f'  <rect width="{SIZE}" height="{SIZE}" fill="{bg_color}" mask="url(#web-cutout)"/>',
         "</svg>",
         "",
     ])
@@ -345,168 +291,53 @@ def hex_rgb(hex_color: str) -> tuple[int, int, int]:
     return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 
-def make_shape_mask(out_px: int, shape: str = "square", corner_rx_512: float = 96.0) -> np.ndarray:
-    """Anti-aliased shape alpha mask (square, rounded, or circle) at ``out_px``."""
-    if shape == "square":
-        return np.ones((out_px, out_px), dtype=np.float32)
-    scale = out_px / SIZE
-    coords = (np.arange(out_px, dtype=np.float32) + 0.5) / scale
-    gx, gy = np.meshgrid(coords, coords)
-    half = SIZE / 2.0
-    if shape == "circle":
-        d = np.hypot(gx - half, gy - half) - half
-    else:
-        r = corner_rx_512
-        qx = np.abs(gx - half) - (half - r)
-        qy = np.abs(gy - half) - (half - r)
-        d = np.hypot(np.maximum(qx, 0.0), np.maximum(qy, 0.0)) + np.minimum(np.maximum(qx, qy), 0.0) - r
-    aa_half = 0.5 / scale
-    return np.clip(0.5 - d / (2.0 * aa_half), 0.0, 1.0)
-
-
-def compose_rgba(
-    web_mask: np.ndarray,
-    *,
-    bg_color: str = ORANGE,
-    fg_color: str | None = WHITE,  # None means the spiderweb is cut out (transparent) from bg_color
-    shape: str = "square",
-) -> Image.Image:
-    """Compose a 1024x1024 RGBA PIL image from ``web_mask``."""
+def compose_rgba(web_mask: np.ndarray, *, bg_color: str = ORANGE, fg_color: str | None = None) -> Image.Image:
+    """An RGBA square from ``web_mask``: ``bg_color`` with the web cut out (``fg_color`` None) or drawn in ``fg_color``."""
     out_px = web_mask.shape[0]
-    shape_mask = make_shape_mask(out_px, shape=shape)
     br, bg, bb = hex_rgb(bg_color)
     rgba = np.zeros((out_px, out_px, 4), dtype=np.uint8)
     if fg_color is None:
-        # Everything inside the shape is bg_color (e.g. orange), and the spiderweb itself is transparent
-        a = shape_mask * (1.0 - web_mask)
         rgba[:, :, 0] = br
         rgba[:, :, 1] = bg
         rgba[:, :, 2] = bb
-        rgba[:, :, 3] = np.round(a * 255.0).astype(np.uint8)
+        rgba[:, :, 3] = np.round((1.0 - web_mask) * 255.0).astype(np.uint8)
     else:
         fr, fg, fb = hex_rgb(fg_color)
         w = web_mask
         rgba[:, :, 0] = np.round(br * (1.0 - w) + fr * w).astype(np.uint8)
         rgba[:, :, 1] = np.round(bg * (1.0 - w) + fg * w).astype(np.uint8)
         rgba[:, :, 2] = np.round(bb * (1.0 - w) + fb * w).astype(np.uint8)
-        rgba[:, :, 3] = np.round(shape_mask * 255.0).astype(np.uint8)
+        rgba[:, :, 3] = 255
     return Image.fromarray(rgba, mode="RGBA")
 
 
+def save_png(img: Image.Image, px: int, path: Path) -> None:
+    resized = img if img.width == px else img.resize((px, px), Image.Resampling.LANCZOS)
+    resized.save(path, format="PNG", optimize=True)
+
+
 def main() -> None:
-    ICON_DIR.mkdir(parents=True, exist_ok=True)
-    PACK_DIR.mkdir(parents=True, exist_ok=True)
+    cutout_svg = build_cutout_svg(FINAL_WEB)
+    for svg_path in (ICON_DIR / f"{FINAL_NAME}-cutout.svg", PUBLIC_DIR / "favicon.svg"):
+        svg_path.write_text(cutout_svg, encoding="utf-8", newline="\n")
 
-    final_svg = build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="square")
-    cutout_svg = build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="square")
-    (ICON_DIR / f"{FINAL_NAME}.svg").write_text(final_svg, encoding="utf-8", newline="\n")
-    (ICON_DIR / f"{FINAL_NAME}-cutout.svg").write_text(cutout_svg, encoding="utf-8", newline="\n")
-
-    svg_variants = [
-        ("nop-icon.svg", f"Standard 512x512 square icon (NOP orange {ORANGE} + white web)", final_svg),
-        ("favicon.svg", "Scalable SVG favicon (512x512 orange square with transparent web cutout)", cutout_svg),
-        (
-            "nop-icon-rounded.svg",
-            "Rounded square app/navbar badge (rx=96, white web on orange)",
-            build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="rounded"),
-        ),
-        (
-            "nop-icon-circle.svg",
-            "Circular avatar / social badge (white web on orange)",
-            build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=WHITE, shape="circle"),
-        ),
-        (
-            "nop-icon-transparent.svg",
-            f"Transparent cutout square: NOP orange ({ORANGE}) square with the spiderweb cut out",
-            cutout_svg,
-        ),
-        (
-            "nop-icon-cutout.svg",
-            f"Transparent cutout square alias: NOP orange ({ORANGE}) square with the spiderweb cut out",
-            cutout_svg,
-        ),
-        (
-            "nop-icon-rounded-transparent.svg",
-            f"Transparent cutout rounded square (rx=96): NOP orange ({ORANGE}) with the spiderweb cut out",
-            build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="rounded"),
-        ),
-        (
-            "nop-icon-circle-transparent.svg",
-            f"Transparent cutout circle: NOP orange ({ORANGE}) circle with the spiderweb cut out",
-            build_svg_variant(FINAL_WEB, bg_color=ORANGE, fg_color=None, shape="circle"),
-        ),
-        (
-            "nop-icon-transparent-white.svg",
-            "Monochrome white (#FFFFFF) square with the spiderweb cut out (for dark backgrounds)",
-            build_svg_variant(FINAL_WEB, bg_color=WHITE, fg_color=None, shape="square"),
-        ),
-        (
-            "nop-icon-transparent-dark.svg",
-            "Monochrome dark (#1E1E1E) square with the spiderweb cut out (for light backgrounds)",
-            build_svg_variant(FINAL_WEB, bg_color=DARK, fg_color=None, shape="square"),
-        ),
-        (
-            "safari-pinned-tab.svg",
-            "Monochrome black (#000000) square with the spiderweb cut out (Safari pinned tab mask)",
-            build_svg_variant(FINAL_WEB, bg_color="#000000", fg_color=None, shape="square"),
-        ),
-    ]
-    for filename, _, content in svg_variants:
-        (PACK_DIR / filename).write_text(content, encoding="utf-8", newline="\n")
-
-    # Render high-resolution master mask and raster pack
     web_mask = render_web_alpha_mask(FINAL_WEB, out_px=1024)
-    master_square = compose_rgba(web_mask, bg_color=ORANGE, fg_color=WHITE, shape="square")
-    master_rounded = compose_rgba(web_mask, bg_color=ORANGE, fg_color=WHITE, shape="rounded")
-    master_circle = compose_rgba(web_mask, bg_color=ORANGE, fg_color=WHITE, shape="circle")
-    master_cutout_square = compose_rgba(web_mask, bg_color=ORANGE, fg_color=None, shape="square")
-    master_cutout_rounded = compose_rgba(web_mask, bg_color=ORANGE, fg_color=None, shape="rounded")
-    master_cutout_circle = compose_rgba(web_mask, bg_color=ORANGE, fg_color=None, shape="circle")
-    master_cutout_white = compose_rgba(web_mask, bg_color=WHITE, fg_color=None, shape="square")
-    master_cutout_dark = compose_rgba(web_mask, bg_color=DARK, fg_color=None, shape="square")
+    cutout = compose_rgba(web_mask)
     # Home screen icons cannot be see-through (iOS fills transparency with black, Android puts the icon on a
     # white plate), so they draw the web in the dark page color: they look like the cutout icon on a dark page
-    master_dark_web = compose_rgba(web_mask, bg_color=ORANGE, fg_color=DARK, shape="square")
+    dark_web = compose_rgba(web_mask, fg_color=DARK)
 
-    png_specs: list[tuple[str, Image.Image, int, str]] = [
-        ("favicon-16x16.png", master_cutout_square, 16, "16x16 browser tab favicon (orange square with transparent web cutout)"),
-        ("favicon-32x32.png", master_cutout_square, 32, "32x32 browser tab favicon (orange square with transparent web cutout)"),
-        ("favicon-48x48.png", master_cutout_square, 48, "48x48 desktop shortcut icon (orange square with transparent web cutout)"),
-        ("nop-icon-64.png", master_square, 64, "64x64 UI / toolbar icon"),
-        ("nop-icon-128.png", master_square, 128, "128x128 store / badge icon"),
-        ("apple-touch-icon.png", master_dark_web, 180, "180x180 iOS / iPadOS home screen icon (orange + dark web)"),
-        ("android-chrome-192x192.png", master_dark_web, 192, "192x192 Android / PWA home screen icon (orange + dark web, also maskable)"),
-        ("nop-icon-256.png", master_square, 256, "256x256 desktop / documentation icon"),
-        ("android-chrome-512x512.png", master_dark_web, 512, "512x512 Android / PWA splash & store icon (orange + dark web, also maskable)"),
-        ("nop-icon-512.png", master_square, 512, "512x512 standard square PNG (white web on orange)"),
-        ("nop-icon-1024.png", master_square, 1024, "1024x1024 high-DPI master PNG (white web on orange)"),
-        ("nop-icon-rounded-512.png", master_rounded, 512, "512x512 rounded square PNG (white web on orange)"),
-        ("nop-icon-circle-512.png", master_circle, 512, "512x512 circular avatar PNG (white web on orange)"),
-        ("nop-icon-transparent-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout"),
-        ("nop-icon-cutout-512.png", master_cutout_square, 512, "512x512 orange square with transparent spiderweb cutout (alias)"),
-        ("nop-icon-transparent-1024.png", master_cutout_square, 1024, "1024x1024 orange square with transparent spiderweb cutout"),
-        ("nop-icon-rounded-transparent-512.png", master_cutout_rounded, 512, "512x512 orange rounded square with transparent spiderweb cutout"),
-        ("nop-icon-circle-transparent-512.png", master_cutout_circle, 512, "512x512 orange circle with transparent spiderweb cutout"),
-        ("nop-icon-transparent-white-512.png", master_cutout_white, 512, "512x512 white square with transparent spiderweb cutout"),
-        ("nop-icon-transparent-dark-512.png", master_cutout_dark, 512, "512x512 dark square with transparent spiderweb cutout"),
-    ]
-    for filename, source_img, px, _ in png_specs:
-        resized = source_img if px == 1024 else source_img.resize((px, px), Image.Resampling.LANCZOS)
-        resized.save(PACK_DIR / filename, format="PNG", optimize=True)
-
+    save_png(cutout, 512, ICON_DIR / f"{FINAL_NAME}-cutout-512.png")
+    save_png(dark_web, 180, PUBLIC_DIR / "apple-touch-icon.png")
+    save_png(dark_web, 192, PUBLIC_DIR / "android-chrome-192x192.png")
+    save_png(dark_web, 512, PUBLIC_DIR / "android-chrome-512x512.png")
     # Houdini shelf icon: the see-through version as a PNG. The cutout SVG needs a <mask>, which the
     # Qt SVG renderer behind Houdini's icons may ignore (it would draw a plain orange square).
-    shelf_icon = master_cutout_square.resize((SHELF_ICON_PX, SHELF_ICON_PX), Image.Resampling.LANCZOS)
-    shelf_icon.save(SHELF_ICON, format="PNG", optimize=True)
+    save_png(cutout, SHELF_ICON_PX, SHELF_ICON)
 
-    # Multi-resolution favicon.ico (16, 32, 48) from transparent cutout square
-    ico_16 = master_cutout_square.resize((16, 16), Image.Resampling.LANCZOS)
-    ico_32 = master_cutout_square.resize((32, 32), Image.Resampling.LANCZOS)
-    ico_48 = master_cutout_square.resize((48, 48), Image.Resampling.LANCZOS)
-    ico_48.save(PACK_DIR / "favicon.ico", format="ICO", append_images=[ico_16, ico_32], sizes=[(16, 16), (32, 32), (48, 48)])
-
-    # The Open Graph card (pack/og-image.png and public/og-image.png, 1200x630) is a separate design with
-    # the NOP lockup over the orb web render. scripts/build_og_image.py builds it; run it after this script.
+    # Multi-resolution favicon.ico (16, 32, 48) from the cutout
+    ico = [cutout.resize((n, n), Image.Resampling.LANCZOS) for n in (16, 32, 48)]
+    ico[2].save(PUBLIC_DIR / "favicon.ico", format="ICO", append_images=ico[:2], sizes=[(16, 16), (32, 32), (48, 48)])
 
     # Web App Manifest (with relative icon paths so subpath hosting works)
     manifest = {
@@ -524,88 +355,8 @@ def main() -> None:
         "background_color": DARK,
         "display": "standalone",
     }
-    (PACK_DIR / "site.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
-
-    # Sync playground public/ assets
-    public_dir = ICON_DIR.parent.parent / "public"
-    if public_dir.is_dir():
-        for pub_name in (
-            "favicon.ico",
-            "favicon.svg",
-            "favicon-16x16.png",
-            "favicon-32x32.png",
-            "apple-touch-icon.png",
-            "android-chrome-192x192.png",
-            "android-chrome-512x512.png",
-            "site.webmanifest",
-        ):
-            shutil.copy2(PACK_DIR / pub_name, public_dir / pub_name)
-
-    # Generate web.html showcase page
-    head_snippet = f"""&lt;link rel="icon" href="/favicon.ico" sizes="32x32"&gt;
-&lt;link rel="icon" href="/favicon.svg" type="image/svg+xml"&gt;
-&lt;link rel="apple-touch-icon" href="/apple-touch-icon.png"&gt;
-&lt;link rel="mask-icon" href="/safari-pinned-tab.svg" color="{ORANGE}"&gt;
-&lt;link rel="manifest" href="/site.webmanifest"&gt;
-&lt;meta name="theme-color" content="{ORANGE}"&gt;
-&lt;meta property="og:image" content="/og-image.png"&gt;"""
-
-    svg_cards = []
-    for filename, desc, _ in svg_variants:
-        small = "".join(f"<img src='pack/{filename}' width='{n}' height='{n}' alt=''>" for n in (64, 32, 24, 16))
-        light = "".join(f"<img src='pack/{filename}' width='{n}' height='{n}' alt=''>" for n in (32, 16))
-        svg_cards.append(
-            f"<div class='card'><code>{filename}</code><p>{desc}</p><div class='sizes'>"
-            f"<img class='big checker' src='pack/{filename}' alt='{filename}'>{small}"
-            f"<span class='light'>{light}</span></div></div>"
-        )
-
-    png_cards = []
-    for filename, _, px, desc in png_specs:
-        disp = min(px, 128)
-        png_cards.append(
-            f"<div class='card'><code>pack/{filename}</code><p>{desc} ({px}x{px})</p>"
-            f"<div class='sizes'><img class='checker' src='pack/{filename}' width='{disp}' height='{disp}' alt='{filename}'></div></div>"
-        )
-
-    html = f"""<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NOP Final Icon Pack</title>
-<style>
-  body {{ margin: 0; padding: 24px 16px; background: #1e1e1e; color: #ddd; font: 14px/1.4 system-ui, sans-serif; }}
-  h1 {{ font-size: 20px; margin: 0 0 4px; }}
-  h2 {{ font-size: 16px; margin: 32px 0 6px; }}
-  p {{ margin: 0 0 12px; color: #999; }}
-  a {{ color: {ORANGE}; }}
-  .row {{ display: flex; flex-wrap: wrap; gap: 16px; }}
-  .card {{ background: #2b2b2b; border-radius: 8px; padding: 12px; max-width: 360px; }}
-  .card code {{ display: block; margin-bottom: 4px; color: #eee; font-weight: 600; }}
-  .sizes {{ display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }}
-  .big {{ width: 160px; height: 160px; display: block; }}
-  .checker {{ background: repeating-conic-gradient(#383838 0% 25%, #262626 0% 50%) 50% / 16px 16px; border-radius: 4px; }}
-  .light {{ background: #f2f2f2; padding: 6px; border-radius: 4px; display: flex; gap: 6px; align-items: flex-end; }}
-  pre {{ background: #141414; border: 1px solid #333; border-radius: 6px; padding: 12px; color: #ccc; overflow-x: auto; font-size: 13px; }}
-</style></head><body>
-<h1>NOP Final Icon Pack</h1>
-<p>Chosen final icon: <code>{FINAL_NAME}.svg</code> and <code>{FINAL_NAME}-cutout.svg</code> (also saved as <code>pack/nop-icon.svg</code>, <code>pack/favicon.svg</code> and the Houdini shelf icon).</p>
-
-<h2>1. Vector SVG Variants (<code>design/nop-icon/</code> &amp; <code>design/nop-icon/pack/</code>)</h2>
-<div class="row">{"".join(svg_cards)}</div>
-
-<h2>2. Website HTML <code>&lt;head&gt;</code> Snippet</h2>
-<pre><code>{head_snippet}</code></pre>
-
-<h2>3. Raster PNGs, <code>favicon.ico</code> &amp; Social Preview (<code>design/nop-icon/pack/</code>)</h2>
-<div class="row">
-  <div class="card"><code>pack/favicon.ico</code><p>Multi-size ICO (16x16, 32x32, 48x48)</p><div class="sizes"><img src="pack/favicon.ico" width="48" height="48" alt="favicon.ico"><img src="pack/favicon.ico" width="32" height="32" alt=""><img src="pack/favicon.ico" width="16" height="16" alt=""></div></div>
-  <div class="card"><code>pack/og-image.png</code><p>Open Graph social card (1200x630)</p><div class="sizes"><img src="pack/og-image.png" width="300" height="158" alt="og-image.png" style="border-radius:4px"></div></div>
-  {"".join(png_cards)}
-</div>
-</body></html>
-"""
-    (ICON_DIR / "web.html").write_text(html, encoding="utf-8", newline="\n")
-    print(f"wrote {len(svg_variants)} SVGs, {len(png_specs)} PNGs, favicon.ico and site.webmanifest to {PACK_DIR}")
+    (PUBLIC_DIR / "site.webmanifest").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+    print(f"wrote the NOP icon to {ICON_DIR}, {PUBLIC_DIR} and {SHELF_ICON}")
 
 
 if __name__ == "__main__":
