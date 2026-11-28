@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- Custom node shapes are exported: a node whose shape is installed in a `config/NodeShapes/` folder on `HOUDINI_PATH` (the user preference folder, a package, `$HSITE`) is drawn with that shape on the web instead of as a rectangle. The export holds only the shape's drawing data, never its file or folder, and never the 36 shapes Houdini ships (schema 1.5.1, `customShapes`). Shapes that are not installed where the export runs still fall back to the rectangle.
+
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.

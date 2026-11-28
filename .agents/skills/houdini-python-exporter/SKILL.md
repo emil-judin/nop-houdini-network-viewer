@@ -73,6 +73,15 @@ Exports must be as safe to share as a screenshot of the network: no user, client
 - Only `opdef:/...?IconSVG` sections and `.svg` files of assets outside `$HFS` and SideFX Labs are embedded,
   after `clean_svg` removes editor metadata (`<metadata>`, `sodipodi:` / `inkscape:` attributes, comments).
 
+### 3.4 Custom node shapes (`register_custom_shape`, `installed_node_shapes`)
+
+- Houdini loads every `*.json` in each `config/NodeShapes/` folder on HOUDINI_PATH and names a shape by the
+  file's `"name"` field (checked in Houdini 22.0.466). The exporter reads those folders through
+  `hou.findDirectories("config/NodeShapes")`, skips folders inside `$HFS`, and never exports the 36 built-in
+  shapes (`BUILTIN_NODE_SHAPES`, the same as the viewer's `houdiniShapesData.json`).
+- `clean_node_shape` keeps only `name`, `outline`, `flags`, `inputs`, `outputs` and `icon` as plain numbers:
+  never a file path or any other field of the file.
+
 ## 4. Schema versioning
 
 - Bump `SCHEMA_VERSION` (minor) whenever a field is added, mark the field "schema 1.x.0" in `docs/SCHEMA.md`

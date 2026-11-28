@@ -2,6 +2,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { HoudiniNetwork } from '../../src/components/HoudiniNetwork';
+import { type HoudiniNodeShapeDef, pointsToSvgPath } from '../../src/components/nodes/shapes/nodeShapes';
 import type { HoudiniNetworkDocument } from '../../src/schema/types';
 import { exportSampleNetwork } from '../unit/exporterSample';
 
@@ -29,6 +30,13 @@ describe('NOP-EXP-051: the viewer draws a fresh export', () => {
     const icon = nodeElement('circuit_gen1')?.querySelector('img');
     expect(icon?.getAttribute('src')).toMatch(/^data:image\/svg\+xml/);
     expect(nodeElement('thicken1')?.querySelector('img')).toBeNull();
+  });
+
+  it('NOP-EXP-051: draws the node with the exported custom shape', async () => {
+    await renderExport();
+    const shape = exported.customShapes?.nop_test_hexagon as HoudiniNodeShapeDef;
+    const outline = [...(nodeElement('file1')?.querySelectorAll(':scope > div > svg > path') ?? [])].at(-1);
+    expect(outline?.getAttribute('d')).toBe(pointsToSvgPath(shape.outline, true));
   });
 
   it('NOP-EXP-051: opens the user asset but not the closed locked asset', async () => {

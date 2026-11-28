@@ -238,6 +238,48 @@ class HoudiniSession(unittest.TestCase):
                 pass
             shutil.rmtree(hda_dir, ignore_errors=True)
 
+    def test_NOP_EXP_037_a_custom_node_shape_on_houdini_path_is_exported(self):
+        """Installs a shape in a temporary `config/NodeShapes/` folder put first on HOUDINI_PATH."""
+        shape_root = tempfile.mkdtemp(prefix="nop_shapes_")
+        shape_dir = os.path.join(shape_root, "config", "NodeShapes")
+        os.makedirs(shape_dir)
+        outline = [[0, 0.15], [0.08, 0.3], [0.92, 0.3], [1, 0.15], [0.92, 0], [0.08, 0]]
+        with open(os.path.join(shape_dir, "session_shape.json"), "w", encoding="utf-8") as handle:
+            json.dump({"name": "nop_session_hexagon", "outline": outline, "author": f"{HOME}/secret_project"}, handle)
+        original_path = hou.getenv("HOUDINI_PATH")
+        try:
+            # hou.putenv() makes Houdini search the new HOUDINI_PATH right away, also in hython
+            hou.putenv("HOUDINI_PATH", shape_root.replace("\\", "/") + os.pathsep + (original_path or "&"))
+            folders = [folder.replace("\\", "/") for folder in hou.findDirectories(nop.NODE_SHAPE_FOLDER)]
+            self.assertEqual(folders[0], shape_root.replace("\\", "/") + "/config/NodeShapes")
+
+            custom = self.geo.createNode("null", "custom_shaped")
+            custom.setUserData("nodeshape", "nop_session_hexagon")
+            self.geo.createNode("null", "built_in_shaped").setUserData("nodeshape", "wave")
+            self.geo.createNode("null", "missing_shape").setUserData("nodeshape", "not_installed_here")
+            document, _selected, _state = export(self.geo, "custom-shapes")
+        finally:
+            hou.putenv("HOUDINI_PATH", original_path or "&")
+            shutil.rmtree(shape_root, ignore_errors=True)
+
+        nodes = document["root"]["nodes"]
+        self.assertEqual(by_name(nodes, "custom_shaped")["shape"], "nop_session_hexagon")
+        self.assertEqual(by_name(nodes, "built_in_shaped")["shape"], "wave")
+        self.assertEqual(by_name(nodes, "missing_shape")["shape"], "not_installed_here")
+        self.assertEqual(document["customShapes"], {"nop_session_hexagon": {"name": "nop_session_hexagon", "outline": outline}})
+        text = json.dumps(document)
+        self.assertNotIn("secret_project", text)
+        self.assertNotIn("nop_shapes_", text)
+
+    def test_NOP_EXP_037_the_built_in_shapes_are_the_ones_houdini_ships(self):
+        hfs_shapes = os.path.join(hou.text.expandString("$HFS"), "houdini", "config", "NodeShapes")
+        names = set()
+        for file_name in os.listdir(hfs_shapes):
+            if file_name.endswith(".json"):
+                with open(os.path.join(hfs_shapes, file_name), encoding="utf-8") as handle:
+                    names.add(json.load(handle)["name"])
+        self.assertEqual(names, set(nop.BUILTIN_NODE_SHAPES))
+
     def test_NOP_EXP_016_every_sop_type_exports_in_full_mode_without_unreadable_parameters(self):
         """Full mode reads every visible parameter: a Houdini update that breaks one shows here."""
         started = time.time()

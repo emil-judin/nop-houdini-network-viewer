@@ -8,7 +8,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 ```json
 {
-  "schemaVersion": "1.5.0",
+  "schemaVersion": "1.5.1",
   "houdiniVersion": "22.0.466",
   "exportedAt": "2026-10-23T15:00:00Z",
   "exportMode": "compact",
@@ -41,6 +41,23 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
 
 `icons` only ever holds custom SVG icons of assets outside the Houdini install and SideFX Labs (cleaned of editor metadata). Built-in SideFX icons are never embedded: nodes reference them by id (`SOP_box`) and the viewer draws its own original icons.
 
+`customShapes` holds the custom node shapes the exported nodes use, keyed by the name in the node's `shape`. Each entry is the drawing data of a Houdini node shape file, in Houdini's shape space (x from 0 to 1, y from 0 to 0.3, +y up): `name`, `outline` (body polygon), `flags` (slots `"0"` to `"3"`, each an `outline` and an optional divider `edge`), `inputs` and `outputs` (`[x, y, angle]` connector slots) and `icon` (the icon box `[[minX, minY], [maxX, maxY]]`). Any other field of the file and the file's path are never exported. Exporters before schema 1.5.1 always wrote `{}`.
+
+```json
+"customShapes": {
+  "studio_hexagon": {
+    "name": "studio_hexagon",
+    "outline": [[0, 0.15], [0.08, 0.3], [0.92, 0.3], [1, 0.15], [0.92, 0], [0.08, 0]],
+    "flags": { "0": { "outline": [[0.08, 0], [0, 0.15], [0.08, 0.3], [0.15, 0.3], [0.12, 0]], "edge": [[0.15, 0.3], [0.12, 0]] } },
+    "inputs": [[0.5, 0.385, 90]],
+    "outputs": [[0.5, -0.085, 270]],
+    "icon": [[0.4, 0.04], [0.6, 0.26]]
+  }
+}
+```
+
+Where the shapes come from (checked in Houdini 22.0.466 with `hou.NetworkEditor.reloadNodeShapes()`, which lists every file it loads): Houdini loads every `*.json` file in each `config/NodeShapes/` folder on `HOUDINI_PATH` (`$HFS/houdini`, the user preference folder such as `~/houdini22.0`, packages, `$HSITE`). A shape is named by the file's `"name"` field, not by its file name, and a file without one fails to load. The exporter finds those folders with `hou.findDirectories("config/NodeShapes")` (HOUDINI_PATH order; with two files of the same name it takes the first), skips folders inside `$HFS` and never exports the 36 shapes Houdini ships there, which the viewer draws itself. A shape that is not installed where the export runs is left out, and the viewer draws that node as `rect`.
+
 `exportWarnings` (schema 1.4.0, optional) counts parameters the exporter could not read and left out. It is missing when there were none.
 
 `outsideWires` (schema 1.5.0, optional, exported root only) lists the wires between an exported selection and items outside it, one entry per wire, so the viewer can draw the start of each wire as a short stub toward the outside item. An input entry is `{ "to": "noise1", "toInput": 0, "pos": [-2, 3], "type": "grid" }`: that input is wired from the Grid node at `pos`. An output entry is `{ "from": "copy1", "fromOutput": 0, "pos": [1, -2], "type": "copytopoints::2.0", "input": 1 }`: that output feeds input 2 of the Copy to Points at `pos`. `pos` is in network units like the `pos` of nodes (lower left corner) and dots (center); `dot` is written only for dots, `type` (the operator type) only for nodes, and `input` (the input the wire enters outside) only on output entries. With them the viewer draws each stub solid or dotted like the real wire. It never names the item outside. Without `pos` the viewer draws a straight stub. Whole-network exports and older exports omit `outsideWires`, and the viewer then draws no stubs.
@@ -65,6 +82,7 @@ This document defines the JSON contract produced by `exporter/nop_exporter.py` a
    - Every file is checked once on load (`normalizeNetworkDocument` in `src/schema/normalize.ts`): items without a name are dropped, missing or wrong values get the defaults documented here (for example `pos` `[0, 0]`, a scalar `val` becomes a one-item list), unknown extra fields are kept. Only files that are not networks at all, or that use a newer major schema, are refused with a message.
 2. **Node Shape Normalization:**
    - In Houdini, nodes with the default rectangular shape report `"shape": ""`. The converter normalizes `""` to `"rect"`.
+   - The viewer looks a shape up in the document's `customShapes` first (own entries with an outline of at least 3 points), then in its 36 built-in shapes, and draws `rect` for any other name.
 3. **Connector counts (`maxInputs`, `maxOutputs`):**
    - Operators with variable inputs (such as `merge` and `switch`) report `"maxInputs": 9999`.
    - Any node with `maxInputs > 4` renders a single wide multi-input bar connector at the top of the node rather than discrete circular connectors.

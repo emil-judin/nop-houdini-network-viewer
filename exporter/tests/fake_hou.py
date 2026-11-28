@@ -7,6 +7,7 @@ objects built with the helper classes below.
 """
 
 import enum
+import os
 
 ENV = {}
 
@@ -41,9 +42,19 @@ def node(path):
     return NODES.get(path)
 
 
+# Folders on HOUDINI_PATH, in order: `findDirectories()` returns the subfolders that exist in them
+HOUDINI_PATH = []
+
+
+def findDirectories(directory_name):
+    folders = (folder.rstrip("/") + "/" + directory_name for folder in HOUDINI_PATH)
+    return tuple(folder for folder in folders if os.path.isdir(folder))
+
+
 def reset():
-    """Clears every global the tests set: variables, selection, asset sections, nodes and the UI."""
+    """Clears every global the tests set: variables, selection, asset sections, nodes, HOUDINI_PATH and the UI."""
     ENV.clear()
+    HOUDINI_PATH.clear()
     SELECTION.clear()
     ASSET_SECTIONS.clear()
     NODES.clear()
@@ -506,6 +517,7 @@ class Node(Item):
 
     `indirect_inputs` is the number of subnet inputs; without it the node is not a subnetwork and
     `indirectInputs()` raises like Houdini does. `template_group` replaces the group built from the parameters.
+    `shape` is the node's `nodeshape` user data (the shape set with the Network Editor's shape palette).
     """
 
     def __init__(
@@ -523,6 +535,7 @@ class Node(Item):
         template_group=None,
         output_labels=("Output 1",),
         output_connectors=None,
+        shape=None,
         **kwargs
     ):
         super().__init__(name, **kwargs)
@@ -544,6 +557,7 @@ class Node(Item):
                 indirect_input._parent = self
         self._wire_style = wire_style
         self._template_group = template_group
+        self._shape = shape
         for child in children:
             self.add(child)
 
@@ -633,8 +647,8 @@ class Node(Item):
             return ParmTemplateGroup(self._template_group)
         return ParmTemplateGroup([pt.parmTemplate() for pt in self._parm_tuples])
 
-    def userData(self, _key):
-        return None
+    def userData(self, key):
+        return self._shape if key == "nodeshape" else None
 
     def inputConnectors(self):
         return ((),)

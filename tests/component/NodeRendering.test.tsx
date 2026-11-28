@@ -62,6 +62,35 @@ describe('operator nodes', () => {
     expect(bodyOutline(element)).toBe(pointsToSvgPath(outline as Array<[number, number]>, true));
   });
 
+  it('NOP-NODE-013: an exported custom shape draws its flag slots, divider lines and icon box', async () => {
+    type Point = [number, number];
+    const hexagon = {
+      name: 'studio_hexagon',
+      outline: [[0, 0.15], [0.08, 0.3], [0.92, 0.3], [1, 0.15], [0.92, 0], [0.08, 0]] as Point[],
+      flags: {
+        '0': { outline: [[0.08, 0], [0, 0.15], [0.08, 0.3], [0.15, 0.3], [0.12, 0]] as Point[], edge: [[0.15, 0.3], [0.12, 0]] as Point[] },
+        '3': { outline: [[0.88, 0], [0.85, 0.3], [0.92, 0.3], [1, 0.15], [0.92, 0]] as Point[], edge: [[0.88, 0], [0.85, 0.3]] as Point[] },
+      },
+      inputs: [[0.5, 0.385, 90]],
+      outputs: [[0.5, -0.085, 270]],
+      icon: [[0.4, 0.04], [0.6, 0.26]] as Point[],
+    };
+    const flags = { bypass: true, display: true, render: false, template: false, lock: false };
+    const element = await renderNode({ name: 'n1', shape: 'studio_hexagon', icon: 'SOP_box', flags }, { customShapes: { studio_hexagon: hexagon } });
+    expect(bodyOutline(element)).toBe(pointsToSvgPath(hexagon.outline, true));
+    const filled = [...element.querySelectorAll('g[clip-path] path')].filter((path) => path.getAttribute('fill') !== 'none');
+    expect(filled.map((path) => [path.getAttribute('d'), path.getAttribute('fill')])).toEqual([
+      [pointsToSvgPath(hexagon.flags['0'].outline, true), '#ead02a'],
+      [pointsToSvgPath(hexagon.flags['3'].outline, true), '#3098e5'],
+    ]);
+    const paths = [...element.querySelectorAll('path')].map((path) => path.getAttribute('d'));
+    expect(paths).toContain(pointsToSvgPath(hexagon.flags['0'].edge, false));
+    expect(paths).toContain(pointsToSvgPath(hexagon.flags['3'].edge, false));
+    const iconBox = element.querySelector('svg[viewBox="0 0 24 24"]')?.parentElement as HTMLElement;
+    expect(iconBox.style.left).toBe('40px');
+    expect(Number.parseFloat(iconBox.style.width)).toBeCloseTo(20);
+  });
+
   it.each([
     ['bypass', '#ead02a'],
     ['lock', '#d94040'],

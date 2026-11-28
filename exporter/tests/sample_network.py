@@ -42,6 +42,12 @@ INKSCAPE_SVG = (
     "<metadata>Jane Doe for Acme</metadata>"
     '<path d="M2 2h20v20H2z" fill="#3fa9f5"/></svg>'
 )
+# A custom node shape installed in a `config/NodeShapes/` folder on HOUDINI_PATH. The file is named
+# `hexagon_shape.json`, the shape `nop_test_hexagon` (its "name" field), and it has an extra "author"
+# field with a home folder that must not reach an export.
+NODE_SHAPES_ROOT = os.path.join(HERE, "node_shapes").replace("\\", "/")
+CUSTOM_SHAPE = "nop_test_hexagon"
+
 PLAIN_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#e0a030"/></svg>'
 
 # Text that must never reach an export, apart from network box comments (exported as written)
@@ -89,6 +95,7 @@ def build_sample():
     fake_hou.ASSET_SECTIONS[USER_ICON] = INKSCAPE_SVG
     fake_hou.ASSET_SECTIONS[VENDOR_ICON] = PLAIN_SVG
     fake_hou.ASSET_SECTIONS[LABS_ICON] = PLAIN_SVG
+    fake_hou.HOUDINI_PATH.append(NODE_SHAPES_ROOT)
 
     box = node("box1", flags={"display": True, "render": True}, parms=[parm("scale", 2.0, default=1.0)])
     menu = fake_hou.ParmTemplate(
@@ -100,6 +107,7 @@ def build_sample():
         pos=(0.0, -1.5),
         comment="From \\\\studio-nas\\acme\\shot010\\plate.exr",
         show_comment=True,
+        shape=CUSTOM_SHAPE,
         parms=[
             parm("file", "D:/Clients/Acme/tex/rock.exr", default=""),
             parm("cache", HIP + "/cache/a.bgeo", default="", expression='chs("D:/Clients/Acme/cache/a.bgeo")'),

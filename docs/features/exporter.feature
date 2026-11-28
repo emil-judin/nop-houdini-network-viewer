@@ -332,6 +332,19 @@ Feature: Houdini exporter and package
     When the network is exported with HIP "C:/Users/jane/projA", and again after HIP changes to "C:/Users/jane/projB"
     Then the first export has "<path>/a.bgeo" and the second "$HIP/geo/a.bgeo"
 
+  @NOP-EXP-037
+  Scenario: Custom node shapes are exported with their drawing data only
+    Given a node whose shape "nop_test_hexagon" is defined by "hexagon_shape.json" in a "config/NodeShapes" folder on HOUDINI_PATH
+    And that file has an extra "author" field with a home folder
+    When the network is exported
+    Then "customShapes" holds "nop_test_hexagon" once, with only name, outline, flags, inputs, outputs and icon
+    And no file name, folder or extra field of the shape file is in the export
+    And the 36 built-in shapes are never exported, also when a user folder has a file with a built-in name
+    And folders inside $HFS are never read
+    And when two folders define the same name, the first folder on HOUDINI_PATH wins
+    And files that are not valid shapes are skipped, and invalid parts of a shape are left out
+    And a shape that is not installed where the export runs is not exported: the node keeps its shape name and the viewer draws "rect"
+
   # Package
 
   @NOP-EXP-040 @unit
@@ -369,4 +382,5 @@ Feature: Houdini exporter and package
     Given the export of the same network
     When the viewer shows it
     Then every exported node is drawn, the user asset with its embedded icon
+    And the node with the custom shape is drawn with the exported outline
     And the user asset opens as a subnetwork, while the closed locked asset does not

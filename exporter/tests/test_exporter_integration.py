@@ -185,6 +185,117 @@ class IconTest(unittest.TestCase):
         )
 
 
+def shape_file(folder, file_name, data):
+    """Writes a node shape file into `<folder>/config/NodeShapes/` and returns `folder`."""
+    shapes = os.path.join(folder, "config", "NodeShapes")
+    os.makedirs(shapes, exist_ok=True)
+    with open(os.path.join(shapes, file_name), "w", encoding="utf-8") as f:
+        f.write(data if isinstance(data, str) else json.dumps(data))
+    return folder
+
+
+def shape_data(name, **fields):
+    """A small valid node shape named `name`."""
+    return {"name": name, "outline": [[0, 0], [1, 0], [0.9, 0.3], [0.1, 0.3]], **fields}
+
+
+class CustomShapeTest(unittest.TestCase):
+    def setUp(self):
+        default_env()
+        self.folder = tempfile.TemporaryDirectory()
+        self.addCleanup(self.folder.cleanup)
+        self.root = self.folder.name.replace("\\", "/")
+
+    def path_folder(self, name):
+        folder = self.root + "/" + name
+        fake_hou.HOUDINI_PATH.append(folder)
+        return folder
+
+    def test_NOP_EXP_037_a_custom_shape_on_houdini_path_is_exported_once_with_its_drawing_data_only(self):
+        document = sample_document()
+        nodes = by_name(document["root"]["nodes"])
+        self.assertEqual(nodes["file1"]["shape"], "nop_test_hexagon")
+        self.assertEqual(list(document["customShapes"]), ["nop_test_hexagon"])
+        shape = document["customShapes"]["nop_test_hexagon"]
+        # Named by the file's "name" field like in Houdini, not by its file name (hexagon_shape.json)
+        self.assertEqual(shape["name"], "nop_test_hexagon")
+        self.assertEqual(set(shape), {"name", "outline", "flags", "inputs", "outputs", "icon"})
+        self.assertEqual(shape["outline"], [[0, 0.15], [0.08, 0.3], [0.92, 0.3], [1, 0.15], [0.92, 0], [0.08, 0]])
+        self.assertEqual(sorted(shape["flags"]), ["0", "1", "2", "3"])
+        self.assertEqual(shape["icon"], [[0.4, 0.04], [0.6, 0.26]])
+        # The file's "author" field and the folder the shape was found in never reach the export
+        text = json.dumps(document)
+        self.assertNotIn("author", text)
+        self.assertNotIn("node_shapes", text)
+        self.assertNotIn("hexagon_shape", text)
+
+        twice = network(node("a", shape="nop_test_hexagon"), node("b", shape="nop_test_hexagon"))
+        self.assertEqual(list(export(twice)["customShapes"]), ["nop_test_hexagon"])
+
+    def test_NOP_EXP_037_built_in_shapes_and_shapes_inside_hfs_are_never_exported(self):
+        user = self.path_folder("user")
+        shape_file(user, "mywave.json", shape_data("wave"))
+        shape_file(user, "mine.json", shape_data("mine"))
+        hfs = self.root + "/hfs"
+        reset(HIP=HIP, HFS=hfs)
+        fake_hou.HOUDINI_PATH.extend([user, hfs + "/houdini"])
+        shape_file(hfs + "/houdini", "sidefx_extra.json", shape_data("sidefx_extra"))
+        nodes = [node(n, shape=s) for n, s in (("a", "wave"), ("b", "rect"), ("c", "sidefx_extra"), ("d", "mine"))]
+        nodes.append(node("e"))  # no user data: the type's default shape
+        document = export(network(*nodes))
+        self.assertEqual(list(document["customShapes"]), ["mine"])
+        self.assertEqual([n["shape"] for n in document["root"]["nodes"]], ["wave", "rect", "sidefx_extra", "mine", "rect"])
+        self.assertEqual(len(nop.BUILTIN_NODE_SHAPES), 36)
+
+    def test_NOP_EXP_037_a_shape_that_is_not_installed_keeps_its_name_and_is_not_exported(self):
+        self.path_folder("empty")
+        document = export(network(node("a", shape="studio_shape")))
+        self.assertEqual(document["customShapes"], {})
+        self.assertEqual(document["root"]["nodes"][0]["shape"], "studio_shape")
+
+    def test_NOP_EXP_037_the_first_folder_on_houdini_path_wins(self):
+        first, second = self.path_folder("first"), self.path_folder("second")
+        shape_file(first, "z.json", shape_data("twin", icon=[[0.1, 0.1], [0.2, 0.2]]))
+        shape_file(second, "a.json", shape_data("twin", icon=[[0.3, 0.3], [0.4, 0.4]]))
+        document = export(network(node("a", shape="twin")))
+        self.assertEqual(document["customShapes"]["twin"]["icon"], [[0.1, 0.1], [0.2, 0.2]])
+
+    def test_NOP_EXP_037_files_that_are_no_shape_are_skipped_and_bad_parts_are_left_out(self):
+        folder = self.path_folder("user")
+        shape_file(folder, "broken.json", "{ not json")
+        shape_file(folder, "nameless.json", {"outline": [[0, 0], [1, 0], [1, 0.3]]})
+        shape_file(folder, "flat.json", shape_data("flat", outline=[[0, 0], [1, 0]]))
+        shape_file(folder, "words.json", shape_data("words", outline=[[0, 0], ["a", 0], [1, 0.3]]))
+        shape_file(folder, "readme.txt", "not a shape")
+        partial = shape_data(
+            "partial",
+            flags={"0": {"outline": [[0, 0], [0.1, 0], [0.1, 0.3]], "edge": [[0.1, 0]]}, "1": "x", "7": {"outline": []}},
+            inputs=[[0.5, 0.4]],
+            outputs=[[0.5, -0.1, 270]],
+            icon=[[0.4, 0.0], [0.6, 0.3], [0.7, 0.3]],
+            comment="C:/Users/jane/shapes",
+        )
+        shape_file(folder, "partial.json", partial)
+        names = ("broken", "nameless", "flat", "words", "partial")
+        document = export(network(*(node(name, shape=name) for name in names)))
+        self.assertEqual(
+            document["customShapes"],
+            {
+                "partial": {
+                    "name": "partial",
+                    "outline": partial["outline"],
+                    "flags": {"0": {"outline": [[0, 0], [0.1, 0], [0.1, 0.3]]}},
+                    "outputs": [[0.5, -0.1, 270]],
+                }
+            },
+        )
+
+    def test_NOP_EXP_037_the_built_in_shapes_are_the_ones_the_viewer_draws(self):
+        viewer_shapes = os.path.join(os.path.dirname(__file__), "..", "..", "src", "components", "nodes", "shapes", "houdiniShapesData.json")
+        with open(viewer_shapes, encoding="utf-8") as f:
+            self.assertEqual(set(json.load(f)), set(nop.BUILTIN_NODE_SHAPES))
+
+
 def visible_parms():
     """3 changed, 20 default, a default `snippet`, a hidden parameter and a button."""
     parms = [parm("changed%d" % i, float(i + 1), default=0.0) for i in range(3)]
@@ -440,7 +551,7 @@ class FieldsTest(unittest.TestCase):
         self.assertEqual(
             set(document), {"schemaVersion", "houdiniVersion", "exportedAt", "exportMode", "icons", "customShapes", "root"}
         )
-        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.5.0", "22.0.100"))
+        self.assertEqual((document["schemaVersion"], document["houdiniVersion"]), ("1.5.1", "22.0.100"))
         exported_at = datetime.datetime.fromisoformat(document["exportedAt"])
         self.assertEqual(exported_at.utcoffset(), datetime.timedelta(0))
         self.assertIsInstance(document["customShapes"], dict)

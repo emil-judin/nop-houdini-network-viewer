@@ -26,6 +26,15 @@ Feature: Draw nodes, boxes, sticky notes and dots like Houdini 22
     When the node is rendered
     Then its outline is the custom outline
 
+  @NOP-NODE-013
+  Scenario: An exported custom shape is drawn with all its parts
+    Given the document's "customShapes" defines "studio_hexagon" with an outline, flag regions 0 and 3 with divider lines, and an icon box
+    And an operator node with shape "studio_hexagon" and the bypass and display flags set
+    When the node is rendered
+    Then its outline is the custom outline
+    And the bypass and display flags fill the custom flag regions 0 and 3, with their divider lines
+    And the operator icon sits in the custom icon box
+
   @NOP-NODE-003
   Scenario Outline: Active flags fill their slot in the flag color
     Given an operator node with the flag "<flag>" set

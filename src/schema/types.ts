@@ -393,7 +393,11 @@ export interface HoudiniNetworkDocument {
   exportMode?: 'compact' | 'full';
   /** Deduplicated dictionary mapping icon names to raw SVG markup. */
   icons?: Record<string, string>;
-  /** Deduplicated dictionary mapping custom shape names to raw Houdini NodeShape JSON objects. */
+  /**
+   * Custom node shapes the nodes use, keyed by shape name: the drawing data of a Houdini
+   * `config/NodeShapes/*.json` file (`name`, `outline`, `flags`, `inputs`, `outputs`, `icon`). The exporter
+   * fills it since schema 1.5.1 (empty before) and never writes the 36 built-in shapes.
+   */
   customShapes?: Record<string, unknown>;
   /** Root network graph. */
   root: HoudiniNetworkGraph;

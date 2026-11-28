@@ -13,6 +13,8 @@ Features:
 - Legal Icon Extraction: Only extracts custom SVG icons of HDAs outside $HFS and outside SideFX Labs, with editor
   metadata removed. Built-in SideFX icons from $HFS are never extracted or redistributed; they are referenced by
   identifier only.
+- Custom node shapes: the drawing data of every shape outside the 36 built-in ones that an exported node uses,
+  read from the `config/NodeShapes/` folders on HOUDINI_PATH (never their file paths).
 - Privacy: paths inside $HIP and $JOB become variables, every other absolute path keeps only its file name.
 """
 
@@ -24,7 +26,7 @@ import re
 import hou
 
 
-SCHEMA_VERSION = "1.5.0"
+SCHEMA_VERSION = "1.5.1"
 
 # Keyframe segment functions: an animated parameter reports the function of its current segment
 # as its "expression". Houdini stores a real expression (ch(), $F, ...) as one keyframe holding it.
@@ -654,9 +656,113 @@ def clean_svg(svg):
     return scrub_path(cleaned)
 
 
+# Node shapes. Checked in Houdini 22.0.466 (`hou.NetworkEditor.reloadNodeShapes()` lists every file it loads):
+# Houdini loads every `*.json` file in each `config/NodeShapes/` folder on HOUDINI_PATH ($HFS/houdini, the
+# user preference folder, packages, ...). A shape is named by the file's "name" field, not by its file name;
+# a file without one fails to load. `hou.findDirectories(NODE_SHAPE_FOLDER)` returns those folders in
+# HOUDINI_PATH order, also in hython, where there is no Network Editor to ask.
+NODE_SHAPE_FOLDER = "config/NodeShapes"
+
+# The 36 shapes Houdini 20.5, 21 and 22 ship in $HFS/houdini/config/NodeShapes/. The viewer draws them
+# itself (src/components/nodes/shapes/houdiniShapesData.json), so they are never exported, also when a
+# user folder holds a file with one of these names.
+BUILTIN_NODE_SHAPES = frozenset((
+    "bone", "bulge", "bulge_down", "burst", "camera", "chevron_down", "chevron_up", "cigar", "circle",
+    "clipped_left", "clipped_right", "cloud", "cop", "cop2", "diamond", "ensign", "gurgle", "light", "null",
+    "oval", "peanut", "pointy", "rect", "shop", "slash", "squared", "star", "subnet_input", "tabbed_left",
+    "tabbed_right", "task", "tilted", "trapezoid_down", "trapezoid_up", "vop", "wave",
+))
+
+
+def _shape_numbers(value, count):
+    """`value` as a list of `count` finite numbers, or None."""
+    if not isinstance(value, (list, tuple)) or len(value) != count:
+        return None
+    numbers = []
+    for number in value:
+        if isinstance(number, bool) or not isinstance(number, (int, float)) or number != number or abs(number) == float("inf"):
+            return None
+        numbers.append(number)
+    return numbers
+
+
+def _shape_list(value, count, minimum=1):
+    """`value` as a list of at least `minimum` entries of `count` numbers each, or None."""
+    if not isinstance(value, (list, tuple)) or len(value) < minimum:
+        return None
+    entries = [_shape_numbers(entry, count) for entry in value]
+    return None if any(entry is None for entry in entries) else entries
+
+
+def clean_node_shape(data):
+    """The drawing data of a node shape file (schema 1.0.0 `customShapes` entry), or None if it is no shape.
+
+    Keeps only the fields Houdini's own shape files have and the viewer draws: `name`, `outline`, `flags`
+    (slots "0" to "3", each an `outline` and an optional `edge`), `inputs`, `outputs` and `icon`, all as plain
+    numbers. Anything else in the file (an author, a path, a comment) is left out.
+    """
+    if not isinstance(data, dict) or not isinstance(data.get("name"), str) or not data["name"]:
+        return None
+    outline = _shape_list(data.get("outline"), 2, minimum=3)
+    if outline is None:
+        return None
+    shape = {"name": data["name"], "outline": outline}
+    flags = {}
+    raw_flags = data.get("flags")
+    for slot in ("0", "1", "2", "3"):
+        region = raw_flags.get(slot) if isinstance(raw_flags, dict) else None
+        region_outline = _shape_list(region.get("outline"), 2, minimum=3) if isinstance(region, dict) else None
+        if region_outline is None:
+            continue
+        flags[slot] = {"outline": region_outline}
+        edge = _shape_list(region.get("edge"), 2, minimum=2)
+        if edge is not None:
+            flags[slot]["edge"] = edge
+    if flags:
+        shape["flags"] = flags
+    for key in ("inputs", "outputs"):
+        slots = _shape_list(data.get(key), 3)
+        if slots is not None:
+            shape[key] = slots
+    icon = _shape_list(data.get("icon"), 2, minimum=2)
+    if icon is not None and len(icon) == 2:
+        shape["icon"] = icon
+    return shape
+
+
+def installed_node_shapes(hfs_prefix):
+    """The node shapes installed in `config/NodeShapes/` folders on HOUDINI_PATH outside $HFS, by name.
+
+    Folders inside $HFS hold only SideFX's own shapes and are never read. When two files define the same
+    name, the one in the first folder on HOUDINI_PATH is used. Files that cannot be read are skipped.
+    """
+    shapes = {}
+    try:
+        folders = hou.findDirectories(NODE_SHAPE_FOLDER)
+    except Exception:
+        return shapes
+    for folder in folders:
+        if folder.replace("\\", "/").lower().startswith(hfs_prefix):
+            continue
+        try:
+            file_names = sorted(name for name in os.listdir(folder) if name.lower().endswith(".json"))
+        except OSError:
+            continue
+        for file_name in file_names:
+            try:
+                with open(os.path.join(folder, file_name), "r", encoding="utf-8") as f:
+                    shape = clean_node_shape(json.load(f))
+            except (OSError, ValueError):
+                continue
+            if shape is not None and shape["name"] not in BUILTIN_NODE_SHAPES:
+                shapes.setdefault(shape["name"], shape)
+    return shapes
+
+
 class CustomUserAssetExtractor:
     """
-    Extracts only user-authored custom HDA SVG icons (outside $HFS and SideFX Labs).
+    Extracts only user-authored custom HDA SVG icons (outside $HFS and SideFX Labs), and the custom node
+    shapes the exported nodes use (see `installed_node_shapes()`).
     Does not extract proprietary SideFX icons from $HFS/houdini/config/Icons/icons.zip.
     """
 
@@ -664,6 +770,21 @@ class CustomUserAssetExtractor:
         self.icons = {}
         self.custom_shapes = {}
         self._hfs_prefix = hou.text.expandString("$HFS").replace("\\", "/").lower()
+        self._installed_shapes = None
+
+    def register_custom_shape(self, shape_name):
+        """Adds the drawing data of a custom node shape to `custom_shapes` (built-in shapes never).
+
+        A shape that is not installed where the export runs is left out: the viewer draws that node as `rect`.
+        """
+        if not shape_name or shape_name in BUILTIN_NODE_SHAPES or shape_name in self.custom_shapes:
+            return
+        if self._installed_shapes is None:
+            # Read once per export, and only when a node uses a shape that is not built in
+            self._installed_shapes = installed_node_shapes(self._hfs_prefix)
+        shape = self._installed_shapes.get(shape_name)
+        if shape is not None:
+            self.custom_shapes[shape_name] = shape
 
     def register_user_icon(self, node, icon_id):
         """Extracts an SVG string only if the icon belongs to a user-authored custom HDA or external file."""
@@ -787,6 +908,7 @@ def serialize_network(net, state, selected_only=False):
             icon_id = it.type().icon()
             shape_name = it.userData("nodeshape") or it.type().defaultShape() or "rect"
             extractor.register_user_icon(it, icon_id)
+            extractor.register_custom_shape(shape_name)
 
             parms = []
             layout = collect_parm_layout(it)

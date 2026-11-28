@@ -14,12 +14,39 @@
       "type": "object",
       "additionalProperties": { "type": "string" }
     },
-    "customShapes": { "type": "object", "additionalProperties": { "type": "object" } },
+    "customShapes": {
+      "description": "Custom node shapes the exported nodes use, keyed by the node's `shape` name: the drawing data of a Houdini `config/NodeShapes/*.json` file. Never the 36 built-in shapes, never file paths.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/nodeShape" }
+    },
     "exportWarnings": { "description": "Parameters the exporter could not read (schema 1.4.0).", "type": "integer", "minimum": 0 },
     "root": { "$ref": "#/$defs/graph" }
   },
   "$defs": {
     "vec2": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2 },
+    "shapePoints": { "type": "array", "items": { "$ref": "#/$defs/vec2" } },
+    "shapeSlots": {
+      "type": "array",
+      "items": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }], "minItems": 3 }
+    },
+    "nodeShape": {
+      "description": "A node shape in Houdini's shape space: x from 0 to 1, y from 0 to 0.3, +y up. `flags` has the slots \"0\" to \"3\", `inputs` and `outputs` are [x, y, angle] connector slots, `icon` is the icon box [min, max].",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "outline": { "$ref": "#/$defs/shapePoints" },
+        "flags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": { "outline": { "$ref": "#/$defs/shapePoints" }, "edge": { "$ref": "#/$defs/shapePoints" } }
+          }
+        },
+        "inputs": { "$ref": "#/$defs/shapeSlots" },
+        "outputs": { "$ref": "#/$defs/shapeSlots" },
+        "icon": { "$ref": "#/$defs/shapePoints" }
+      }
+    },
     "rgb": {
       "type": "array",
       "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }],
