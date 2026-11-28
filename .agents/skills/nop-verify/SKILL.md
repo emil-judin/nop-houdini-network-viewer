@@ -10,7 +10,9 @@ description: >-
 Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands with `;`).
 
 1. `npm.cmd run check`: strict TypeScript for `src/` and the tests.
-2. `npm.cmd run lint`: ESLint (TypeScript, React hooks, JSX accessibility).
+2. `npm.cmd run lint`: ESLint (TypeScript, React hooks, JSX accessibility, and the AGENTS.md rules it enforces,
+   [decision 0017](../../../docs/decisions/0017-corrections-become-checks.md)). Fix what a rule asks for; never
+   disable a rule inline or add an exception to `eslint.config.js` without the owner's agreement.
 3. `npm.cmd test`: Vitest unit and component tests (`tests/unit`, `tests/component`).
 4. `npm.cmd run test:exporter`: exporter tests with the fake `hou` (Python 3.9+, standard library). For a change
    in `exporter/` (outside `exporter/tests/`), also `npm.cmd run test:exporter:houdini` before committing: the same
@@ -26,5 +28,8 @@ Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands w
 9. Git: the work is on the issue's branch (`<issue>-<topic>`, branched from `main`) and stays inside the issue's
    scope. Commit subjects follow `type(area): summary` (AGENTS.md section 5); `npm.cmd run lint:commits` checks
    the branch's commits against `main`. The pull request body ends with `Closes #<issue>`.
+
+When the owner or a review corrects the same kind of mistake twice, propose a check for it (a lint rule, a type
+or a test) instead of a new line in AGENTS.md.
 
 Report failures with their output. Never mark a step as passed that was not run.
