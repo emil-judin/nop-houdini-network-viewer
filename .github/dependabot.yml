@@ -5,6 +5,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: "build(deps)"
     groups:
       # TypeScript and ESLint move together with the lint plugins that support them, all update
       # types in one pull request each. A new major (TypeScript 7, ESLint 10) can wait there with
@@ -33,3 +35,5 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: "ci(deps)"

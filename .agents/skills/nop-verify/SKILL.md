@@ -21,7 +21,10 @@ Run from the repository root (Windows PowerShell: `npm.cmd`, separate commands w
    `npx playwright install`). It builds and serves everything itself. On a busy machine run one browser
    with `--project=chromium`, or fewer workers with `--workers=1`.
 7. No en or em dashes in docs, comments or UI strings.
-8. Add user-visible changes to `CHANGELOG.md` "Unreleased" (one line each), update `docs/ROADMAP.md`, and add a
-   record in `docs/decisions/` for a lasting decision.
+8. Add user-visible changes to `CHANGELOG.md` "Unreleased" (one line each), and add a record in
+   `docs/decisions/` for a lasting decision.
+9. Git: the work is on the issue's branch (`<issue>-<topic>`, branched from `main`) and stays inside the issue's
+   scope. Commit subjects follow `type(area): summary` (AGENTS.md section 5); `npm.cmd run lint:commits` checks
+   the branch's commits against `main`. The pull request body ends with `Closes #<issue>`.
 
 Report failures with their output. Never mark a step as passed that was not run.

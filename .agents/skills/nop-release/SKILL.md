@@ -7,6 +7,9 @@ description: >-
 
 # Release NOP
 
+0. Issues: tester releases ship what is done. For the public release, every issue listed under "Next" in
+   `docs/ROADMAP.md` is closed, or the owner agreed to leave it open. Work on the branch `release/<version>`
+   from `main`.
 1. Run the full definition of done (`.agents/skills/nop-verify/SKILL.md`), including the browser tests.
 2. Version: bump `package.json` `version` (pre-releases: `0.x.y-alpha.n`). The exporter zip, the README of the
    Houdini package and the feedback form read it from there.
@@ -18,7 +21,7 @@ description: >-
 6. npm releases only (Milestone 4): set `PUBLISHED_ON_NPM = true` in `src/examplePage/embedPanel.ts` and drop
    the "not on npm yet" notes from the README and `example-site.html`; build with `npm.cmd run build:lib`, then `npm.cmd run sri` and
    publish the `web-component.js` hash in the README and CHANGELOG.
-7. Release: commit steps 2 to 6 on main, then push the tag `v<version>`, only when the owner says so. The
+7. Release: commit steps 2 to 6 as `chore(release): <version>`, merge into main, then push the tag `v<version>`, only when the owner says so. The
    workflow `.github/workflows/release.yml` publishes the GitHub release: notes from the CHANGELOG section,
    `nop-exporter.zip` attached, pre-release for versions with a suffix. It stops if the tag does not match the
    `package.json` version or the CHANGELOG has no section for it; then fix main, delete the tag
