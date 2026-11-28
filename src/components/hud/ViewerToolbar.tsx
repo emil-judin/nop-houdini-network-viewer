@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Download, LoaderCircle, Map as MapIcon, Maximize2, Minimize2 } from 'lucide-react';
+import { Camera, Download, LoaderCircle, Map as MapIcon, Maximize2, Minimize2, Search } from 'lucide-react';
 import type { HoudiniNetworkDocument, HoudiniWireStyle } from '../../schema/types';
 import { downloadBlob } from '../downloadFile';
 import { TOUCH_TARGET } from './touchTarget';
@@ -55,6 +55,10 @@ export interface ViewerToolbarProps {
   isFullscreen?: boolean;
   /** Callback to toggle fullscreen mode. */
   onToggleFullscreen?: () => void;
+  /** Whether the node search field is open. */
+  searchOpen?: boolean;
+  /** Opens or closes the node search (also `/`); without it there is no search button. */
+  onToggleSearch?: () => void;
 }
 
 /**
@@ -62,7 +66,7 @@ export interface ViewerToolbarProps {
  * possible: the network path bar fills the row, then the view tools. Viewers with room (448px and
  * wider) show the node count, the two wire styles, the overview, the screenshot and the optional
  * Download JSON as their own buttons; narrow viewers (phones) put wire style, overview and
- * screenshot into one settings menu. Fullscreen is always its own button. Fitting the network has
+ * screenshot into one settings menu. Find Node and fullscreen are always their own buttons. Fitting the network has
  * no button: H, or a double-click or double-tap on the empty canvas.
  */
 export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
@@ -80,6 +84,8 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
   showFullscreenButton = true,
   isFullscreen = false,
   onToggleFullscreen,
+  searchOpen = false,
+  onToggleSearch,
 }) => {
   const handleDownloadJson = () => {
     const baseName = networkPath.split('/').filter(Boolean).pop() || 'houdini-network';
@@ -94,6 +100,22 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
       {pathBar}
 
       <div role="toolbar" aria-label="View" className="shrink-0 flex items-center">
+        {/* Find Node on every width, so touch screens (no / key) can search too */}
+        {onToggleSearch && (
+          <>
+            <button
+              type="button"
+              onClick={onToggleSearch}
+              title={searchOpen ? 'Close node search (Esc)' : 'Find node (/)'}
+              aria-label="Find node"
+              aria-pressed={searchOpen}
+              className={toolButtonClass(searchOpen)}
+            >
+              <Search className="w-4 h-4" aria-hidden="true" />
+            </button>
+            <ToolSeparator />
+          </>
+        )}
         {/* Wide viewers: node count (where Houdini has its menus) and every tool as its own button */}
         <div className="hidden @md:flex items-center">
           <span className="px-1.5 text-[12px] text-[#b0b0b0] whitespace-nowrap">{nodeCount} nodes</span>

@@ -74,8 +74,9 @@ Feature: Navigate the network
   @e2e @NOP-NAV-009
   Scenario: Hotkeys with Ctrl, Cmd or Alt are left to the browser
     Given focus is inside the viewer
-    When the visitor presses Ctrl+F
-    Then the viewer does not frame anything
+    When the visitor presses Alt+F, or H or O with Ctrl, Cmd or Alt
+    Then the viewer does not frame, fit or show the overview, and the keys are not prevented
+    # Ctrl+F (Cmd+F) and Ctrl+G with focus inside the viewer belong to the node search (NOP-FIND-002)
 
   @e2e @mobile @NOP-NAV-010
   Scenario: Two fingers move the network on a scrolling page
