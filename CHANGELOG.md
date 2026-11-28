@@ -5,6 +5,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 ## Unreleased
 
 ### Changed
+- The exporter is now checked with Houdini 20.5.613 and 21.0.671 as well as 22.0.466: `npm run test:exporter:houdini` passes on all three, with no exporter changes needed.
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.
 
