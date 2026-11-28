@@ -24,7 +24,7 @@ The node label size is set by the page, not by visitors.
 
 ## Web component
 
-- **Data:** `src="my-network.json"` loads a file. A file on another site must allow cross-origin requests (CORS). The JSON can also be put inline, without an extra request:
+- **Data:** `src="my-network.json"` loads a file. A file on another site must allow cross-origin requests (see [Hosting the network file](#hosting-the-network-file)). The JSON can also be put inline, without an extra request:
 
   ```html
   <houdini-network style="height: 600px">
@@ -48,7 +48,61 @@ The [example page](https://emil-judin.github.io/nop-houdini-network-viewer/examp
 
 ## iframe page
 
-`https://<your-playground>/?embed=true&src=<URL-encoded https address>` shows one network full-page. The server of the `.json` file must allow cross-origin requests. Options are added as URL parameters, for example `&label-size=large&minimap=true&focus-node=transform1`.
+`https://<your-playground>/?embed=true&src=<URL-encoded https address>` shows one network full-page. The server of the `.json` file must allow cross-origin requests (see [Hosting the network file](#hosting-the-network-file)). Options are added as URL parameters, for example `&label-size=large&minimap=true&focus-node=transform1`.
+
+## Hosting the network file
+
+`src` on the web component, `RemoteHoudiniNetwork` and the iframe page all download the file the same way.
+
+### Files on another site (CORS)
+
+A file on the same site as the page needs no setup. For a file on another site, the browser only hands it to the viewer if that server answers with this header:
+
+```text
+Access-Control-Allow-Origin: *
+```
+
+`*` allows every site. To allow only your own page, send its origin instead, for example `Access-Control-Allow-Origin: https://www.example.com`. The viewer sends no cookies or logins to other sites, so it needs nothing else.
+
+To check a file, look at the headers its server sends:
+
+```sh
+curl -I https://example.com/my-network.json
+```
+
+The answer must contain an `Access-Control-Allow-Origin` line with `*` or your page's origin. Without it, the viewer shows "Could not download ... that server must allow cross-origin requests (CORS)".
+
+### Limits
+
+| Limit | Value | Set in `src/embed/fetchNetwork.ts` |
+| :--- | :--- | :--- |
+| File size | 100 MB. Larger files are refused before they freeze the visitor's tab; real exports are a few MB | `MAX_NETWORK_BYTES` |
+| Download time | 30 seconds, then the download is given up and the viewer asks to try again later | `NETWORK_TIMEOUT_MS` |
+
+Browsers without `AbortSignal.timeout` download without a time limit.
+
+### Where to host it
+
+- **GitHub Pages:** put the `.json` file in the repository that the site is built from. GitHub Pages sends `Access-Control-Allow-Origin: *`, so any page can load it, for example `src="https://<user>.github.io/<repo>/my-network.json"`.
+- **A raw GitHub file:** `raw.githubusercontent.com` also sends `Access-Control-Allow-Origin: *`, for example `src="https://raw.githubusercontent.com/<user>/<repo>/main/my-network.json"`. The repository must be public.
+- **Your own server:** add the header for `.json` files.
+  - Apache (`.htaccess` or the site configuration, needs `mod_headers`):
+
+    ```apache
+    <FilesMatch "\.json$">
+      Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+    ```
+
+  - nginx (inside the `server` block):
+
+    ```nginx
+    location ~* \.json$ {
+      add_header Access-Control-Allow-Origin "*";
+    }
+    ```
+
+If you cannot change the server's headers (a site builder or shared hosting), put the JSON inline in the page instead: see the inline `<script type="application/json">` under [Web component](#web-component), or pass it as `data` to `HoudiniNetwork` in React. Inline JSON needs no download, so CORS and the time limit do not apply.
 
 ## Phones
 
