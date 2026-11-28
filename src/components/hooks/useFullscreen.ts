@@ -18,7 +18,7 @@ function fullscreenElementFor(element: HTMLElement): Element | null {
  * Fullscreen for the viewer whose outer element is `containerRef`. Several viewers on one page
  * each keep their own state: only the viewer that is actually fullscreen switches its layout.
  */
-export function useFullscreen(containerRef: RefObject<HTMLElement>) {
+export function useFullscreen(containerRef: RefObject<HTMLElement | null>) {
   const [mode, setMode] = useState<FullscreenMode>('off');
 
   useEffect(() => {

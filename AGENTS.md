@@ -23,7 +23,7 @@ Every change must strictly follow our **6 Core Pillars**:
 
 ## 2. Tech Stack & Commands
 
-- **Framework:** React 18 + TypeScript (Strict) + `@xyflow/react` + Tailwind CSS + Vite
+- **Framework:** React 19 (React 18 stays supported) + TypeScript (Strict) + `@xyflow/react` + Tailwind CSS + Vite
 - **Houdini Exporter:** Python 3 (`hou` HOM API) inside `exporter/`
 - **Windows PowerShell Note:** On Windows PowerShell where script execution policy blocks `npm.ps1` and `&&` is unsupported in PS 5.1, invoke `npm.cmd` and separate commands with `;`.
 - **Install Dependencies:** `npm.cmd install`

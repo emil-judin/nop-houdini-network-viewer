@@ -90,7 +90,7 @@ export function PortfolioBreakdown() {
 }
 ```
 
-`react` and `react-dom` 18.2 or newer are peer dependencies. React 19 is not tested yet. [React Flow](https://reactflow.dev/) (`@xyflow/react` 12) renders the network and is installed with the package.
+`react` and `react-dom` 18.2 or newer (React 18 or 19) are peer dependencies. Development runs on React 19, and CI runs the unit and component tests on React 18 too. [React Flow](https://reactflow.dev/) (`@xyflow/react` 12) renders the network and is installed with the package.
 
 ### 3. iframe (not tested yet)
 
