@@ -10,10 +10,6 @@ Where NOP stands and where it is heading. Open work is in the [issues](https://g
 - **Browsers:** checked by the automated browser tests in Chromium, Firefox and WebKit, and in emulated phone and tablet profiles (Pixel 7, iPhone 14, iPad gen 7), and by hand on a physical iPhone 13 and iPad 11. Not checked in Safari on macOS or on a real Android phone yet.
 - **Example networks:** seven guided examples in `fixtures/examples/`, built in Houdini for the playground (the scene stays outside the repository: non-commercial license).
 
-## In progress
-
-- **Teaser video:** a short video for people who do not want to explore the playground right away.
-
 ## Next
 
 - **Public release:** what has to be done before NOP leaves the tester phase: [#43](https://github.com/emil-judin/nop-houdini-network-viewer/issues/43) public API, [#44](https://github.com/emil-judin/nop-houdini-network-viewer/issues/44) React 19, [#45](https://github.com/emil-judin/nop-houdini-network-viewer/issues/45) npm and jsDelivr, [#46](https://github.com/emil-judin/nop-houdini-network-viewer/issues/46) embedding guide, [#47](https://github.com/emil-judin/nop-houdini-network-viewer/issues/47) `noindex`, [#48](https://github.com/emil-judin/nop-houdini-network-viewer/issues/48) Prettier, [#49](https://github.com/emil-judin/nop-houdini-network-viewer/issues/49) Firefox test crash, [#50](https://github.com/emil-judin/nop-houdini-network-viewer/issues/50) Vite 8. Remove an entry here when its issue closes.

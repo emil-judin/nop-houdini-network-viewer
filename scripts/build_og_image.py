@@ -6,15 +6,14 @@ measures below are the banner's own pixels (icon 156 px); ``SCALE`` and ``ORIGIN
 the tagline ends before the web.
 
 Input: ``design/nop-icon/og-background.jpg`` (the web render without text, from the owner's Houdini
-project) and ``design/nop-icon/pack/nop-icon-cutout-512.png`` (run ``build_nop_icon_pack.py`` first).
-Output: ``design/nop-icon/pack/og-image.png`` and ``public/og-image.png``.
+project) and ``design/nop-icon/nop-icon-cutout-512.png`` (run ``build_nop_icon_pack.py`` first).
+Output: ``public/og-image.png``.
 
 Usage: ``python scripts/build_og_image.py`` (needs Pillow and the Noto Sans Bold font).
 """
 
 from __future__ import annotations
 
-import shutil
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -22,14 +21,13 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ICON_DIR = ROOT_DIR / "design" / "nop-icon"
 BACKGROUND = ICON_DIR / "og-background.jpg"
-ICON = ICON_DIR / "pack" / "nop-icon-cutout-512.png"
-OUT = ICON_DIR / "pack" / "og-image.png"
-PUBLIC_OUT = ROOT_DIR / "public" / "og-image.png"
+ICON = ICON_DIR / "nop-icon-cutout-512.png"
+OUT = ROOT_DIR / "public" / "og-image.png"
 FONT = "C:/Windows/Fonts/NotoSans-Bold.ttf"
 
 CARD = (1200, 630)
-SCALE = 0.70  # card lockup size relative to the banner lockup
-ORIGIN = (64, 278)  # top left corner of the icon on the card
+SCALE = 0.665  # card lockup size relative to the banner lockup; leaves the same gap between the tagline and the web as on the banner (about 0.75 icon heights)
+ORIGIN = (64, 281)  # top left corner of the icon on the card
 SUPER = 4  # the lockup is drawn 4x larger and scaled down, for smooth edges at any scale
 
 # Banner measures, relative to the top left corner of the icon
@@ -101,8 +99,7 @@ def main() -> None:
     lockup = draw_lockup()
     card.alpha_composite(lockup, ORIGIN)
     card.convert("RGB").save(OUT, format="PNG", optimize=True)
-    shutil.copy2(OUT, PUBLIC_OUT)
-    print(f"wrote {OUT} and {PUBLIC_OUT}; lockup {lockup.width}x{lockup.height} at {ORIGIN}")
+    print(f"wrote {OUT}; lockup {lockup.width}x{lockup.height} at {ORIGIN}")
 
 
 if __name__ == "__main__":
