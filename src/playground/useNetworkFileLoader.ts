@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { formatMegabytes, MAX_NETWORK_BYTES } from '../embed/fetchNetwork';
-import { normalizeNetworkDocument, type HoudiniNetworkDocument } from '../api';
+import { MAX_NETWORK_BYTES, normalizeNetworkDocument, type HoudiniNetworkDocument } from '../api';
+
+/** Readable size of the limit, such as `100 MB`. */
+const LIMIT_TEXT = `${Math.round(MAX_NETWORK_BYTES / (1024 * 1024))} MB`;
 
 /**
  * A network loaded by the user (opened, dropped or pasted).
@@ -54,7 +56,7 @@ export function useNetworkFileLoader(onLoad: (network: LoadedNetwork) => void): 
 
   const loadText = useCallback((text: string, sourceName: string) => {
     if (text.length > MAX_NETWORK_BYTES) {
-      setError(`${sourceName} is larger than ${formatMegabytes(MAX_NETWORK_BYTES)}, which is more than the viewer can show.`);
+      setError(`${sourceName} is larger than ${LIMIT_TEXT}, which is more than the viewer can show.`);
       return;
     }
     try {
@@ -71,7 +73,7 @@ export function useNetworkFileLoader(onLoad: (network: LoadedNetwork) => void): 
     (file: File) => {
       // Checked before reading, so a huge file never has to be loaded into memory
       if (file.size > MAX_NETWORK_BYTES) {
-        setError(`${file.name} is larger than ${formatMegabytes(MAX_NETWORK_BYTES)}, which is more than the viewer can show.`);
+        setError(`${file.name} is larger than ${LIMIT_TEXT}, which is more than the viewer can show.`);
         return;
       }
       file.text().then(

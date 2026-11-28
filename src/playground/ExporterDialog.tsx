@@ -1,7 +1,7 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 import packageJson from '../../package.json';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 import { PlaygroundDialog } from './PlaygroundDialog';
 
 /** Built into `public/downloads/` by `scripts/build_exporter_package.mjs`, relative to the page (works from a sub-path). */

@@ -31,22 +31,18 @@ export default tseslint.config(
     },
   },
   {
-    // The playground uses the package like a React user: through `src/api.ts`. The exceptions below
-    // are playground helpers and dev tools, each a known gap in the public API, not a free pass.
+    // The playground uses the package like a React user: through `src/api.ts`, with no exceptions
+    // (decision 0010).
     files: ['src/playground/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
-          // Regular expressions, because `group` negations do not work with `../` paths. Allowed:
-          // the tap target size shared with the viewer's buttons, the loading and error states of a
-          // network that is not on screen yet, the icon registry for bundling the Labs icons up front,
-          // and the size limit for files a visitor opens.
+          // A regular expression, because `group` patterns do not match `../` paths reliably
           patterns: [
             {
-              regex:
-                '^\\.\\./(schema/|index$|web-component$|components/(?!hud/(touchTarget|NetworkErrorState|NetworkLoadingState)$|nodes/icons/)|embed/(?!fetchNetwork$))',
-              message: 'The playground uses the package through its public API: import from ../api. Exceptions are listed in eslint.config.js.',
+              regex: '^\\.\\./(schema|components|embed|styles)/|^\\.\\./(index|web-component)$',
+              message: 'The playground uses the package through its public API: import from ../api.',
             },
           ],
         },

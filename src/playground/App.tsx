@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ClipboardPaste, FileUp, Network } from 'lucide-react';
-import { HoudiniNetwork, type HoudiniNetworkDocument } from '../api';
-import { NetworkErrorState } from '../components/hud/NetworkErrorState';
-import { NetworkLoadingState } from '../components/hud/NetworkLoadingState';
-import { TOUCH_TARGET, TOUCH_TARGET_COMPACT } from '../components/hud/touchTarget';
-import { registerLabsIcons } from '../components/nodes/icons/iconRegistry';
-import { LABS_BUILTIN_ICON_ALIASES, LABS_ICONS } from '../components/nodes/icons/labs';
+import { HoudiniNetwork, NetworkErrorState, NetworkLoadingState, type HoudiniNetworkDocument } from '../api';
+import { TOUCH_TARGET, TOUCH_TARGET_COMPACT } from './touchTarget';
 import { AboutBlock } from './AboutBlock';
 import { EmbedHintCard, EmbedHintStrip, useEmbedHint } from './EmbedHint';
 import { AVAILABLE_EXAMPLES, exampleNodeCount, findExample, loadExample, type PlaygroundExample } from './examples';
@@ -17,10 +13,6 @@ import { FEEDBACK_ACCESS_KEY } from './sendFeedback';
 import { useMediaQuery } from './useMediaQuery';
 import { useNetworkFileLoader, type LoadedNetwork } from './useNetworkFileLoader';
 import { WelcomeDialog } from './WelcomeDialog';
-
-// The playground shows Labs tools in its examples, so it bundles their
-// drawings up front (embeds load them on demand, see `loadLabsIcons`)
-registerLabsIcons(LABS_ICONS, LABS_BUILTIN_ICON_ALIASES);
 
 type ExampleState = { status: 'loading' } | { status: 'ready'; doc: HoudiniNetworkDocument } | { status: 'error'; message: string };
 

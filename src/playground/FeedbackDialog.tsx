@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 import { PlaygroundDialog } from './PlaygroundDialog';
 import { sendFeedback } from './sendFeedback';
 

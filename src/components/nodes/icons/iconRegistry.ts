@@ -122,7 +122,7 @@ let labsLoading: Promise<void> | null = null;
 /**
  * Registers the SideFX Labs drawings. `aliases` maps Labs base types that Houdini draws with a
  * built-in SOP icon to that icon's id. Called by `loadLabsIcons`, or directly by code that bundles
- * the Labs drawings anyway (the playground).
+ * the Labs drawings anyway (tests).
  */
 export function registerLabsIcons(defs: readonly OperatorIconDef[], aliases: Readonly<Record<string, string>>): void {
   if (labsLoaded) return;

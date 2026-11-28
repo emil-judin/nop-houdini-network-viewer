@@ -44,6 +44,9 @@ The [example page](https://emil-judin.github.io/nop-houdini-network-viewer/examp
 - `HoudiniNetwork` takes the network as `data`.
 - `RemoteHoudiniNetwork` loads it from a URL: `<RemoteHoudiniNetwork src="/my-network.json" />`.
 - Both take the props above, plus `onNodeSelect` (called with the selected node, or `null`) and `className`.
+- `NetworkLoadingState` (optional `message`) and `NetworkErrorState` (`message`, optional `title`, `hint` and `action`) are the viewer's own loading and error panels, for an app that loads the network itself.
+- `MAX_NETWORK_BYTES` is the largest file the viewer reads (100 MB): check it before reading a file a visitor opens.
+- `normalizeNetworkDocument` checks and repairs a network file before it is drawn; the schema types (`HoudiniNetworkDocument` and others) describe the result.
 - `nop-houdini-network-viewer/style.css` does not reset the page; its classes only style the viewer.
 
 ## iframe page

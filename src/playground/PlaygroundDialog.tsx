@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 
 /**
  * Props for the playground's modal dialog frame (`PlaygroundDialog`).
