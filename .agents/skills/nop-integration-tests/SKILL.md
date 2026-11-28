@@ -36,7 +36,8 @@ Pure single-function logic belongs in `tests/unit/` and is not the goal here.
      playground on the public API), `vitest.config.ts`, `playwright.config.ts`.
    - List the public interfaces of the area:
      - Library API: everything exported from `src/api.ts` (types, converter, `HoudiniNetwork`,
-       `RemoteHoudiniNetwork`, `parseEmbedOptions`) and the props each component accepts.
+       `RemoteHoudiniNetwork`, `parseEmbedOptions`, `NetworkLoadingState`, `NetworkErrorState`,
+       `MAX_NETWORK_BYTES`) and the props each component accepts.
      - Web component: `src/web-component.ts`, its attributes and events (`src/embed/embedAttributes.ts`).
      - Pages: the playground and the `?embed=true` page (what a visitor can do there).
      - Exporter: the functions the shelf tools and dialogs in `exporter/package/` call, and the JSON it

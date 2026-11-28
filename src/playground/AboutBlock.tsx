@@ -1,6 +1,6 @@
 import React from 'react';
 import { CircleHelp, Code2, Download, MessageSquare } from 'lucide-react';
-import { TOUCH_TARGET_COMPACT } from '../components/hud/touchTarget';
+import { TOUCH_TARGET_COMPACT } from './touchTarget';
 import { EXAMPLE_SITE_PAGE } from './examples';
 import { PlaygroundBanner } from './PlaygroundBanner';
 

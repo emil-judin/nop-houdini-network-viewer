@@ -1,6 +1,6 @@
 import React from 'react';
 import { PanelLeftClose, PanelLeftOpen, type LucideIcon } from 'lucide-react';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 import { PaneTabStrip } from './PaneTabStrip';
 
 /** One network the visitor can show: a demo, their own file or the icon overview. */

@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { parseEmbedOptions, RemoteHoudiniNetwork } from '../api';
+import { NetworkErrorState, NetworkLoadingState, parseEmbedOptions, RemoteHoudiniNetwork } from '../api';
 import { findExample, loadExample } from './examples';
-import { NetworkErrorState } from '../components/hud/NetworkErrorState';
-import { NetworkLoadingState } from '../components/hud/NetworkLoadingState';
 
 
 /**

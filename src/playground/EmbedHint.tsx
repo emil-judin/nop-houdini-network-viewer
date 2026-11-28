@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Code2, X } from 'lucide-react';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 import websiteScreenshot from './assets/embed-hint/website.jpg';
 import { EXAMPLE_SITE_PAGE } from './examples';
 

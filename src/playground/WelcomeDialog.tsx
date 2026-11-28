@@ -1,6 +1,6 @@
 import React from 'react';
 import { BookOpen, Code2, Download, Eye, FileUp, Lock, Network } from 'lucide-react';
-import { TOUCH_TARGET } from '../components/hud/touchTarget';
+import { TOUCH_TARGET } from './touchTarget';
 import { EXAMPLE_SITE_PAGE } from './examples';
 import { PlaygroundBanner } from './PlaygroundBanner';
 import { PlaygroundDialog } from './PlaygroundDialog';
