@@ -3,8 +3,26 @@ import { expect, test, type Page } from '@playwright/test';
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
+/**
+ * Works around a Firefox crash (#49): with Playwright 1.65 (Firefox 159), the page crashes when
+ * page script reads `ariaLabelledByElements` of an element that Playwright's own scripts have also
+ * read it on (always after `getByRole` with a name, sometimes after other locators). Each side alone
+ * is fine. Axe reads that property when it exists and uses the
+ * `aria-labelledby` attribute otherwise, so the property is hidden from the page before a scan.
+ * Playwright's own scripts still see it. Upstream: microsoft/playwright#43967 (Mozilla bug
+ * 2090055), fixed by a later Firefox build on Playwright main. Remove this once a Playwright
+ * release with that build is in use.
+ */
+async function avoidFirefoxAriaReflectionCrash(page: Page) {
+  if (page.context().browser()?.browserType().name() !== 'firefox') return;
+  await page.evaluate(() => {
+    Object.defineProperty(Element.prototype, 'ariaLabelledByElements', { configurable: true, get: () => undefined });
+  });
+}
+
 /** Serious and critical axe violations of the current page, as readable lines. */
 async function seriousViolations(page: Page): Promise<string[]> {
+  await avoidFirefoxAriaReflectionCrash(page);
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   return results.violations
     .filter((violation) => violation.impact === 'serious' || violation.impact === 'critical')
@@ -107,6 +125,7 @@ test.describe('phones and tablets', () => {
 
 /** Axe violations of one rule on the current page, as readable lines. */
 async function ruleViolations(page: Page, rule: string): Promise<string[]> {
+  await avoidFirefoxAriaReflectionCrash(page);
   const results = await new AxeBuilder({ page }).withRules([rule]).analyze();
   return results.violations.flatMap((violation) => violation.nodes.map((n) => `${violation.id}: ${n.target.join(' ')}`));
 }
