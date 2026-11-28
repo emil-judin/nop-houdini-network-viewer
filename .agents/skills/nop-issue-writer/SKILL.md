@@ -121,7 +121,7 @@ then `## Done when`. Add sections only when they hold facts.
 - NOP version: `package.json`, shown in the playground's status bar ("Playground 0.1.0-alpha.9", "Exporter
   ..."). For unreleased code, the commit: `git rev-parse --short HEAD`.
 - Houdini version and schema: an export's `houdiniVersion` and `schemaVersion` fields. The exporter is
-  checked with Houdini 22.0; 20.5 and 21 are not checked yet.
+  checked with Houdini 20.5, 21 and 22.
 - CI failures: the run link from `gh pr checks <n>` or `gh run view <id> --log-failed`, and the
   package versions from the pull request.
 

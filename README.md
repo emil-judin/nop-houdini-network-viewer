@@ -34,7 +34,7 @@ Alpha, tester release. The npm package is not published yet. The JSON format and
 
 | | Checked | Not checked yet |
 | :--- | :--- | :--- |
-| Houdini | 22.0.466 | 20.5, 21 |
+| Houdini | 20.5.613, 21.0.671, 22.0.466 | 20.0 and earlier |
 | Network types | SOP | VOP, LOP, TOP, DOP |
 | Desktop browsers | Chromium, Firefox and WebKit (automated browser tests) | Safari on macOS |
 | Phones and tablets | Emulated Pixel 7, iPhone 14 and iPad (gen 7) (automated browser tests) | Real devices: Safari on iOS and iPadOS, Chrome on Android |

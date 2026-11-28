@@ -11,6 +11,7 @@ Supported Houdini versions: see [Compatibility](../README.md#compatibility).
    - Windows: `Documents\houdini22.0\packages`
    - macOS: `~/Library/Preferences/houdini/22.0/packages`
    - Linux: `~/houdini22.0/packages`
+   - For Houdini 20.5 or 21, use `houdini20.5` or `houdini21.0` (`20.5` or `21.0` on macOS) instead of `houdini22.0`.
 3. Copy `nop.json` and the `nop` folder from the zip into it.
 4. Restart Houdini. The **NOP** shelf tab appears at the top. If it does not, click the **+** next to the shelf tabs and choose **Shelves > NOP**.
 
