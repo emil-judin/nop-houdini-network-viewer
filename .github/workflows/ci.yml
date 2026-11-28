@@ -56,6 +56,22 @@ jobs:
           node-version-file: .nvmrc
       - run: node scripts/lint_commits.mjs origin/${{ github.base_ref }}
 
+  # Development runs React 19, and the peer range still allows React 18: run the unit and component
+  # tests on React 18 as well. Without builds, the tests that check the built files skip themselves.
+  react-18:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save react@18 react-dom@18 @types/react@18 @types/react-dom@18
+      # `npm ls` would report these versions as invalid against package.json, so check them directly
+      - run: node -e "for (const p of ['react', 'react-dom']) { const v = require(p + '/package.json').version; console.log(p, v); if (!v.startsWith('18.')) process.exit(1); }"
+      - run: npm test
+
   browser:
     needs: verify
     runs-on: ubuntu-latest

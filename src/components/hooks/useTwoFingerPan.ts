@@ -21,7 +21,7 @@ const HINT_MS = 2500;
  *
  * @returns `true` while the viewer should show the "use two fingers" hint.
  */
-export function useTwoFingerPan(rootRef: RefObject<HTMLElement>, enabled: boolean): boolean {
+export function useTwoFingerPan(rootRef: RefObject<HTMLElement | null>, enabled: boolean): boolean {
   const [hintVisible, setHintVisible] = useState(false);
 
   useEffect(() => {

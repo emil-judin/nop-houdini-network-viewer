@@ -14,7 +14,7 @@ export type HotkeyMode = 'focus' | 'hover' | 'off';
  * this viewer and returns `true` when it handled it. It may change on every render.
  */
 export function useViewerHotkeys(
-  rootRef: RefObject<HTMLElement>,
+  rootRef: RefObject<HTMLElement | null>,
   mode: HotkeyMode,
   onKey: (event: KeyboardEvent) => boolean,
 ) {
