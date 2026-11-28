@@ -66,7 +66,7 @@ A task is finished only when `check`, `lint`, `build` and `build:lib` pass, the 
 
 ## 4. Security & Privacy Rules
 
-The viewer renders untrusted JSON, and the exporter writes files people publish. Never weaken these:
+The viewer renders untrusted JSON, and the exporter writes files people publish. Never weaken these. `npm run lint` enforces the HTML, `eval` and request rules below and the `rem` and portal rules of section 3 ([decision 0017](./docs/decisions/0017-corrections-become-checks.md)); a new exception goes into `eslint.config.js` only with the owner's agreement:
 
 - No `dangerouslySetInnerHTML`, `innerHTML` or `eval` for anything that comes from a network file. Custom SVG icons are shown only through `<img>` data URIs (`svgDataUri.ts`).
 - Every network file goes through `normalizeNetworkDocument` (`src/schema/normalize.ts`) before it is drawn. Look up file-provided maps (icons, custom shapes) with `Object.hasOwn`.
@@ -110,6 +110,7 @@ Open work lives in [GitHub issues](https://github.com/emil-judin/nop-houdini-net
 
 ## 6. Continuity & On-Demand Skills
 
+- **Corrections become checks:** when the same mistake is corrected twice, propose a lint rule, a type or a test instead of another line here. Comments that describe a workaround link the issue that tracks its fix (`#123`); the lint fails otherwise.
 - **Before starting work:** Find or propose the issue and branch as in section 5. Read the "Unreleased" section of [CHANGELOG.md](./CHANGELOG.md), and [docs/ROADMAP.md](./docs/ROADMAP.md) when the direction matters.
 - **While working:** When the scope or the plan changes, say so in a comment on the issue (`gh issue comment <n>`) after the owner agrees, so the issue stays the record of what was decided.
 - **After completing a task:** Add user-visible changes to "Unreleased" in [CHANGELOG.md](./CHANGELOG.md) (one line each) and write a decision record for anything a later change should not silently undo. The pull request closes the issue (`Closes #<issue>`); do not close issues by hand. Do not keep a separate progress log.
