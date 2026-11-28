@@ -6,6 +6,7 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
+- For contributors: `npm run lint` now enforces the security and style rules of AGENTS.md (no HTML from network files, no portals, `px` instead of `rem`, requests only in reviewed files, workaround comments link an issue) ([decision 0017](docs/decisions/0017-corrections-become-checks.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.
 
 ### Removed
