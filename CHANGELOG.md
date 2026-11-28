@@ -4,6 +4,9 @@ Notable changes to NOP. Versions follow [Semantic Versioning](https://semver.org
 
 ## Unreleased
 
+### Added
+- The embedding guide (`docs/EMBEDDING.md`) explains hosting the network file: the `Access-Control-Allow-Origin` header a server on another site must send and how to check it with `curl -I`, the 100 MB and 30 second download limits, examples for GitHub Pages, raw GitHub files, Apache and nginx, and inline JSON for pages that cannot change their server.
+
 ### Changed
 - Planned work and bugs are tracked in [GitHub issues](https://github.com/emil-judin/nop-houdini-network-viewer/issues) instead of the roadmap's checklists. Every change starts from an issue, branches are named `<issue>-<topic>`, and commits follow Conventional Commits with NOP's areas as scope, checked by `npm run lint:commits` and in CI ([decision 0016](docs/decisions/0016-issues-branches-and-commit-names.md)).
 - The link preview lockup (icon, name and tagline) is a bit smaller, so the tagline keeps the same distance from the spider web as on the README banner.
